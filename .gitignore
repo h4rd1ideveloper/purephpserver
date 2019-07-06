@@ -140,4 +140,5 @@ modules.xml
 
 # Sonarlint plugin
 
+debug.log
 # End of https://www.gitignore.io/api/phpstorm,phpstorm+all
