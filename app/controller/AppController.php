@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '.\..\controller\Controller.php';
-require_once __DIR__ . '.\..\model\User.php';
+require_once __DIR__ . './../controller/Controller.php';
+require_once __DIR__ . './../model/User.php';
 
 /**
  * Class AppController
@@ -11,7 +11,7 @@ final class AppController extends Controller {
      *
      */
     public static function index() {
-        echo json_encode( Router::getRequest() );
+        //echo json_encode( Router::getRequest() );
         return self::view('index');
     }
 

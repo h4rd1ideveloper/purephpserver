@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '.\..\routes\index.php';
+require_once __DIR__ . './../routes/index.php';
 
 
 /**
@@ -12,7 +12,7 @@ abstract class Controller {
      * @param array $vars
      */
     protected final function view(string $_name, array $vars = []) {
-        $_filename = __DIR__.".\..\\view\\".$_name.".php";
+        $_filename = __DIR__."./../view/".$_name.".php";
 
         if(!file_exists($_filename))
             die("View {$_name} not found!");

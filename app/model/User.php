@@ -15,6 +15,7 @@ class User {
     }
 
     /**
+     * Return all users in $_SESSION['users']
      * @return mixed
      */
     public function listAll() {

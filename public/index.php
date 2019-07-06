@@ -1,7 +1,7 @@
 <?php
 
-require_once __DIR__ . '.\..\app\routes\index.php';
-require_once __DIR__ . '.\..\app\controller\AppController.php';
+require_once __DIR__ . './../app/routes/index.php';
+require_once __DIR__ . './../app/controller/AppController.php';
 
 $app = new Router();
 /** @var TYPE_NAME $app */
