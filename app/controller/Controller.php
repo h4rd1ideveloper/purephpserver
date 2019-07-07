@@ -11,35 +11,26 @@ abstract class Controller {
      * @param string $_name
      * @param array $vars
      */
-    protected final function view(string $_name, array $vars = []) {
-        $_filename = __DIR__."./../view/".$_name.".php";
-
-        if(!file_exists($_filename))
-            die("View {$_name} not found!");
-
-        include_once $_filename;
+    protected final function view(string $_name, array $vars = []):void {
+        !file_exists( sprintf("%s./../view/%s.php", __DIR__, $_name) ) && die("View {$_name} not found!");
+        include_once ( sprintf("%s./../view/%s.php", __DIR__, $_name) );
     }
 
     /**
      * @param string $name
-     * @return |null
+     * @return \http\Params |null
      */
-    protected final function params(string $name) {
-        $params = Router::getRequest();
-
-        if(!isset($params[$name]))
-            return null;
-        return $params[$name];
+    protected final function params(string $name): string {
+        return !( isset( Router::getRequest()[$name] ) ) ? null : Router::getRequest()[$name];
     }
 
     /**
      * @param string $to
      */
-    protected final function redirect(string $to) {
-        $url = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
+    protected final function redirect(string $to): void {
+        $url = sprintf("%s://%s", isset($_SERVER['HTTPS']) ? 'https' : 'http', $_SERVER['HTTP_HOST']);
         $folders = explode('?', $_SERVER['REQUEST_URI'])[0];
-
-        header('Location:' . $url . $folders . '?r=' . $to);
+        header(sprintf("Location:%s%s?r=%s", $url, $folders, $to));
         exit();
     }
 }

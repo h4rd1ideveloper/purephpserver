@@ -61,12 +61,8 @@ class Router {
     public function run () {
         $method = strtolower($_SERVER['REQUEST_METHOD']) ?? 'get';
         $route = $_GET['r'] ?? '/';
-        
-        if(!isset($this->routes[$method]))
-            die('405 Method not allowed');
-        if(!isset($this->routes[$method][$route]))
-            die('404 Error');
-        
+        !isset($this->routes[$method]) && die('405 Method not allowed');
+        !isset($this->routes[$method][$route]) && die('404 Error');
         self::$params = $this->getParams($method);
         die( $this->routes[$method][$route]() );
     }
