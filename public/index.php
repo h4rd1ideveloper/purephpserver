@@ -1,24 +1,24 @@
 <?php
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: *");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+
 
 require_once __DIR__ . './../app/routes/index.php';
 require_once __DIR__ . './../app/controller/AppController.php';
 
 $app = new Router();
-/** @var TYPE_NAME $app */
-$app->get('/', function () {
-    return AppController::index();
+
+$app->post('/send', function () {
+    return json_encode( AppController::readXLSXWriteHTML(), JSON_UNESCAPED_UNICODE );
 });
-/** @var TYPE_NAME $app */
-$app->get('/list', function () {
-    return AppController::list();
+$app->get('/', function (){
+    return  AppController::index();
 });
-/** @var TYPE_NAME $app */
-$app->post('/list', function () {
-    return AppController::write();
+$app->post('/insert', function (){
+    return json_encode( AppController::insert() , JSON_UNESCAPED_UNICODE );
 });
-/** @var TYPE_NAME $app */
-$app->get('/out', function () {
-    return AppController::logout();
+$app->get('/teste', function(){
+    return json_encode(array("ok"), JSON_UNESCAPED_UNICODE );
 });
-//echo __DIR__;
 $app->run();

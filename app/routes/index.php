@@ -1,7 +1,9 @@
 <?php
-
+header("Access-Control-Allow-Origin: *");
 /**
  * Class Router
+ * @method post(string $string, Closure $param)
+ * @method get(string $string, Closure $param)
  */
 class Router {
     /* armazenamento das rotas e dos parâmetros atuais do HTTP */
@@ -9,16 +11,21 @@ class Router {
      * @var array
      */
     private $routes = [];
+    public function debugger(){
+        return json_encode($this->routes);
+    }
     /**
      * @var array
      */
     private static $params = [];
+
+    private static $files = [];
     /**
      * verifica se método chamado é GET ou POST
      * @param string $method
      * @return bool
      */
-    private function validate(string $method) {
+    private function validate($method) {
         return in_array($method, ['get', 'post']);
     }
 
@@ -40,11 +47,13 @@ class Router {
      * @param array $args
      * @return bool
      */
-    public function __call(string $method, array $args) {
+    public function __call($method, array $args) {
         $method = strtolower($method);
         if(!$this->validate($method))
             return false;
-        [$route, $action] = $args;
+        //[$route, $action] = $args;
+        $route = $args[0];
+        $action = $args[1];
         if(!isset($action) or !is_callable($action))
             return false;
         
@@ -59,11 +68,12 @@ class Router {
      * finalizando a aplicação exibindo o seu retorno (a resposta do Controller).
      */
     public function run () {
-        $method = strtolower($_SERVER['REQUEST_METHOD']) ?? 'get';
-        $route = $_GET['r'] ?? '/';
+        $method = strtolower($_SERVER['REQUEST_METHOD']) ? strtolower($_SERVER['REQUEST_METHOD']): 'get';
+        $route = isset( $_SERVER['REQUEST_URI']) ? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) : '/';//$_SERVER['REQUEST_URI']
         !isset($this->routes[$method]) && die('405 Method not allowed');
         !isset($this->routes[$method][$route]) && die('404 Error');
         self::$params = $this->getParams($method);
+        self::$files = $this->getFiles();
         die( $this->routes[$method][$route]() );
     }
 
@@ -73,14 +83,29 @@ class Router {
      * @param string $method
      * @return mixed
      */
-    private function getParams(string $method) {
+    private function getParams($method) {
         if($method == 'get')
             return $_GET;
-        return $_POST;
+        return json_decode( file_get_contents("php://input"), true); //$_POST;
+    }
+    /**
+     * Acessa a variavel global $_FILES
+     * enviados pelo cliente.
+     */
+    private function getFiles(){
+        return $_FILES ? $_FILES : null;
     }
 
     /**
-     *  Getter para que controlador possa pegar os dados da requisição do cliente
+     *  Getter para que controlador possa pegar os dados da requisição do cliente [$_FILES]
+     * @return array
+     */
+    public static function getRequestFile() {
+        return self::$files;
+    }
+
+    /**
+     *  Getter para que controlador possa pegar os dados da requisição do cliente [$_GET | $_POST]
      * @return array
      */
     public static function getRequest() {

@@ -25,7 +25,7 @@ class User {
     /**
      * @param string $name
      */
-    public function createNew(string $name) {
+    public function createNew($name) {
         $_SESSION['users'][] = $name;
     }
 
