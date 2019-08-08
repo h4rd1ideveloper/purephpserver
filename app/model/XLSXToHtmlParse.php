@@ -3,6 +3,7 @@
 require_once __DIR__ . './../assets/lib/SimpleXLSX.php';
 require_once __DIR__ . './../assets/lib/Helpers.php';
 require_once  __DIR__ . './Dao.php';
+require_once  __DIR__ . '../.env.php';
 
 class XLSXToHtmlParse
 {
@@ -24,7 +25,7 @@ class XLSXToHtmlParse
      */
     public function XLSXinsert($row)
     {
-        $db_ = new Dao("suporteRBM02", "RBMsuporte03","crefazscm_webscm", "mysql", null, "177.184.16.61");
+        $db_ = new Dao(DB_USER_PRODUCTION, DB_PASS_PRODUCTION,DB_PASS_PRODUCTION, DB_TYPE_PRODUCTION, null, DB_HOST_PRODUCTION);
         $res = false;
         if($db_->connect()) {
             $res = $db_->insert($row['table'], $row['values'], $row['fields']);
