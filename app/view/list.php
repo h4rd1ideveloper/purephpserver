@@ -1,18 +1,22 @@
 
-<section>
-    <h1>Users</h1>
-    <a href="?r=/out">Reset</a>
-</section>
+<table class="table table-striped table-hover" >
+    <thead>
+    <tr>
+        <th scope="col">Nº do cliente</th>
+        <th scope="col">Digito Verificador</th>
+        <th scope="col">Data Baixa</th>
+        <th scope="col">Correlativo</th>
+        <th scope="col">Tipo Doc</th>
+    </tr>
+    </thead>
+    <tbody>
 
-<form action="?r=/list" method="POST">
-    <label for="user">User: </label>
-    <input type="text" name="user" id="user"/>
-    <button>Send</button>
-</form>
-
-<small><?php echo count($vars['users']) ?> users.</small>
-<ul>
-    <?php foreach ($vars['users'] as $user): ?>
-        <li><?php echo $user ?></li>
-    <?php endforeach ?>
-</ul>
+    <tr>
+        <th scope="row">...</th>
+        <td id="a1">...</td>
+        <td id="a2">...</td>
+        <td id="a3">...</td>
+        <td id="a4">...</td>
+    </tr>
+    </tbody>
+</table>

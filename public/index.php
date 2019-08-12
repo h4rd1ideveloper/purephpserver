@@ -1,24 +1,24 @@
 <?php
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: *");
-header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+/**
+ * Setup imports
+ */
 
+use App\assets\lib\Helpers\Helpers;
 
+require_once __DIR__.'./../app/assets/lib/Helpers.php';
+require_once __DIR__.'./../app/routes/routes.php';
 require_once __DIR__ . './../app/routes/index.php';
-require_once __DIR__ . './../app/controller/AppController.php';
-
+/***
+ * Setup config
+ */
+Helpers::cors();
 $app = new Router();
+/**
+ * setup routes closures
+ */
+$app->post('/send', $routes['xlsxToHtml']);
+$app->get('/',  $routes['indexView']);
+$app->post('/insert', $routes['insertToXlsx']);
+$app->get('/teste', $routes['teste']);
 
-$app->post('/send', function () {
-    return json_encode( AppController::readXLSXWriteHTML(), JSON_UNESCAPED_UNICODE );
-});
-$app->get('/', function (){
-    return  AppController::index();
-});
-$app->post('/insert', function (){
-    return json_encode( AppController::insert() , JSON_UNESCAPED_UNICODE );
-});
-$app->get('/teste', function(){
-    return json_encode(array("ok"), JSON_UNESCAPED_UNICODE );
-});
 $app->run();

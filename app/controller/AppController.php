@@ -22,4 +22,7 @@ final class AppController extends Controller {
     {
         return (new XLSXToHtmlParse())->XLSXtoJSON( $_FILES["fileToUpload"]["tmp_name"] );
     }
+    public static function listTableToJson(){
+        return (new XLSXToHtmlParse())->listTable();
+    }
 }

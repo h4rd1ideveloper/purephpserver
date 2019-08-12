@@ -1,0 +1,60 @@
+Arguments: 
+  C:\Program Files\nodejs\node.exe C:\Users\RBM_20\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js add jquery
+
+PATH: 
+  C:\Program Files\JetBrains\PhpStorm 2019.1.3\jbr\\bin;C:\Program Files\JetBrains\PhpStorm 2019.1.3\jbr\\bin\server;C:\xampp\php\php.exe;C:\xampp\php;C:\Program Files (x86)\Intel\iCLS Client\;C:\Program Files\Intel\iCLS Client\;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files\Git\cmd;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\nodejs\;C:\Program Files\PuTTY\;C:\ProgramData\ComposerSetup\bin;C:\Users\RBM_20\AppData\Local\Programs\Microsoft VS Code\bin;C:\xampp\php\php.exe;C:\Program Files\JetBrains\DataGrip 2019.1.4\bin;;C:\Program Files\JetBrains\PhpStorm 2019.1.3\bin;;C:\Users\RBM_20\AppData\Local\Microsoft\WindowsApps;C:\Users\RBM_20\AppData\Roaming\npm;C:\Users\RBM_20\AppData\Roaming\Composer\vendor\bin
+
+Yarn version: 
+  1.17.3
+
+Node version: 
+  10.16.0
+
+Platform: 
+  win32 x64
+
+Trace: 
+  Error: getaddrinfo ENOTFOUND registry.yarnpkg.com registry.yarnpkg.com:443
+      at GetAddrInfoReqWrap.onlookup [as oncomplete] (dns.js:56:26)
+
+npm manifest: 
+  {
+    "name": "view",
+    "version": "0.1.0",
+    "private": true,
+    "homepage": "http://h4rd1ideveloper.github.io/view",
+    "dependencies": {
+      "axios": "^0.19.0",
+      "react": "^16.8.6",
+      "react-dom": "^16.8.6",
+      "react-scripts": "^3.0.1",
+      "xlsx": "^0.14.3"
+    },
+    "scripts": {
+      "start": "react-scripts start",
+      "build": "react-scripts build",
+      "test": "react-scripts test",
+      "eject": "react-scripts eject"
+    },
+    "eslintConfig": {
+      "extends": "react-app"
+    },
+    "browserslist": {
+      "production": [
+        ">0.2%",
+        "not dead",
+        "not op_mini all"
+      ],
+      "development": [
+        "last 1 chrome version",
+        "last 1 firefox version",
+        "last 1 safari version"
+      ]
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

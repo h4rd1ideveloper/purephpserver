@@ -1,8 +1,17 @@
 <?php
 
-
+namespace App\assets\lib\Helpers;
 class Helpers
 {
+    public static function teste(){
+        echo "ok";
+    }
+    public static function cors($timeLimit = 0){
+        header("Access-Control-Allow-Origin: *");
+        header("Access-Control-Allow-Headers: *");
+        header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+        set_time_limit($timeLimit);
+    }
     public static function cut_and_format_date_from_XLSX_to_Ymd($string_date, $start_cut = 0, $end_cut = 10, $search = "/", $replace = "-") {
         /*
          * Por algum motivo não consegui utilizar o str_replace na cadeia de funções

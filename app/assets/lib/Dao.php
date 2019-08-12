@@ -1,5 +1,4 @@
 <?php
-//srequire_once ('./vendor/autoload.php');
 error_reporting(E_ALL | E_STRICT);
 ini_set('display_errors', 'On');
 define("DB_type", "mysql");
@@ -7,13 +6,11 @@ define("DB_HOST", "localhost");
 define("DB_USER", "root");
 define("DB_PASS", "");
 define("DB_NAME", "crefazscm_webscm");
-
-require_once __DIR__ . './QueryBuilder.php';
-
+require_once __DIR__.'./QueryBuilder.php';
 class Dao extends QueryBuilder
 {
     /**
-     * @var PDO
+     * @var \PDO
      */
     private $_db;
     /**
@@ -56,6 +53,7 @@ class Dao extends QueryBuilder
      * @var array|object|bool
      */
     private $result = false;
+
     /**
      * Construtor
      * __construct e seus parametretros *opcionais
@@ -78,29 +76,29 @@ class Dao extends QueryBuilder
         $this->_db_path = $db_path;
         $this->_db_type = $db_type;
 
-        switch($this->_db_type)
-        {
+        switch ($this->_db_type) {
             case "mysql":
-                $this->_connection_string = sprintf(/** @lang text*/"mysql:host=%s;dbname=%s", $db_host, $db_name);
+                $this->_connection_string = sprintf(/** @lang text */ "mysql:host=%s;dbname=%s", $db_host, $db_name);
                 break;
             case "sqlite":
-                $this->_connection_string = sprintf(/** @lang text */"sqlite:%s", $db_path);
+                $this->_connection_string = sprintf(/** @lang text */ "sqlite:%s", $db_path);
                 break;
             case "oracle":
-                $this->_connection_string = sprintf(/** @lang text*/"OCI:dbname=%s;charset=UTF-8", $db_name);
+                $this->_connection_string = sprintf(/** @lang text */ "OCI:dbname=%s;charset=UTF-8", $db_name);
                 break;
             case "dblib":
-                $this->_connection_string = sprintf(/** @lang text */"dblib:host=%s;dbname=%s", $db_host, $db_name);
+                $this->_connection_string = sprintf(/** @lang text */ "dblib:host=%s;dbname=%s", $db_host, $db_name);
                 break;
             case "postgresql":
-                $this->_connection_string = sprintf(/** @lang text*/"pgsql:host=%s dbname=%s", $db_host, $db_name);
+                $this->_connection_string = sprintf(/** @lang text */ "pgsql:host=%s dbname=%s", $db_host, $db_name);
                 break;
             case "sqlsrv":
-                $this->_connection_string = sprintf(/** @lang text */"sqlsrv:Server=%s;Database=%s", $db_host, $db_name);
+                $this->_connection_string = sprintf(/** @lang text */ "sqlsrv:Server=%s;Database=%s", $db_host, $db_name);
                 break;
         }
         return $this;
     }
+
     /**
      * Connect
      *
@@ -122,6 +120,7 @@ class Dao extends QueryBuilder
             return true;
         }
     }
+
     /**
      * Disconecta ($con==false)
      *
@@ -136,59 +135,38 @@ class Dao extends QueryBuilder
         }
         return !$this->_con;
     }
-    /**
-     * @param $table
-     * @return bool|string
-     */
-    private function tableExists($table) {
-        $q = parent::querySelect($table);
-        $this->numResults = null;
-        try {
-            $sql = $this->_db->prepare($q);
-            $sql->execute();
-            $this->result = $sql->fetchAll(PDO::FETCH_OBJ);
-            $this->numResults = count($this->result);
-            if ($this->numResults === 0) {
-                $this->numResults = null;
-            }
-            return true;
-        }
-        catch (PDOException $e) {
-            return sprintf("%s%s", $e->getMessage(), $e->getTraceAsString());
-        }
-    }
+
     /**
      * Select
      *
-     * @param string $table     tabela
-     * @param string $columns   colunas
-     * @param string $join      Junção
-     * @param string $where     Condicional
-     * @param string $order     Ordenação
-     * @param integer $limit    limit
+     * @param string $table tabela
+     * @param string $columns colunas
+     * @param string $join Junção
+     * @param string $where Condicional
+     * @param string $order Ordenação
+     * @param integer $limit limit
      *
      * @return mixed True ou getMessage()
      */
     public function select($table, $columns = "*", $join = null, $where = null, $order = null, $limit = null)
     {
-        if ($this->tableExists($table)) {
-            $q = parent::querySelect($table,$columns,$join,$where,$order,$limit);
-            $this->numResults = null;
-            try {
-                $sql = $this->_db->prepare($q);
-                $sql->execute();
-                $this->result = $sql->fetchAll(PDO::FETCH_OBJ);
-                $this->numResults = count($this->result);
-                if ($this->numResults === 0) {
-                    $this->numResults = null;
-                }
-                return true;
-            } catch (PDOException $e) {
-                return $e->getMessage().''.$e->getTraceAsString().'';
+
+        $q = parent::querySelect($table, $columns, $join, $where, $order, $limit);
+        $this->numResults = null;
+        try {
+            $sql = $this->_db->prepare($q);
+            $sql->execute();
+            $this->result = $sql->fetchAll(PDO::FETCH_ASSOC);
+            $this->numResults = count($this->result);
+            if ($this->numResults === 0) {
+                $this->numResults = null;
             }
+            return true;
+        } catch (PDOException $e) {
+            return $e->getMessage() . '' . $e->getTraceAsString() . '';
         }
-        return false;
     }
+
     /**
      * Resultado da query
      * select ou insert??'';
@@ -199,6 +177,7 @@ class Dao extends QueryBuilder
     {
         return $this->result;
     }
+
     /**
      * Numero de Linhas
      * Afetadas pela Query Ou nº Resultados
@@ -222,20 +201,42 @@ class Dao extends QueryBuilder
     public function update($table, $where, $value)
     {
         if ($this->tableExists($table)) {
-           $q = parent::queryUpdate($table, $value, $where);
+            $q = parent::queryUpdate($table, $value, $where);
             $this->numResults = null;
             try {
                 $sql = $this->_db->prepare($q);
                 $sql->execute();
                 $this->result = $sql->fetchAll(PDO::FETCH_ASSOC);
                 $this->numResults = count($this->result);
-                $this->numResults === 0 ? $this->result = null : true ;
+                $this->numResults === 0 ? $this->result = null : true;
                 return true;
             } catch (PDOException $e) {
-                return $e->getMessage().''.$e->getTraceAsString().'';
+                return $e->getMessage() . '' . $e->getTraceAsString() . '';
             }
         }
         return false;
+    }
+
+    /**
+     * @param $table
+     * @return bool|string
+     */
+    private function tableExists($table)
+    {
+        $q = parent::querySelect($table);
+        $this->numResults = null;
+        try {
+            $sql = $this->_db->prepare($q);
+            $sql->execute();
+            $this->result = $sql->fetchAll(PDO::FETCH_OBJ);
+            $this->numResults = count($this->result);
+            if ($this->numResults === 0) {
+                $this->numResults = null;
+            }
+            return true;
+        } catch (PDOException $e) {
+            return sprintf("%s%s", $e->getMessage(), $e->getTraceAsString());
+        }
     }
 
     /**
@@ -251,9 +252,8 @@ class Dao extends QueryBuilder
             $ins = $this->_db->prepare($insert);
             $ins->execute();
             return true;
-        }
-        catch (PDOException $e) {
-            return $e->getMessage().''.$e->getTraceAsString().'';
+        } catch (PDOException $e) {
+            return $e->getMessage() . '' . $e->getTraceAsString() . '';
         }
     }
 
@@ -265,9 +265,9 @@ class Dao extends QueryBuilder
      */
     public function delete($table, $where)
     {
-        $deleteQ =  parent::keyAndValue(
+        $deleteQ = parent::keyAndValue(
             sprintf(
-                /**@lang text*/
+            /**@lang text */
                 'DELETE FROM %s',
                 $table
             ),
@@ -279,9 +279,8 @@ class Dao extends QueryBuilder
             $del = $this->_db->prepare($deleteQ);
             $del->execute();
             return true;
-        }
-        catch (PDOException $e) {
-            return $e->getMessage().''.$e->getTraceAsString().'';
+        } catch (PDOException $e) {
+            return $e->getMessage() . '' . $e->getTraceAsString() . '';
         }
     }
 }

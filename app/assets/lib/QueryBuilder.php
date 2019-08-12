@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Manager query String
  */
@@ -83,7 +82,7 @@ class QueryBuilder
         if (!is_array($join) && $join !== null) {
             $q .= $join;
         } else {
-            $q .= sprintf(" %s %s on ", $join['type'], $join['table']);
+            $join && $q .= sprintf(" %s %s on ", $join['type'], $join['table']);
             if (!is_array($join['on'])) {
                 $q .= sprintf(" %s ", $join['on']);
             } else {

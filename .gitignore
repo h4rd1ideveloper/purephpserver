@@ -56,7 +56,9 @@ out/
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
-
+node_modules/
+**/node_modules/
+**/node_modules/**
 # JIRA plugin
 atlassian-ide-plugin.xml
 
@@ -145,3 +147,4 @@ modules.xml
 
 debug.log
 # End of https://www.gitignore.io/api/phpstorm,phpstorm+all
+/vendor/
