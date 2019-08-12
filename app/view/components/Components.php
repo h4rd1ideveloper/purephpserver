@@ -1,4 +1,5 @@
 <?php
+
 namespace App\view\components;
 class Components
 {
@@ -11,5 +12,25 @@ class Components
                 </div>
             </div>
         ', $text);
+    }
+
+    public static function table($data)
+    {
+
+        $html = '<table class="table table-striped table-hover" ><thead><tr> ';
+        foreach ($data[0] as $key){
+            $html .= sprintf('<th scope="col">%s</th>', $key);
+        }
+        $html .= '</tr></thead><tbody>';
+        foreach ($data as $index => $row)  {
+            $html .= '<tr>';
+            $header = 0;
+            foreach ($row as $key => $value) {
+                $html .=(0 === $header++)? sprintf('<th scope ="row" > %s</th >', $value):sprintf('<td>%s</td>', $value);
+            }
+            $html .= '</tr >';
+        }
+        $html .= '</tbody></table>';
+        echo $html;
     }
 }

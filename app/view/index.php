@@ -6,7 +6,6 @@ use App\view\components\Components;
 include_once __DIR__ . './Header.php';
 require_once __DIR__ . './components/Components.php';
 Components::centredTextH1('Verificação de Arrecadações Não processadas');
-Helpers::teste();
 ?>
 <div class="row">
     <div class="col-8 mx-auto">

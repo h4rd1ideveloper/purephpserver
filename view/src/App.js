@@ -14,7 +14,7 @@ function App() {
                     let index = 1;
                     const veri = toVerify.slice(Number((42416 - 3)), toVerify.length);
                     for (const k of veri) {
-                        console.log(updateProgress(index, veri.length), index, veri.length)
+                        console.log(updateProgress(index, veri.length), index, veri.length);
                         yield await (
                             (
                                 await axios.post('http://localhost:8080/insert',
@@ -37,7 +37,7 @@ function App() {
 
             }
         }
-        , [isLoaded, toVerify])
+        , [isLoaded, toVerify]);
 
     return (
         <>
