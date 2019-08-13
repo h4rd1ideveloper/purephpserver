@@ -15,12 +15,15 @@ final class AppController extends Controller {
         //echo json_encode( Router::getRequest() );
         self::view('index');
     }
+    public static function consiliar(){
+        return (new XLSXToHtmlParse())->checkInTable(parent::request() );
+    }
     public static function insert(){
         return (new XLSXToHtmlParse())->XLSXinsert(parent::request() );
     }
-    public static function readXLSXWriteHTML()
+    public static function readXLSXWriteHTML() :void
     {
-        return (new XLSXToHtmlParse())->XLSXtoJSON( $_FILES["fileToUpload"]["tmp_name"] );
+        self::view('list', (new XLSXToHtmlParse('suporteRBM02','RBMsuporte03','crefazscm_webscm','mysql','','177.184.16.61'))->XLSXtoJSON( $_FILES["fileToUpload"]["tmp_name"] ) );
     }
     public static function listTableToJson(){
         return (new XLSXToHtmlParse())->listTable();

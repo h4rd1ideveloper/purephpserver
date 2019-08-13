@@ -1,8 +1,5 @@
 <?php
 
-use App\assets\lib\Helpers\Helpers;
-use App\view\components\Components;
-
 include_once __DIR__ . './Header.php';
 require_once __DIR__ . './components/Components.php';
 Components::centredTextH1('Verificação de Arrecadações Não processadas');

@@ -118,6 +118,7 @@ class SimpleXLSX {
 	const SCHEMA_REL_SHAREDSTRINGS = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings';
 	const SCHEMA_REL_WORKSHEET = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet';
 	const SCHEMA_REL_STYLES = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles';
+	public $_fid = array();
 	public static $CF = array( // Cell formats
 		0  => 'General',
 		1  => '0',
@@ -165,7 +166,16 @@ class SimpleXLSX {
 		68 => 't0.00%',
 		69 => 't# ?/?',
 		70 => 't# ??/??',
-	);
+
+        71 => 'dd-mm-yy',
+        72 => 'dd-mm-Y',
+        73 => 'dd-mm-yyyy',
+
+        74 => 'mm-dd-yy',
+        75 => 'mm-dd-Y',
+        76 => 'mm-dd-yyyy',
+
+    );
 	public $cellFormats = array();
 	public $datetimeFormat = 'Y-m-d H:i:s';
 	public $skipEmptyRows = false;
@@ -524,6 +534,10 @@ class SimpleXLSX {
 										if ( isset( $v['@attributes']['numFmtId'] ) ) {
 											$v = $v['@attributes'];
 											$fid = (int) $v['numFmtId'];
+											$this->_fid[] = $fid;
+											$this->_fid[]['nf'] = $nf;
+											$this->_fid[]['cf'] = self::$CF;
+											//var_dump($fid);
 											if ( isset( self::$CF[ $fid ] ) ) {
 												$v['format'] = self::$CF[ $fid ];
 											} else if ( isset( $nf[ $fid ] ) ) {

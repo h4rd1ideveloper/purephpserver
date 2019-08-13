@@ -9,6 +9,11 @@ define("DB_NAME", "crefazscm_webscm");
 require_once __DIR__.'./QueryBuilder.php';
 class Dao extends QueryBuilder
 {
+    public function __destruct()
+    {
+       self::disconnect();
+    }
+
     /**
      * @var \PDO
      */
@@ -150,7 +155,6 @@ class Dao extends QueryBuilder
      */
     public function select($table, $columns = "*", $join = null, $where = null, $order = null, $limit = null)
     {
-
         $q = parent::querySelect($table, $columns, $join, $where, $order, $limit);
         $this->numResults = null;
         try {

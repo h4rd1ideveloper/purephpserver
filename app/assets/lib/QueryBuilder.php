@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Manager query String
  */
@@ -28,9 +29,9 @@ class QueryBuilder
                 $value
             );
         } else {
-            $q .= self::keyAndValue($q, $value, ',', true);
+            $q = self::keyAndValue($q, $value, ',', true);
         }
-        $q .=
+        $q =
             /** @lang text */
             " WHERE " . self::keyAndValue($q, $where, 'and', true);
         return $q;
@@ -79,19 +80,21 @@ class QueryBuilder
             $columns,
             $table
         );
-        if (!is_array($join) && $join !== null) {
-            $q .= $join;
-        } else {
-            $join && $q .= sprintf(" %s %s on ", $join['type'], $join['table']);
-            if (!is_array($join['on'])) {
-                $q .= sprintf(" %s ", $join['on']);
+        if ($join !== null) {
+            if (!is_array($join)) {
+                $q .= $join;
             } else {
-                $q .= self::keyAndValue($q, $join['on']);
+                $join && $q .= sprintf(" %s %s on ", $join['type'], $join['table']);
+                if (!is_array($join['on'])) {
+                    $q .= sprintf(" %s ", $join['on']);
+                } else {
+                    $q = self::keyAndValue($q, $join['on']);
+                }
             }
         }
         if ($where != null) {
             $q .= "WHERE ";
-            $q .= self::keyAndValue($q, $where);
+            $q = self::keyAndValue($q, $where, 'and', true);
         }
         if ($order != null) {
             $q .= sprintf(" ORDER BY %s ", $order);

@@ -9,19 +9,23 @@ require_once __DIR__ . './../controller/AppController.php';
  */
 $routes = [
     'xlsxToHtml' =>
-        function () {
-            return json_encode(AppController::readXLSXWriteHTML(), JSON_UNESCAPED_UNICODE);
+        function (): void {
+            AppController::readXLSXWriteHTML();
         },
     'indexView' =>
         function () {
             return AppController::index();
         },
     'insertToXlsx' =>
-        function () {
+        function (): string {
             return json_encode(AppController::insert(), JSON_UNESCAPED_UNICODE);
+        },
+    'consiliar' =>
+        function(){
+            return json_encode(AppController::consiliar(), JSON_UNESCAPED_UNICODE);
         },
     'teste' =>
         function () {
-            return json_encode(AppController::listTableToJson(), JSON_UNESCAPED_UNICODE);
+            var_dump(AppController::listTableToJson());
         }
 ];
