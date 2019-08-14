@@ -1,7 +1,7 @@
 <?php
-require_once __DIR__ . './../controller/Controller.php';
-require_once __DIR__ . './../model/User.php';
-require_once __DIR__ . './../model/XLSXToHtmlParse.php';
+require_once  './../controller/Controller.php';
+require_once  './../model/User.php';
+require_once  './../model/XLSXToHtmlParse.php';
 
 /**
  * Class AppController

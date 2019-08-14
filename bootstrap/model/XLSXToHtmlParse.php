@@ -1,9 +1,9 @@
 <?php
 
-require_once __DIR__ . './../assets/lib/SimpleXLSX.php';
-require_once __DIR__ . './../assets/lib/Helpers.php';
-require_once __DIR__ . './../assets/lib/Dao.php';
-require_once __DIR__.'./../assets/config/const.php';
+require_once  './../assets/lib/SimpleXLSX.php';
+require_once  './../assets/lib/Helpers.php';
+require_once  './../assets/lib/Dao.php';
+require_once './../assets/config/const.php';
 class XLSXToHtmlParse extends Dao
 {
     public function __construct($production = false)

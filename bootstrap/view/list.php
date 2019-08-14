@@ -1,6 +1,6 @@
 <?php
-include_once __DIR__ . './Header.php';
-require_once __DIR__ . './components/Components.php';
+include_once  './Header.php';
+require_once  './components/Components.php';
 
 ?>
 <div class="row mb-5">

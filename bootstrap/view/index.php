@@ -1,7 +1,7 @@
 <?php
 
-include_once __DIR__ . './Header.php';
-require_once __DIR__ . './components/Components.php';
+include_once  './Header.php';
+require_once  './components/Components.php';
 Components::centredTextH1('Verificação de Arrecadações Não processadas');
 ?>
 <div class="row">
@@ -75,5 +75,5 @@ include_once __DIR__ . './Scripts.php';
 </script>
 
 <?php
-include_once __DIR__ . './Footer.php';
+include_once  './Footer.php';
 ?>

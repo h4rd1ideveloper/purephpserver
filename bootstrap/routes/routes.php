@@ -2,8 +2,8 @@
 /**
  * Setup imports
  */
-require_once __DIR__ . './../model/XLSXToHtmlParse.php';
-require_once __DIR__ . './../controller/AppController.php';
+require_once  './../model/XLSXToHtmlParse.php';
+require_once  './../controller/AppController.php';
 /**
  * Setup Object routes closures
  */
