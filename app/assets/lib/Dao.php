@@ -15,7 +15,7 @@ class Dao extends QueryBuilder
     }
 
     /**
-     * @var \PDO
+     * @var \PDO $_db DB
      */
     private $_db;
     /**

@@ -8,11 +8,8 @@ require_once __DIR__ . './../model/XLSXToHtmlParse.php';
  * @see Controller
  */
 final class AppController extends Controller {
-    /**
-     *
-     */
+    
     public static function index() {
-        //echo json_encode( Router::getRequest() );
         self::view('index');
     }
     public static function consiliar(){
@@ -23,7 +20,7 @@ final class AppController extends Controller {
     }
     public static function readXLSXWriteHTML() :void
     {
-        self::view('list', (new XLSXToHtmlParse('suporteRBM02','RBMsuporte03','crefazscm_webscm','mysql','','177.184.16.61'))->XLSXtoJSON( $_FILES["fileToUpload"]["tmp_name"] ) );
+        self::view('list', (new XLSXToHtmlParse(true))->XLSXtoJSON( $_FILES["fileToUpload"]["tmp_name"] ) );
     }
     public static function listTableToJson(){
         return (new XLSXToHtmlParse())->listTable();
