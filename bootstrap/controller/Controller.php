@@ -1,6 +1,6 @@
 <?php
 
-require_once './../routes/index.php';
+require_once __DIR__ . './../routes/index.php';
 
 
 /**
@@ -12,8 +12,8 @@ abstract class Controller {
      * @param array $vars
      */
     protected static final function view( $_name, array $vars = []) {
-        !file_exists( sprintf("./../view/%s.php",  $_name) ) && die("View {$_name} not found!");
-        include_once ( sprintf("./../view/%s.php",  $_name) );
+        !file_exists( sprintf("%s./../view/%s.php", __DIR__, $_name) ) && die("View {$_name} not found!");
+        include_once ( sprintf("%s./../view/%s.php", __DIR__, $_name) );
     }
     /**
      * @param string $name

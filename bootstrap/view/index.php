@@ -1,8 +1,8 @@
 <?php
 
-include_once  './Header.php';
-require_once  './components/Components.php';
-Components::centredTextH1('Verificação de Arrecadações Não processadas');
+include_once __DIR__ . './Header.php';
+require_once __DIR__ . './components/Components.php';
+Components::centredTitle('Verificação de Arrecadações Não processadas');
 ?>
 <div class="row">
     <div class="col-8 mx-auto">
@@ -75,5 +75,5 @@ include_once __DIR__ . './Scripts.php';
 </script>
 
 <?php
-include_once  './Footer.php';
+include_once __DIR__ . './Footer.php';
 ?>

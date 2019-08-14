@@ -1,14 +1,15 @@
 <?php
 
-require_once  './../assets/lib/SimpleXLSX.php';
-require_once  './../assets/lib/Helpers.php';
-require_once  './../assets/lib/Dao.php';
-require_once './../assets/config/const.php';
+require_once __DIR__ . './../assets/lib/SimpleXLSX.php';
+require_once __DIR__ . './../assets/lib/Helpers.php';
+require_once __DIR__ . './../assets/lib/Dao.php';
+require_once __DIR__ . './../assets/config/const.php';
+
 class XLSXToHtmlParse extends Dao
 {
     public function __construct($production = false)
     {
-        if($production){
+        if ($production) {
             parent::__construct(
                 PRODUCTION_DB_USER,
                 PRODUCTION_DB_PASS,
@@ -17,7 +18,7 @@ class XLSXToHtmlParse extends Dao
                 null,
                 PRODUCTION_DB_HOST
             );
-        }else{
+        } else {
             parent::__construct();
         }
 
@@ -37,39 +38,67 @@ class XLSXToHtmlParse extends Dao
      * }) : false;
      * });
      */
-    public function checkInTable($params)
+    public function checkInTable($params): array
     {
-
-        $params['source'] = json_decode($params['source'], true);
+        /**
+         * Setup
+         */
+        $params['source'] = json_decode($params['source'], true);//Decode string json to array
         $source = $params['source'];
-
+        //container
+        $formatted_source = [];
+        //Ids results
+        $finds = [];
+        $notFinds = [];
+        //Insert Header to the front of array
+        $arrFind = [$params['source'][0]];
+        $arrNotFind = [$params['source'][0]];
+        //Remove any row that not is a array
         $source = array_filter($source, function ($value) {
-            return is_array($value) ?
-                array_filter($value, function ($inside) {
-                    return !($inside == "");
-                }) : false;
+            return is_array($value);
         });
+        //Remove dont used fields
         $fields = array_filter($params, function ($value) {
             return !is_array($value) ? !($value === 'Não utilizado' || $value === "") : false;
         });
-
+        //Each source
         for ($k = 0; $k < count($source); $k++) {
+            //Skip Header
             if ($k != 0) {
+                //Fix keys and values from source to formatted_source
                 for ($i = 0; $i < count($source[0]); $i++) {
-                    if ($source[0][$i] != "" && $source[$k][$i] != "") {
-                        $formated_source[$k][$source[0][$i]] = $source[$k][$i];
+                    if ($source[0][$i] != "" && $source[$k][$i] != "") { // skip empty
+                        $formatted_source[$k][$source[0][$i]] = $source[$k][$i];
                     }
                 }
             }
         }
-        for ($index = 1; $index <= count($formated_source) ; $index++) {
-            foreach ($fields as $key =>$value){
-                isset($formated_source[$index][$value]) && $toVerify[($index -1)][$key] = Helpers::formatValueByKey($formated_source[$index][$value], $key);
+        for ($index = 1; $index <= count($formatted_source); $index++) {
+            //Fix key and values of the array to verify
+            foreach ($fields as $key => $value) {
+                isset($formatted_source[$index][$value]) && $toVerify[($index - 1)][$key] = Helpers::formatValueByKey($formatted_source[$index][$value], $key);
             }
-
+            //Check ir current row exist in Database
+            parent::select('enel_arrecadacao', '*', null, $toVerify[($index - 1)]);
+            //put result on correct array
+            if (parent::getNumResults()) {
+                $finds[] = $index;
+            } else {
+                $notFinds[] = $index;
+            }
         }
-
-        return parent::querySelect('enel_arrecadacao','*',null, $toVerify[1]);
+        //Insert Another rows
+        foreach ($params['source'] as $i => $row) {
+            if (in_array($i, $finds)) {
+                $arrFind[] = $row;
+            } elseif ($i) {
+                $arrNotFind[] = $row;
+            }
+        }
+        return [
+            'find' => $arrFind,
+            'notFind' => $arrNotFind
+        ];
     }
 
     public function listTable()

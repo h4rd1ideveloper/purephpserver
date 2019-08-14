@@ -1,6 +1,6 @@
 <?php
-include_once  './Header.php';
-require_once  './components/Components.php';
+include_once __DIR__ . './Header.php';
+require_once __DIR__ . './components/Components.php';
 
 ?>
 <div class="row mb-5">
@@ -16,7 +16,7 @@ require_once  './components/Components.php';
 </div>
 <div class="row">
     <div class="col-12 mx-auto">
-        <section style="overflow-x: scroll;max-width: 100%!important;">
+        <section style="overflow-x: scroll;max-width: 100%!important;max-height: 400px!important">
             <?php
             Components::table($vars['xlsx'] ?? [['...', '...'], ['..', '..'], ['..', '..'], ['..', '..']]);
             ?>

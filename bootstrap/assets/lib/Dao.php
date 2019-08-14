@@ -6,7 +6,7 @@ define("DB_HOST", "localhost");
 define("DB_USER", "root");
 define("DB_PASS", "");
 define("DB_NAME", "crefazscm_webscm");
-require_once './QueryBuilder.php';
+require_once __DIR__.'./QueryBuilder.php';
 class Dao extends QueryBuilder
 {
     public function __destruct()
