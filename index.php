@@ -2,16 +2,16 @@
 error_reporting(E_ALL | E_STRICT);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
+ini_set('memory_limit', '1024M');
 /**
  * Setup imports
  */
-require_once __DIR__ . './app/assets/lib/Helpers.php';
-require_once __DIR__ . './app/routes/routes.php';
-require_once __DIR__ . './app/routes/index.php';
+require_once __DIR__ . './bootstrap/assets/lib/Helpers.php';
+require_once __DIR__ . './bootstrap/routes/routes.php';
+require_once __DIR__ . './bootstrap/routes/index.php';
 /***
  * Setup config
  */
-ini_set('memory_limit', '1024M');
 Helpers::cors();
 $app = new Router();
 /**

@@ -8,7 +8,7 @@
 .app/.env.php
 **/.env.php
 */.env.php
-app/.env.php
+bootstrap/.env.php
 # User-specific stuff
 .idea/**/workspace.xml
 .idea/**/tasks.xml
@@ -47,9 +47,9 @@ cmake-build-*/
 
 # Mongo Explorer plugin
 .idea/**/mongoSettings.xml
- app/view/node_modules/
- app/view/node_modules/*
-  ./app/view/node_modules/**
+ bootstrap/view/node_modules/
+ bootstrap/view/node_modules/*
+  bootstrap/view/node_modules/**
    **/app/view/node_modules/
 
 # File-based project format
