@@ -2,8 +2,7 @@
 /**
  * Setup imports
  */
-require_once  './../model/XLSXToHtmlParse.php';
-require_once  './../controller/AppController.php';
+require_once  '../controller/AppController.php';
 /**
  * Setup Object routes closures
  */
