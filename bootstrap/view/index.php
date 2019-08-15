@@ -7,7 +7,7 @@ Components::centredTitle('Verificação de Arrecadações Não processadas');
     <div class="col-8 mx-auto">
         <div class="d-flex flex-column justify-content-center"
              style=" border-radius:8px;  background-color: rgba(0,0,0,0.1);-webkit-backdrop-filter: blur(20px);backdrop-filter: blur(20px);">
-            <form id="form" class="form-group form-group  w-50 mx-auto p-3 rounded" action='/send' method='get'
+            <form id="form" class="form-group form-group  w-50 mx-auto p-3 rounded" action='/send' method='POST'
                   enctype='multipart/form-data'>
                 <div class="form-group">
                     <label class='btn btn-dark mx-auto text-center h2 w-100' for='fileToUpload'>Selecione a planilha

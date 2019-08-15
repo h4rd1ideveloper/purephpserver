@@ -18,11 +18,11 @@ $app = new Router();
  * setup routes closures
  */
 $app->debugger();
-$app->get('/send', $routes['xlsxToHtml']);
+$app->post('/send', $routes['xlsxToHtml']);
 $app->get('/', $routes['indexView']);
-$app->get('/insert', $routes['insertToXlsx']);
+$app->post('/insert', $routes['insertToXlsx']);
 $app->get('/teste', $routes['teste']);
-$app->get('/consiliar', $routes['consiliar']);
+$app->post('/consiliar', $routes['consiliar']);
 $app->debugger();
 $app->run();
 $app->debugger();

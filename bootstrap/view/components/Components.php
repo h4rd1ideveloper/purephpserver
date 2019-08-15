@@ -97,7 +97,7 @@ class Components
         );
         $html .= '
             <div class="col-12 mx-auto">
-                <form class="row" action="/consiliar" method="get" >';
+                <form class="row" action="/consiliar" method="POST" >';
         $html .= sprintf("<input name='source' type='hidden' value='%s' />", json_encode(array_filter($source, function ($row) {
             foreach ($row as $value) {
                 if ($value != "" || $value != null) {
