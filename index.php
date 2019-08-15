@@ -17,12 +17,12 @@ $app = new Router();
 /**
  * setup routes closures
  */
-echo $app->debugger();
+$app->debugger();
 $app->get('/send', $routes['xlsxToHtml']);
 $app->get('/', $routes['indexView']);
 $app->get('/insert', $routes['insertToXlsx']);
 $app->get('/teste', $routes['teste']);
 $app->get('/consiliar', $routes['consiliar']);
-echo $app->debugger();
+$app->debugger();
 $app->run();
-echo $app->debugger();
+$app->debugger();

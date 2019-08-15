@@ -39,7 +39,7 @@ class Router
 
     public function debugger()
     {
-        return json_encode($this->routes);
+        var_dump($this->routes);
     }
 
     /**
