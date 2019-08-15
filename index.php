@@ -17,10 +17,10 @@ $app = new Router();
 /**
  * setup routes closures
  */
-$app->post('/send', $routes['xlsxToHtml']);
+$app->get('/send', $routes['xlsxToHtml']);
 $app->get('/', $routes['indexView']);
-$app->post('/insert', $routes['insertToXlsx']);
+$app->get('/insert', $routes['insertToXlsx']);
 $app->get('/teste', $routes['teste']);
-$app->post('/consiliar', $routes['consiliar']);
+$app->get('/consiliar', $routes['consiliar']);
 
 $app->run();
