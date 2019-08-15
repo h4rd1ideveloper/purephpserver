@@ -3,6 +3,16 @@ error_reporting(E_ALL | E_STRICT);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 ini_set('memory_limit', '1024M');
+
+die(print_r([
+    getenv('PRODUCTION_DB_NAME' ),
+    getenv('PRODUCTION_DB_USER' ),
+    getenv('PRODUCTION_DB_PASS' ),
+    getenv('PRODUCTION_DB_TYPE' ),
+    getenv('PRODUCTION_DB_HOST'),
+    getenv('ENEL_FIELDS'),
+    getenv('ENEL_TABLE')
+]));
 /**
  * Setup imports
  */
