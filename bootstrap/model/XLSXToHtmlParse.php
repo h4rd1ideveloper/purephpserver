@@ -4,10 +4,10 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 ini_set('memory_limit', '1024M');
 ini_set('upload_max_filesize ', '10M');
-require_once __DIR__ . './../assets/lib/SimpleXLSX.php';
-require_once __DIR__ . './../assets/lib/Helpers.php';
-require_once __DIR__ . './../assets/lib/Dao.php';
-require_once __DIR__ . './../assets/config/const.php';
+require_once __DIR__ . '/../assets/lib/SimpleXLSX.php';
+require_once __DIR__ . '/../assets/lib/Helpers.php';
+require_once __DIR__ . '/../assets/lib/Dao.php';
+require_once __DIR__ . '/../assets/config/const.php';
 
 class XLSXToHtmlParse extends Dao
 {

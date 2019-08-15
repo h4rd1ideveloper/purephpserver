@@ -1,7 +1,6 @@
 <?php
-
-include_once __DIR__ . './Header.php';
-require_once __DIR__ . './components/Components.php';
+include_once __DIR__ . '/Header.php';
+require_once __DIR__ . '/components/Components.php';
 Components::centredTitle('Verificação de Arrecadações Não processadas');
 ?>
 <div class="row">
