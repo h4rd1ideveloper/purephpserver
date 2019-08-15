@@ -12,8 +12,8 @@ abstract class Controller {
      * @param array $vars
      */
     protected static final function view( $_name, array $vars = []) {
-        !file_exists( sprintf("/bootstrap/view/%s.php", __DIR__, $_name) ) && die("View {$_name} not found!");
-        include_once ( sprintf("/bootstrap/view/%s.php", __DIR__, $_name) );
+        !file_exists( sprintf("/bootstrap/view/%s.php",  $_name) ) && die("View {$_name} not found!");
+        include_once ( sprintf("/bootstrap/view/%s.php",  $_name) );
     }
     /**
      * @param string $name
