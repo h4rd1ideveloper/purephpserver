@@ -10,6 +10,11 @@
     "scripts": {
         "start-dev": "php -S localhost:8080 -t public"
     },
+    "autoload": {
+        "psr-4": {
+            "SRC\\": "bootstrap/"
+        }
+    },
     "require": {
         "php": ">=7.1.0",
       "ext-json": "*",

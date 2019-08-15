@@ -1,5 +1,9 @@
 <?php
-
+error_reporting(E_ALL | E_STRICT);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+ini_set('memory_limit', '1024M');
+ini_set('upload_max_filesize ', '10M');
 require_once __DIR__ . './../assets/lib/SimpleXLSX.php';
 require_once __DIR__ . './../assets/lib/Helpers.php';
 require_once __DIR__ . './../assets/lib/Dao.php';
@@ -59,7 +63,7 @@ class XLSXToHtmlParse extends Dao
         });
         //Remove dont used fields
         $fields = array_filter($params, function ($value) {
-            return !is_array($value) ? !($value === 'Não utilizado' || $value === "") : false;
+            return !is_array($value) ? !($value === 'Não utilizado') : false;
         });
         //Each source
         for ($k = 0; $k < count($source); $k++) {
@@ -67,7 +71,7 @@ class XLSXToHtmlParse extends Dao
             if ($k != 0) {
                 //Fix keys and values from source to formatted_source
                 for ($i = 0; $i < count($source[0]); $i++) {
-                    if ($source[0][$i] != "" && $source[$k][$i] != "") { // skip empty
+                    if ($source[0][$i] !== null && $source[$k][$i] !== null) { // skip empty
                         $formatted_source[$k][$source[0][$i]] = $source[$k][$i];
                     }
                 }
@@ -82,29 +86,27 @@ class XLSXToHtmlParse extends Dao
             parent::select('enel_arrecadacao', '*', null, $toVerify[($index - 1)]);
             //put result on correct array
             if (parent::getNumResults()) {
-                $finds[] = $index;
+                $finds[] = ($index-1);
             } else {
-                $notFinds[] = $index;
+                $notFinds[] = ($index-1);
             }
         }
-        //Insert Another rows
-        foreach ($params['source'] as $i => $row) {
-            if (in_array($i, $finds)) {
-                $arrFind[] = $row;
-            } elseif ($i) {
-                $arrNotFind[] = $row;
-            }
+        $headers =[];
+        foreach ($toVerify[0] as $key => $value){
+            $headers[] = $key;
         }
         return [
-            'find' => $arrFind,
-            'notFind' => $arrNotFind
+            'headers' => $headers,
+            'source' => $toVerify,
+            'find' => $finds,
+            'notFind' => $notFinds
         ];
     }
 
     public function listTable()
     {
         // parent::select('divergencias');
-        parent::select('enel_arrecadacao', '*', null, null, null, 1);
+        parent::select(ENEL_TABLE, ENEL_FIELDS, null, null, null, 1);
         return parent::getResult();
     }
 
@@ -115,7 +117,14 @@ class XLSXToHtmlParse extends Dao
      */
     public function XLSXtoJSON($file): array
     {
-        parent::select('enel_arrecadacao', '*', null, null, null, 1);
+        parent::select(
+            ENEL_TABLE,
+            ENEL_FIELDS,
+            null,
+            null,
+            null,
+            1
+        );
         $fields = array();
         foreach (parent::getResult()[0] as $key => $value) {
             $fields[] = $key;

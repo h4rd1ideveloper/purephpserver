@@ -10,7 +10,7 @@ class Components
                     <h1 class="%s text-center text-black-50">%s </h1>
                 </div>
             </div>
-        ',$size, $text);
+        ', $size, $text);
     }
 
     public static function leftTitle($text, $text_class = '')
@@ -35,36 +35,55 @@ class Components
 
     }
 
-    public static function table(array $data)
+    public static function table(array $data, $flag = false, $id = false, $tableClass = false)
     {
         if (count($data) > 1) {
-
-            $html = '<table class="table table-striped table-hover">
+            $html = sprintf('<table id="%s" class="table table-striped table-hover">
                     <thead>
-                        <tr> ';
-            for ($i = 0; $i < count($data); $i++) {
-                if ($i === 0) {
-                    foreach ($data[$i] as $headers) {
-                        $html .= sprintf('<th scope="col">%s</th>', $headers);
-                    }
-                    $html .= '</tr></thead><tbody>';
-                } else {
-                    if ($data[$i][0] === '') {
-                        continue;
-                    }
+                        <tr> ', $id ?? 'table-' . date('m_d_Y_h_i_s_a', time()));
+            if ($flag) {
+                foreach ($data[0] as $headers => $value) {
+                    $html .= sprintf('<th scope="col">%s</th>', $headers);
+                }
+                $html .= '</tr></thead><tbody>';
+                for ($i = 0; $i < count($data); $i++) {
                     $html .= '<tr>';
+                    $index = 0;
                     foreach ($data[$i] as $key => $value) {
-                        $html .= (0 === $key) ?
+                        $html .= (0 === $index++) ?
                             sprintf('<th scope ="row" > %s</th >', $value)
                             :
                             sprintf('<td>%s</td>', $value);
-
                     }
                     $html .= '</tr >';
                 }
+                $html .= '</tbody></table>';
+                echo $html;
+            } else {
+                for ($i = 0; $i < count($data); $i++) {
+                    if ($i === 0) {
+                        foreach ($data[$i] as $headers) {
+                            $html .= sprintf('<th scope="col">%s</th>', $headers);
+                        }
+                        $html .= '</tr></thead><tbody>';
+                    } else {
+                        if ($data[$i][0] === '') {
+                            continue;
+                        }
+                        $html .= '<tr>';
+                        foreach ($data[$i] as $key => $value) {
+                            $html .= (0 === $key) ?
+                                sprintf('<th scope ="row" > %s</th >', $value)
+                                :
+                                sprintf('<td>%s</td>', $value);
+                        }
+                        $html .= '</tr >';
+                    }
+                }
+                $html .= '</tbody></table>';
+                echo $html;
+
             }
-            $html .= '</tbody></table>';
-            echo $html;
         }
     }
 

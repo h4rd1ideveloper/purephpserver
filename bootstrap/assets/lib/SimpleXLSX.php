@@ -167,14 +167,6 @@ class SimpleXLSX {
 		69 => 't# ?/?',
 		70 => 't# ??/??',
 
-        71 => 'dd-mm-yy',
-        72 => 'dd-mm-Y',
-        73 => 'dd-mm-yyyy',
-
-        74 => 'mm-dd-yy',
-        75 => 'mm-dd-Y',
-        76 => 'mm-dd-yyyy',
-
     );
 	public $cellFormats = array();
 	public $datetimeFormat = 'Y-m-d H:i:s';
