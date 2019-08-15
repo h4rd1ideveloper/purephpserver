@@ -6,9 +6,9 @@ ini_set('memory_limit', '1024M');
 /**
  * Setup imports
  */
-require_once '/bootstrap/assets/lib/Helpers.php';
-require_once '/bootstrap/routes/routes.php';
-require_once '/bootstrap/routes/index.php';
+require_once __DIR__. '/bootstrap/assets/lib/Helpers.php';
+require_once __DIR__. '/bootstrap/routes/routes.php';
+require_once __DIR__. '/bootstrap/routes/index.php';
 /***
  * Setup config
  */
