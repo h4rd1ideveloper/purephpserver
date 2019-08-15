@@ -1,7 +1,7 @@
 <?php
 
-include_once __DIR__ . './Header.php';
-require_once __DIR__ . './components/Components.php';
+include_once __DIR__ . '/Header.php';
+require_once __DIR__ . '/components/Components.php';
 
 Components::centredTitle('Simulação de conciliação', 'h1');
 $dateAndCountFinds = Helpers::countDates($vars['find'] ?? [], $vars['headers'] ?? [], $vars['source'] ?? []);
@@ -59,6 +59,6 @@ if (isset($vars['notFind']) && count($dateAndCountNotFinds) > 0):
 <?php
 endif;
 
-include_once __DIR__ . './Scripts.php';
-include_once __DIR__ . './Footer.php';
+include_once __DIR__ . '/Scripts.php';
+include_once __DIR__ . '/Footer.php';
 ?>

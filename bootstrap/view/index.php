@@ -23,7 +23,7 @@ Components::centredTitle('Verificação de Arrecadações Não processadas');
 
 <?php
 
-include_once __DIR__ . './Scripts.php';
+include_once __DIR__ . '/Scripts.php';
 ?>
 <script>
     $('document').ready(function () {
@@ -74,5 +74,5 @@ include_once __DIR__ . './Scripts.php';
 </script>
 
 <?php
-include_once __DIR__ . './Footer.php';
+include_once __DIR__ . '/Footer.php';
 ?>
