@@ -1,4 +1,5 @@
 <?php
+
 define('PRODUCTION_DB_NAME', getenv('PRODUCTION_DB_NAME') );
 define('PRODUCTION_DB_USER', getenv('PRODUCTION_DB_USER') );
 define('PRODUCTION_DB_PASS', getenv('PRODUCTION_DB_PASS') );
