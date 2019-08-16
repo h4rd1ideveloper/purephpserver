@@ -18,6 +18,7 @@
     "require": {
         "php": ">=7.1.0",
       "ext-json": "*",
-      "ext-pdo": "*"
+      "ext-pdo": "*",
+        "heroku/heroku-buildpack-php": "^159.0"
     }
 }
