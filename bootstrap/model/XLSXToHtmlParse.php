@@ -4,7 +4,7 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 ini_set('memory_limit', '1024M');
 ini_set('upload_max_filesize ', '10M');
-ini_set('max_execution_time', 60000);
+ini_set('max_execution_time', 600000);
 require_once __DIR__ . '/../assets/lib/SimpleXLSX.php';
 require_once __DIR__ . '/../assets/lib/Helpers.php';
 require_once __DIR__ . '/../assets/lib/Dao.php';
