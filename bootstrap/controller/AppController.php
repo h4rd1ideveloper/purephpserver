@@ -16,7 +16,7 @@ final class AppController extends Controller {
         self::view('result', (new XLSXToHtmlParse(true))->checkInTable(parent::request() ));
     }
     public static function insert(){
-        return (new XLSXToHtmlParse(true))->XLSXinsert(parent::request() );
+        return (new XLSXToHtmlParse())->XLSXinsert(parent::request() );
     }
     public static function readXLSXWriteHTML() :void
     {
@@ -25,6 +25,6 @@ final class AppController extends Controller {
         );
     }
     public static function listTableToJson(){
-        return (new XLSXToHtmlParse())->listTable();
+        return (new XLSXToHtmlParse(true))->listTable();
     }
 }
