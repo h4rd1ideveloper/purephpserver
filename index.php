@@ -1,5 +1,6 @@
 <?php
 error_reporting(E_ALL | E_STRICT);
+ini_set('max_execution_time', '600000');
 /**
  * Setup imports
  */
@@ -19,6 +20,7 @@ $app->post('/send', $routes['xlsxToHtml']);
 $app->get('/', $routes['indexView']);
 $app->post('/insert', $routes['insertToXlsx']);
 $app->get('/teste', $routes['teste']);
+$app->post('/check', $routes['consiliar']);
 $app->post('/consiliar', $routes['consiliar']);
 //$app->debugger();
 $app->run();

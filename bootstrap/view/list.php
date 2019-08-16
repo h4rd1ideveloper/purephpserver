@@ -26,5 +26,28 @@ require_once __DIR__ . '/components/Components.php';
 
 <?php
 include_once __DIR__ . '/Scripts.php';
+?>
+<script>
+    $('document').ready(function () {
+        let xlsx = JSON.parse(`<?=json_encode($vars['source'] ?? [], JSON_UNESCAPED_UNICODE);?>`);
+
+        $("#toCheck").on("submit", (e) => {
+            e.preventDefault();
+            if (xlsx.length) {
+                let keyAndValues = [];
+                $("#toCheck select").each((i, e) => {
+                    keyAndValues = (e.value !== "Não utilizado") ? [...keyAndValues, {[`${e.name}`]: `${e.value}`}] : keyAndValues;
+                });
+
+            }
+        );
+
+
+        axios.post('check', {source: xlsx, toCheck: keyAndValues})
+    }
+    })
+    })
+</script>
+<?
 include_once __DIR__ . '/Footer.php';
 ?>

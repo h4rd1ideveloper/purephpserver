@@ -23,6 +23,10 @@ $routes = [
         function(){
             return json_encode(AppController::consiliar(), JSON_UNESCAPED_UNICODE);
         },
+    'check' =>
+        function(){
+            return json_encode(AppController::check(), JSON_UNESCAPED_UNICODE);
+        },
     'teste' =>
         function () {
             var_dump(AppController::listTableToJson());

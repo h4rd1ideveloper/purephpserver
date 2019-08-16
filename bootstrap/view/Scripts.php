@@ -18,7 +18,7 @@
         crossorigin="anonymous"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
-
+<script src="<?= __DIR__.'/../assets/lib/dist/axios.min.js' ;?>"></script>
 <script type="text/javascript">
     $('document').ready(function () {
         //console.log(isToday(new Date(2014, 9, 6, 14, 0)));

@@ -8,6 +8,33 @@
  */
 class Helpers
 {
+    public static function  formmattSource($source){
+        $formatted_source = [];
+        $source = array_filter($source, function ($value) {
+            return is_array($value);
+        });
+        for ($k = 0; $k < count($source); $k++) {
+            //Skip Header
+            if ($k != 0) {
+                //Fix keys and values from source to formatted_source
+                for ($i = 0; $i < count($source[0]); $i++) {
+                    if ($source[0][$i] !== null && $source[$k][$i] !== null) { // skip empty
+                        $formatted_source[$k][$source[0][$i]] = $source[$k][$i];
+                    }
+                }
+            }
+        }
+        return $formatted_source;
+    }
+    public static function toVerify($formatted_source,$fields){
+        for ($index = 1; $index <= count($formatted_source); $index++) {
+            //Fix key and values of the array to verify
+            foreach ($fields as $key => $value) {
+                isset($formatted_source[$index][$value]) && $toVerify[($index - 1)][$key] = Helpers::formatValueByKey($formatted_source[$index][$value], $key);
+            }
+        }
+        return $toVerify;
+    }
     /**
      * @param $toJson
      * @return string
@@ -131,6 +158,7 @@ class Helpers
             }
         }
     }
+
 
     /**
      * @param $string_date

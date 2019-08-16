@@ -12,6 +12,9 @@ final class AppController extends Controller {
     public static function index() {
         self::view('index');
     }
+    public static function check() {
+        self::view('result', ["find"=>(new XLSXToHtmlParse(true))->checkInTable_before(parent::request() )]);
+    }
     public static function consiliar() {
         self::view('result', (new XLSXToHtmlParse(true))->checkInTable(parent::request() ));
     }

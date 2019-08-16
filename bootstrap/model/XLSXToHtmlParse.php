@@ -30,6 +30,14 @@ class XLSXToHtmlParse extends Dao
         parent::disconnect();
     }
 
+
+    public function checkInTable_before($params): int
+    {
+        parent::select(ENEL_TABLE, ENEL_FIELDS, null, $params);
+
+        return parent::getNumResults();
+    }
+
     /**
      * $source = array_filter($params, function ($value) {
      * return is_array($value) ?
@@ -82,13 +90,13 @@ class XLSXToHtmlParse extends Dao
             parent::select('enel_arrecadacao', '*', null, $toVerify[($index - 1)]);
             //put result on correct array
             if (parent::getNumResults()) {
-                $finds[] = ($index-1);
+                $finds[] = ($index - 1);
             } else {
-                $notFinds[] = ($index-1);
+                $notFinds[] = ($index - 1);
             }
         }
-        $headers =[];
-        foreach ($toVerify[0] as $key => $value){
+        $headers = [];
+        foreach ($toVerify[0] as $key => $value) {
             $headers[] = $key;
         }
         return [
@@ -128,7 +136,7 @@ class XLSXToHtmlParse extends Dao
         $formatted = SimpleXLSX::parse($file);
         return !isset($file) ?
             array("error" => true, "message" => "miss file", "debug" => array($_GET, $_FILES))
-            : ['xlsx' => $formatted->rows(), 'fields' => $fields];
+            : ['xlsx' => $formatted->rows(), 'source' => Helpers::formmattSource($formatted->rows()), 'fields' => $fields];
     }
 
     /**
