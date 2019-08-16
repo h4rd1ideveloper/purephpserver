@@ -95,8 +95,8 @@ class Router
     {
         $method = strtolower($_SERVER['REQUEST_METHOD']) ? strtolower($_SERVER['REQUEST_METHOD']) : 'get';
         $route = isset($_SERVER['REQUEST_URI']) ? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) : '/';//$_SERVER['REQUEST_URI']
-        !isset($this->routes[$method]) && die('405 Method not allowed');
-        !isset($this->routes[$method][$route]) && die('404 Error');
+        !isset($this->routes[$method]) && die(print_r(['405 Method not allowed',$method, parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)]));
+        !isset($this->routes[$method][$route]) && die(print_r(['404 Error',$method, parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH)]));
         self::$params = $this->getParams($method);
         self::$files = $this->getFiles();
         die($this->routes[$method][$route]());
