@@ -86,12 +86,11 @@ class Helpers
      * Init Headers
      * @param int $timeLimit
      */
-    public static function cors($timeLimit = 0)
+    public static function cors()
     {
         header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Headers: *");
         header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
-        set_time_limit($timeLimit);
     }
 
     /**
