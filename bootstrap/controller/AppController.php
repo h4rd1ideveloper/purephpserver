@@ -13,10 +13,10 @@ final class AppController extends Controller {
         self::view('index');
     }
     public static function consiliar() {
-        self::view('result', (new XLSXToHtmlParse())->checkInTable(parent::request() ));
+        self::view('result', (new XLSXToHtmlParse(true))->checkInTable(parent::request() ));
     }
     public static function insert(){
-        return (new XLSXToHtmlParse())->XLSXinsert(parent::request() );
+        return (new XLSXToHtmlParse(true))->XLSXinsert(parent::request() );
     }
     public static function readXLSXWriteHTML() :void
     {
