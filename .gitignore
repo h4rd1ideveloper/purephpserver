@@ -8,7 +8,7 @@
 .app/.env.php
 **/.env.php
 */.env.php
-bootstrap/.env.php
+server/.env.php
 # User-specific stuff
 .idea/**/workspace.xml
 .idea/**/tasks.xml
@@ -47,9 +47,9 @@ cmake-build-*/
 
 # Mongo Explorer plugin
 .idea/**/mongoSettings.xml
- bootstrap/view/node_modules/
- bootstrap/view/node_modules/*
-  bootstrap/view/node_modules/**
+ server/src/view/node_modules/
+ server/src/view/node_modules/*
+  server/src/view/node_modules/**
    **/app/view/node_modules/
 
 # File-based project format
@@ -57,12 +57,13 @@ cmake-build-*/
 
 # IntelliJ
 out/
-
+vendor
 # mpeltonen/sbt-idea plugin
 .idea_modules/
 node_modules/
 **/node_modules/
 **/node_modules/**
+**/vendor/**
 # JIRA plugin
 atlassian-ide-plugin.xml
 
@@ -152,3 +153,4 @@ modules.xml
 debug.log
 # End of https://www.gitignore.io/api/phpstorm,phpstorm+all
 /vendor/
+server/
