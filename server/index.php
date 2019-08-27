@@ -10,6 +10,7 @@ use App\assets\lib\Helpers;
 use App\routes\Dispatch;
 use App\routes\Router;
 
+
 Helpers::showErros();
 Helpers::cors();
 Helpers::const();
