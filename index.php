@@ -9,6 +9,7 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+use App\controller\AppController;
 use App\controller\Controller;
 use App\http\Request;
 use App\http\Response;
@@ -23,8 +24,12 @@ $app = new Router(array(
 ));
 $Dispatcher = new Dispatch();
 
-$app->get('/view', function (Request $req, Response $res) use ($app) {
+$app->get('/', function () {
     Controller::view('pages/Listagem');
+});
+
+$app->post('/api/comdominios', static function (Request $request, Response $response) {
+    return AppController::listCondominiosBy($request);
 });
 /**
  *

@@ -4,6 +4,7 @@ namespace App\controller;
 
 use App\assets\lib\Dao;
 use App\http\Request;
+use App\model\AjaxResolver;
 
 /**
  * Class AppController
@@ -20,6 +21,22 @@ final class AppController extends Controller
     }
 
     /**
+     * @param Request $request
+     * @return array|bool|string
+     */
+    public static function listCondominiosBy(Request $request)
+    {
+        $body = $request->getParsedBody();
+        if (isset($body['cpfcnpj'], $body['campo1'], $body['campo2'])) {
+            $result = AjaxResolver::condominios($body['cpfcnpj'], '', '');
+            return $result === false ?
+                Request::toJson(array('error' => true, 'message' => 'something is worng inside AjaxResolver::condominios', 'raw' => array($result, $body))) :
+                $result;
+        }
+        return Request::toJson(array('error' => true, 'message' => 'miss something in body request', 'raw' => $body));
+    }
+
+    /**
      * @param $params
      * @return void
      */
@@ -28,10 +45,13 @@ final class AppController extends Controller
         self::view('index', $params);
     }
 
+    /**
+     * @return mixed
+     */
     public static function testQuery()
     {
-        $_db = new Dao('localhost','root','','app');
-        return $_db->delete('users',array('_id'=>2, 'name'=>'yan'));
+        $_db = new Dao('localhost', 'root', '', 'app');
+        return $_db->delete('users', array('_id' => 2, 'name' => 'yan'));
     }
 
     /**

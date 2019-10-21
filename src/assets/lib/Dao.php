@@ -1,4 +1,5 @@
 <?php
+
 namespace App\assets\lib;
 
 use PDO;
@@ -208,7 +209,7 @@ class Dao extends QueryBuilder
             }
             return true;
         } catch (PDOException $e) {
-            print_r( $e->getMessage() . '' . $e->getTraceAsString() . '');
+            print_r($e->getMessage() . '' . $e->getTraceAsString() . '');
             return false;
         }
     }
@@ -273,6 +274,7 @@ class Dao extends QueryBuilder
         $this->numResults = null;
         try {
             $sql = parent::querySelect($this->_db, $table, '*');
+
             $sql->execute();
             $this->result = $sql->fetchAll(PDO::FETCH_OBJ);
             $this->numResults = count($this->result);
