@@ -16,7 +16,7 @@ abstract class Controller
      */
     public static final function view($_name, $vars = array())
     {
-        !file_exists(sprintf("%s/../view/%s.php", __DIR__, $_name)) && die(print_r(array("view {$_name} not found!", __DIR__)));
+        !file_exists(sprintf("%s/../view/%s.php", __DIR__, $_name)) && die(print_r(array(sprintf('[%s]', sprintf("%s/../view/%s.php", __DIR__, $_name)),"view {$_name} not found!", __DIR__)));
         include_once(sprintf("%s/../view/%s.php", __DIR__, $_name));
     }
 

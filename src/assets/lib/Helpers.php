@@ -2,7 +2,6 @@
 
 namespace App\assets\lib;
 
-use Closure;
 use InvalidArgumentException;
 use Traversable;
 
@@ -14,6 +13,30 @@ use Traversable;
  */
 class Helpers
 {
+
+    /**
+     * @param string $test
+     * @param bool $int
+     * @param bool|int|string $default
+     * @return string
+     */
+    public static function orEmpty($test, $int = false, $default = false)
+    {
+        if ($default === false) {
+            $default = $int ? 0 : '';
+        }
+        return self::stringIsOk((string)$test) ? $test : $default;
+    }
+
+    /**
+     * @param $string
+     * @return bool
+     */
+    public static function stringIsOk($string)
+    {
+        return is_string($string) && $string !== null && !empty($string) && isset($string) && $string !== "";
+    }
+
     /**
      * Helpers constructor.
      */
@@ -85,7 +108,7 @@ class Helpers
      * @param $value mixed
      * @param $arr
      */
-    public static function insertIfNotExist($value, & $arr)
+    public static function insertIfNotExist($value, &$arr)
     {
         if (!in_array($value, $arr)) {
             $arr[] = $value;
@@ -130,7 +153,7 @@ class Helpers
         header("Access-Control-Allow-Headers: *");
         header("Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS");
         header("Accept: application/json, application/x-www-form-urlencoded, multipart/form-data, application/xhtml+xml, application/xml;q=0.9, multipart/*, text/plain, text/html,  image/webp, */*;q=0.8");
-        header("Accept-Encoding: compress, gzip");//
+        header("Accept-Encoding: compress, gzip"); //
 
     }
 
@@ -143,67 +166,12 @@ class Helpers
     }
 
     /**
-     * @param $string
-     * @return bool
-     */
-    public static function stringIsOk($string)
-    {
-        return is_string($string) && $string !== null && !empty($string) && isset($string) && $string !== "";
-    }
-
-    /**
      * @param $data
      * @return array
      */
     public static function jsonToArray($data)
     {
         return json_decode($data, true);
-    }
-
-    /**
-     * Magic Map From
-     * array Map like a javascript
-     * @param $array
-     * @param Closure $callbackToValue
-     * @param Closure $callbackToKey
-     * @return array
-     */
-    public static function MagicMap($array, $callbackToKey, $callbackToValue)
-    {
-        if (
-            !is_callable($callbackToValue) ||
-            !is_callable($callbackToKey) ||
-            !self::is_iterablePolyfill($array)
-        ) {
-            throw new InvalidArgumentException(
-                '$callbackToKey and $callbackToValue, must be a callable (function)' .
-                PHP_EOL .
-                '$array must be a iterable' .
-                PHP_EOL
-            );
-        }
-        $returned = array();
-        foreach ($array as $key => $value) {
-            $returned[$callbackToKey($value, $key)] = $callbackToValue($value, $key);
-        }
-        return $returned;
-    }
-
-    /**
-     * @param $check
-     * @return bool
-     */
-    public static function is_iterablePolyfill($check)
-    {
-        if (!function_exists('is_iterable')) {
-
-            function is_iterable($obj)
-            {
-                return is_array($obj) || (is_object($obj) && ($obj instanceof Traversable));
-            }
-
-        }
-        return is_iterable($check);
     }
 
     /**
@@ -221,7 +189,6 @@ class Helpers
             {
                 return is_array($obj) || (is_object($obj) && ($obj instanceof Traversable));
             }
-
         }
         if (!is_callable($callback) || !is_iterable($array)) {
             throw new InvalidArgumentException('$callback must be a callable (function)');
@@ -247,7 +214,6 @@ class Helpers
             {
                 return is_array($obj) || (is_object($obj) && ($obj instanceof Traversable));
             }
-
         }
         if (!is_iterable($anyIterable)) {
             throw new InvalidArgumentException("");
@@ -278,7 +244,8 @@ class Helpers
             'url' => array(FILTER_VALIDATE_URL, array(FILTER_FLAG_PATH_REQUIRED, FILTER_FLAG_QUERY_REQUIRED)),
             'string' => array(
                 FILTER_SANITIZE_STRING, array(
-                    FILTER_FLAG_STRIP_LOW, FILTER_FLAG_NO_ENCODE_QUOTES, FILTER_FLAG_STRIP_HIGH, FILTER_FLAG_ENCODE_LOW, FILTER_FLAG_ENCODE_HIGH, FILTER_FLAG_ENCODE_AMP)
+                    FILTER_FLAG_STRIP_LOW, FILTER_FLAG_NO_ENCODE_QUOTES, FILTER_FLAG_STRIP_HIGH, FILTER_FLAG_ENCODE_LOW, FILTER_FLAG_ENCODE_HIGH, FILTER_FLAG_ENCODE_AMP
+                )
             )
         );
         $validate = $filters[$type][0];
@@ -328,11 +295,10 @@ class Helpers
     {
         if (!function_exists('is_iterable')) {
 
-            function is_iterable($obj)
+            function is_iterable($objR)
             {
-                return is_array($obj) || (is_object($obj) && ($obj instanceof Traversable));
+                return is_array($objR) || (is_object($objR) && ($objR instanceof Traversable));
             }
-
         }
         if (!is_callable($callback) || !is_iterable($array)) {
             throw new InvalidArgumentException('$callback must be a callable (function)');
@@ -342,6 +308,4 @@ class Helpers
         }
         return $initialValue;
     }
-
-
 }

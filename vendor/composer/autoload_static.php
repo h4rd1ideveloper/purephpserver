@@ -49,8 +49,8 @@ class ComposerStaticInit2ee48c20b1efb3d38488e3802c83d3f9
         'phpDocumentor\\Reflection\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpdocumentor/reflection-common/src',
-            1 => __DIR__ . '/..' . '/phpdocumentor/type-resolver/src',
-            2 => __DIR__ . '/..' . '/phpdocumentor/reflection-docblock/src',
+            1 => __DIR__ . '/..' . '/phpdocumentor/reflection-docblock/src',
+            2 => __DIR__ . '/..' . '/phpdocumentor/type-resolver/src',
         ),
         'Webmozart\\Assert\\' => 
         array (
@@ -63,8 +63,8 @@ class ComposerStaticInit2ee48c20b1efb3d38488e3802c83d3f9
         'Psr\\Http\\Message\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src/http',
-            1 => __DIR__ . '/..' . '/psr/http-message/src',
-            2 => __DIR__ . '/..' . '/psr/http-factory/src',
+            1 => __DIR__ . '/..' . '/psr/http-factory/src',
+            2 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
         'Prophecy\\' => 
         array (
