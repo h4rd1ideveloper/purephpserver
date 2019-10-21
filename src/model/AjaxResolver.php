@@ -21,7 +21,7 @@ class AjaxResolver
         $Host = '177.184.16.56';
         $dbUserName = 'rbm_yan';
         $dbPass = 'AolU+j*w';
-        $DbName = 'emprestascm_webscm5Digite';
+        $DbName = 'emprestascm_webscm5';
         $db = mysqli_connect('177.184.16.56', $dbUserName, $dbPass) or die ('Could not connect');
         mysqli_select_db($db, $DbName);
 
@@ -29,13 +29,13 @@ class AjaxResolver
         if (isset($cpfcnpj, $campo1, $campo2)) {
             $tipo = substr($campo1, 0, 1);
             $pesquisa = substr($cpfcnpj, 0, 1);
-            $sql = "SELECT 
-                    $campo1 AS CPFCNPJ,
-                    LTRIM( $campo2 ) AS NOME
+            $sql = sprintf(/** @lang MySQL */ 'SELECT 
+                    %s AS CPFCNPJ,
+                    LTRIM( %s ) AS NOME
                     FROM operacao d INNER JOIN cronograma i ON
                     d.CODOPERACAO = i.CODOPERACAO 
                     INNER JOIN clientes c ON d.CODCLIENTE = c.CODCLIENTE INNER JOIN rup r ON c.CPFCNPJ = r.CPFCNPJ
-                    ";
+                    ', $campo1, $campo2);
 
             if ($tipo == 'a' || $pesquisa == 'a') {
                 $sql .= ' LEFT JOIN averbador a ON r.CPFCNPJAVERBADOR = a.CPFCNPJ ';
@@ -53,7 +53,7 @@ class AjaxResolver
                 $sql .= ' AND ' . $cpfcnpj;
             }
             $sql .= ' GROUP BY ' . $campo1 . ' ORDER BY NOME ';
-            return $sql;
+            //return $sql;
             $query = mysqli_query($db, $sql) or die(mysqli_error($db));
             $html = '<option value=-1>Selecione...</option>';
             while ($row = mysqli_fetch_array($query)) {

@@ -27,8 +27,9 @@ final class AppController extends Controller
     public static function listCondominiosBy(Request $request)
     {
         $body = $request->getParsedBody();
+        //exit(var_dump($body['cpfcnpj'], $body['campo1'], $body['campo2']));
         if (isset($body['cpfcnpj'], $body['campo1'], $body['campo2'])) {
-            $result = AjaxResolver::condominios($body['cpfcnpj'], '', '');
+            $result = AjaxResolver::condominios($body['cpfcnpj'], $body['campo1'], $body['campo2']);
             return $result === false ?
                 Request::toJson(array('error' => true, 'message' => 'something is worng inside AjaxResolver::condominios', 'raw' => array($result, $body))) :
                 $result;

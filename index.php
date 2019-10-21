@@ -5,33 +5,36 @@ require_once __DIR__ . '/vendor/autoload.php';
 /***
  * Setup config
  */
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 
 use App\controller\AppController;
 use App\controller\Controller;
 use App\http\Request;
-use App\http\Response;
 use App\routes\Dispatch;
 use App\routes\Router;
 
-$app = new Router(array(
-    'path_root' => '/portal',
-    'cors' => true,
-    'show_errors' => true,
-    'production_defines' => true
-));
-$Dispatcher = new Dispatch();
+try {
 
-$app->get('/', function () {
-    Controller::view('pages/Listagem');
-});
+    $routerConfig = array(
+        'path_root' => '/portal',
+        'cors' => true,
+        'show_errors' => true,
+        'production_defines' => true
+    );
+    $app = new Router($routerConfig);
+    $Dispatcher = new Dispatch();
 
-$app->post('/api/comdominios', static function (Request $request, Response $response) {
-    return AppController::listCondominiosBy($request);
-});
-/**
- *
- */
-$app->run();
+    $app->get('/', static function () {
+        Controller::view('pages/Listagem');
+    });
+
+    $app->post('/api/comdominios', static function (Request $request) {
+        return AppController::listCondominiosBy($request);
+    });
+    /**
+     *
+     */
+    $app->run();
+} catch (Exception $e) {
+    echo 'Fail to init Router Server', $e->getMessage(), $e->getCode(), $e->getTraceAsString();
+}
+
