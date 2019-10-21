@@ -58,6 +58,7 @@
   </component>
   <component name="ProjectId" id="1SQnubB0QB6s0mcDxyPhZA9mHXt" />
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last.edited.regexp" value="= " />

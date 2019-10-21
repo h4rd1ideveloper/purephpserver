@@ -1,7 +1,88 @@
 <?php
 
+namespace App\view\components;
+
+use App\assets\lib\Helpers;
+use InvalidArgumentException;
+
 class Components
 {
+    public static function headerHTML(array $config)
+    {
+        $title = Helpers::orEmpty(
+            $config['title'],
+            false,
+            'Boletão'
+        );
+        //$basePath = $_SERVER['HTTP_HOST'];
+        $html =
+            /**@lang HTML */
+            "<!doctype html>
+            <html lang='pt-br'>
+            <head>
+                <meta charset='UTF-8'>
+                <meta name='viewport'
+                      content='width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0'>
+                <meta http-equiv='X-UA-Compatible' content='ie=edge'>
+                <title>$title</title>
+                <link rel='stylesheet' href='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css'
+                      integrity='sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T' crossorigin='anonymous'>
+                <script src='/empresta/src/view/assets/js/jquery-3.4.1.min.js' ></script>
+                <script src='https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js' integrity='sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1' crossorigin='anonymous'></script>
+                <script src='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js'
+                        integrity='sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM'
+                        crossorigin='anonymous'></script>
+                <link rel='stylesheet' href='/empresta/src/view/assets/css/index.css'/>
+                <link href='/empresta/src/view/assets/fonts/fontawesome/css/all.min.css' rel='stylesheet'>
+                <script src='/empresta/src/view/assets/fonts/fontawesome/js/all.min.js'></script>
+
+                <link href='/empresta/src/view/assets/css/jquery.dataTables.min.css' rel='stylesheet'>
+                <script src='/empresta/src/view/assets/js/jquery.dataTables.min.js'></script>
+            </head>
+            <body>";
+        echo $html;
+    }
+    public static function footerHTML(array $config = array())
+    {
+
+        $html =
+            /**@lang HTML */
+            '
+        <script>
+        $(document).ready(function() {
+            $("#listagem").DataTable();
+        });
+        </script>
+        </body>
+        </html>
+        ';
+        echo $html;
+    }
+    public static function tableHTML(array $data, $id)
+    {
+        if (count($data) === 0) {
+            throw new InvalidArgumentException("O array não pode ser Vazio");
+        }
+        if (!isset($data['headers']) || !is_array($data['headers'])) {
+            throw new InvalidArgumentException("Atributo headers é obrigatorio e deve ser um array de valores escalar");
+        }
+        if (!isset($data['body']) || !is_array($data['body'])) {
+            throw new InvalidArgumentException("Atributo headers é obrigatorio e deve ser um array de valores escalar");
+        }
+        $html = '';
+        $html .= Helpers::Reducer($data['headers'], function ($initial, $currentValue, $index) {
+            return $initial . "<th scope='col'>$currentValue</th>";
+        }, "<table id='$id' class='table table-hover'><thead><tr>") . '</tr></thead>';
+        $html .= Helpers::Reducer($data['body'], function ($initial, $currentValue, $index) {
+            if (!is_array($currentValue)) {
+                throw new InvalidArgumentException("Atributo body é obrigatorio e deve ser um array de array valores escalar");
+            }
+            return $initial . Helpers::Reducer($currentValue, function ($init, $v, $key) {
+                return $init . "<th class='text-black-50' scope='row'>$v</th>";
+            }, '<tr>') . '</tr>';
+        }, '<tbody>') . '</tbody></table>';
+        echo $html;
+    }
     public static function centredTitle($text, $size = 'h3')
     {
         echo sprintf('
@@ -12,7 +93,6 @@ class Components
             </div>
         ', $size, $text);
     }
-
     public static function leftTitle($text, $text_class = '')
     {
         if ($text_class === '') {
@@ -32,100 +112,5 @@ class Components
             </div>
         ', $text_class, $text);
         }
-
-    }
-
-    public static function table(array $data, $flag = false, $id = false, $tableClass = false)
-    {
-        if (count($data) > 1) {
-            $html = sprintf('<table id="%s" class="table table-striped table-hover">
-                    <thead>
-                        <tr> ', $id ?? 'table-' . date('m_d_Y_h_i_s_a', time()));
-            if ($flag) {
-                foreach ($data[0] as $headers => $value) {
-                    $html .= sprintf('<th scope="col">%s</th>', $headers);
-                }
-                $html .= '</tr></thead><tbody>';
-                for ($i = 0; $i < count($data); $i++) {
-                    $html .= '<tr>';
-                    $index = 0;
-                    foreach ($data[$i] as $key => $value) {
-                        $html .= (0 === $index++) ?
-                            sprintf('<th scope ="row" > %s</th >', $value)
-                            :
-                            sprintf('<td>%s</td>', $value);
-                    }
-                    $html .= '</tr >';
-                }
-                $html .= '</tbody></table>';
-                echo $html;
-            } else {
-                for ($i = 0; $i < count($data); $i++) {
-                    if ($i === 0) {
-                        foreach ($data[$i] as $headers) {
-                            $html .= sprintf('<th scope="col">%s</th>', $headers);
-                        }
-                        $html .= '</tr></thead><tbody>';
-                    } else {
-                        if ($data[$i][0] === '') {
-                            continue;
-                        }
-                        $html .= '<tr>';
-                        foreach ($data[$i] as $key => $value) {
-                            $html .= (0 === $key) ?
-                                sprintf('<th scope ="row" > %s</th >', $value)
-                                :
-                                sprintf('<td>%s</td>', $value);
-                        }
-                        $html .= '</tr >';
-                    }
-                }
-                $html .= '</tbody></table>';
-                echo $html;
-
-            }
-        }
-    }
-
-    public static function formXSLXtoTable(array $data, array $xlsx, array $source, string $title = ' Associe as colunas da planilha, com as suas respectivas colunas na tabela'): void
-    {
-        $html = sprintf('
-            <div class="col-12 mb-5">
-                <h3 class="h5 text-black-50">%s</h3>
-            </div>',
-            $title
-        );
-        $html .= '
-            <div class="col-12 mx-auto">
-                <form class="row" action="/consiliar" method="POST" id="toCheck" >';
-        $html .= sprintf("<input name='source' type='hidden' value='%s' />", json_encode(array_filter($source, function ($row) {
-            foreach ($row as $value) {
-                if ($value != "" || $value != null) {
-                    return true;
-                } else {
-                    continue;
-                }
-            }
-            return false;
-        }), true));
-        foreach ($data as $key => $value) {
-            $html .= sprintf(
-                '
-                    <div class="col-sm-12 col-md-6 col-lg-4">
-                        <label class="text-justify text-dark" for="%s">%s</label>
-                        <select name="%s" class="form-control">
-                ',
-                $value, $value, $value
-            );
-            $html .= '<option selected class="text-muted" >Não utilizado</option>';
-            foreach ($xlsx as $key => $value) {
-                if ($value === '') continue;
-                $html .= sprintf('<option value="%s">%s</option>', $value, $value);
-            }
-            $html .= '</select></div>';
-        }
-        $html .= ' <button type="submit" class="btn btn-outline-secondary btn-lg my-5">Conciliar</button>   </form>
-                </div>';
-        echo $html;
     }
 }
