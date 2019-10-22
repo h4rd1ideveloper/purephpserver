@@ -16,7 +16,7 @@ abstract class Controller
      */
     public static final function view($_name, $vars = array())
     {
-        !file_exists(sprintf("%s/../view/%s.php", __DIR__, $_name)) && die(print_r(array(sprintf('[%s]', sprintf("%s/../view/%s.php", __DIR__, $_name)),"view {$_name} not found!", __DIR__)));
+        !file_exists(sprintf("%s/../view/%s.php", __DIR__, $_name)) && die(print_r(array(sprintf('[%s]', sprintf("%s/../view/%s.php", __DIR__, $_name)), "view {$_name} not found!", __DIR__)));
         include_once(sprintf("%s/../view/%s.php", __DIR__, $_name));
     }
 
@@ -37,6 +37,19 @@ abstract class Controller
     protected static final function getRequestBody()
     {
         return Router::getRequestBody();
+    }
+
+    /**
+     * redirect($to)
+     * @param string $to
+     */
+    protected static final function redirect($to)
+    {
+        $url = sprintf("%s://%s", isset($_SERVER['HTTPS']) ? 'https' : 'http', $_SERVER['HTTP_HOST']);
+        $becauseIsOldVersionOfThePHP = explode('?', $_SERVER['REQUEST_URI']);
+        $folders = $becauseIsOldVersionOfThePHP[0];
+        header(sprintf("Location:%s%s?r=%s", $url, $folders, $to));
+        exit();
     }
 
     /**
@@ -66,18 +79,5 @@ abstract class Controller
     protected final function serverObject()
     {
         return Router::serverObject();
-    }
-
-    /**
-     * redirect($to)
-     * @param string $to
-     */
-    protected final function redirect($to)
-    {
-        $url = sprintf("%s://%s", isset($_SERVER['HTTPS']) ? 'https' : 'http', $_SERVER['HTTP_HOST']);
-        $becauseIsOldVersionOfThePHP = explode('?', $_SERVER['REQUEST_URI']);
-        $folders = $becauseIsOldVersionOfThePHP[0];
-        header(sprintf("Location:%s%s?r=%s", $url, $folders, $to));
-        exit();
     }
 }

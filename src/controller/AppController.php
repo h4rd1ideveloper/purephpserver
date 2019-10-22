@@ -2,8 +2,9 @@
 
 namespace App\controller;
 
-use App\assets\lib\Dao;
+use App\assets\lib\Helpers;
 use App\http\Request;
+use App\http\Response;
 use App\model\AjaxResolver;
 
 /**
@@ -13,11 +14,47 @@ use App\model\AjaxResolver;
 final class AppController extends Controller
 {
     /**
+     * @param Request $req
+     * @param Response $res
      * @return string
      */
-    public static function test()
+    public static function index(Response $res)
     {
-        return '';
+        $res->send(array(), 'pages/Listagem');
+    }
+
+    public static function indexAfterPost(Request $request, Response $response)
+    {
+        $result = $response::jsonToArray(self::apiIndex($request));
+        if (isset($result['error'])) {
+            self::redirect('/');
+        } else {
+            self::view('pages/Listagem', $result);
+        }
+    }
+
+    public static function apiIndex(Request $req)
+    {
+        $body = $req->getParsedBody();
+        $nomeOuCpf = isset($body['nomeOuCpf']) ? $body['nomeOuCpf'] : null;
+        if (
+            isset($body['start'], $body['end'], $body['averbador'], $body['condominioValue']) &&
+            Helpers::stringIsOk($body['start']) &&
+            Helpers::stringIsOk($body['end']) &&
+            Helpers::stringIsOk($body['averbador']) &&
+            Helpers::stringIsOk($body['condominioValue'])
+        ) {
+            return Helpers::toJson(
+                AjaxResolver::boletos(
+                    $body['start'],
+                    $body['end'],
+                    $body['averbador'],
+                    $nomeOuCpf,
+                    $body['condominioValue']
+                )
+            );
+        }
+        return Helpers::toJson(array('error' => true, 'message' => 'Something is missin on Request Body', 'raw' => $body));
     }
 
     /**
@@ -37,23 +74,6 @@ final class AppController extends Controller
         return Request::toJson(array('error' => true, 'message' => 'miss something in body request', 'raw' => $body));
     }
 
-    /**
-     * @param $params
-     * @return void
-     */
-    public static function index($params)
-    {
-        self::view('index', $params);
-    }
-
-    /**
-     * @return mixed
-     */
-    public static function testQuery()
-    {
-        $_db = new Dao('localhost', 'root', '', 'app');
-        return $_db->delete('users', array('_id' => 2, 'name' => 'yan'));
-    }
 
     /**
      * allAboutTheRequest
@@ -70,5 +90,26 @@ final class AppController extends Controller
                 "parsedBody" => $req->getParsedBody()
             )
         );
+    }
+
+    public static function relatorio(Request $request, Response $response)
+    {
+        $body = $request->getQueryParams();
+        $nomeOuCpf = isset($body['nomeOuCpf']) && !empty($body['nomeOuCpf']) ? $body['nomeOuCpf'] : null;
+        if (
+            isset($body['start'], $body['end'], $body['averbador'], $body['condominioValue']) &&
+            Helpers::stringIsOk($body['start']) &&
+            Helpers::stringIsOk($body['end']) &&
+            Helpers::stringIsOk($body['averbador']) &&
+            Helpers::stringIsOk($body['condominioValue'])
+        ) {
+            AjaxResolver::relatorio($body['start'],
+                $body['end'],
+                $body['averbador'],
+                $nomeOuCpf,
+                $body['condominioValue']);
+        } else {
+            echo Request::toJson(array('error' => true, 'message' => 'miss something in body request', 'raw' => $body));
+        }
     }
 }

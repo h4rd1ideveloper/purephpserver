@@ -190,17 +190,18 @@ class Dao extends QueryBuilder
      * @param string $columns colunas
      * @param string|array $join Junção
      * @param array $where Condicional
+     * @param null $group
      * @param string $order Ordenação
      * @param integer $limit limit
      *
      * @param bool $bind
      * @return bool
      */
-    public function select($table, $columns = "*", $join = null, $where = null, $order = null, $limit = null, $bind = true)
+    public function select($table, $columns = "*", $join = null, $where = null, $group = null, $order = null, $limit = null, $bind = true)
     {
         $this->numResults = null;
         try {
-            $sql = parent::querySelect($this->_db, $table, $columns, $join, $where, $order, $limit, $bind);
+            $sql = parent::querySelect($this->_db, $table, $columns, $join, $where, $group, $order, $limit, $bind);
             $sql->execute();
             $this->result = $sql->fetchAll(PDO::FETCH_ASSOC);
             $this->numResults = count($this->result);

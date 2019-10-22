@@ -15,6 +15,37 @@ class Helpers
 {
 
     /**
+     * @param $str
+     * @return string|string[]|null
+     */
+    public static function soNumero($str)
+    {
+        if (!self::stringIsOk($str)) {
+            throw new InvalidArgumentException('Parameter must be a valid string');
+        }
+        return preg_replace("/[^0-9]/", "", $str);
+
+    }
+
+    /**
+     * @param $string
+     * @return bool
+     */
+    public static function stringIsOk($string)
+    {
+        return is_string($string) && $string !== null && !empty($string) && isset($string) && $string !== "";
+    }
+
+    /**
+     * @param $number
+     * @return bool
+     */
+    public static function isOnlyNumbers($number)
+    {
+        return preg_match("/^\d+$/", $number) ? true : false;
+    }
+
+    /**
      * @param string $test
      * @param bool $int
      * @param bool|int|string $default
@@ -26,15 +57,6 @@ class Helpers
             $default = $int ? 0 : '';
         }
         return self::stringIsOk((string)$test) ? $test : $default;
-    }
-
-    /**
-     * @param $string
-     * @return bool
-     */
-    public static function stringIsOk($string)
-    {
-        return is_string($string) && $string !== null && !empty($string) && isset($string) && $string !== "";
     }
 
     /**

@@ -14,6 +14,8 @@ class Components
             false,
             'Boletão'
         );
+        $scripts = isset($config['src']) ? $config['src'] : '';
+
         //$basePath = $_SERVER['HTTP_HOST'];
         $html =
             /**@lang HTML */
@@ -38,10 +40,12 @@ class Components
 
                 <link href='/portal/src/view/assets/css/jquery.dataTables.min.css' rel='stylesheet'>
                 <script src='/portal/src/view/assets/js/jquery.dataTables.min.js'></script>
+                $scripts
             </head>
             <body>";
         echo $html;
     }
+
     public static function footerHTML(array $config = array())
     {
 
@@ -58,6 +62,7 @@ class Components
         ';
         echo $html;
     }
+
     public static function tableHTML(array $data, $id)
     {
         if (count($data) === 0) {
@@ -71,18 +76,19 @@ class Components
         }
         $html = '';
         $html .= Helpers::Reducer($data['headers'], function ($initial, $currentValue, $index) {
-            return $initial . "<th scope='col'>$currentValue</th>";
-        }, "<table id='$id' class='table table-hover'><thead><tr>") . '</tr></thead>';
+                return $initial . "<th scope='col'>$currentValue</th>";
+            }, "<table id='$id' class='table table-hover'><thead><tr>") . '</tr></thead>';
         $html .= Helpers::Reducer($data['body'], function ($initial, $currentValue, $index) {
-            if (!is_array($currentValue)) {
-                throw new InvalidArgumentException("Atributo body é obrigatorio e deve ser um array de array valores escalar");
-            }
-            return $initial . Helpers::Reducer($currentValue, function ($init, $v, $key) {
-                return $init . "<th class='text-black-50' scope='row'>$v</th>";
-            }, '<tr>') . '</tr>';
-        }, '<tbody>') . '</tbody></table>';
+                if (!is_array($currentValue)) {
+                    throw new InvalidArgumentException("Atributo body é obrigatorio e deve ser um array de array valores escalar");
+                }
+                return $initial . Helpers::Reducer($currentValue, function ($init, $v, $key) {
+                        return $init . "<th class='text-black-50' scope='row'>$v</th>";
+                    }, '<tr>') . '</tr>';
+            }, '<tbody>') . '</tbody></table>';
         echo $html;
     }
+
     public static function centredTitle($text, $size = 'h3')
     {
         echo sprintf('
@@ -93,6 +99,7 @@ class Components
             </div>
         ', $size, $text);
     }
+
     public static function leftTitle($text, $text_class = '')
     {
         if ($text_class === '') {

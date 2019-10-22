@@ -78,12 +78,13 @@ class QueryBuilder
      * @param null|string $columns string
      * @param null|string|array $join string
      * @param null|array|string $where array
+     * @param null $group
      * @param null|string $order string
      * @param null|string $limit string
      * @param $bind bool
      * @return bool|PDOStatement
      */
-    public static function querySelect($PDO, $table, $columns = "*", $join = null, $where = null, $order = null, $limit = null, $bind = false)
+    public static function querySelect($PDO, $table, $columns = "*", $join = null, $where = null, $group = null, $order = null, $limit = null, $bind = false)
     {
         if (!$table) {
             return false;
@@ -117,6 +118,9 @@ class QueryBuilder
                 $q .= $where;
             }
         }
+        if ($group != null) {
+            $q .= sprintf(" GROUP BY %s ", $group);
+        }
         if ($order != null) {
             $q .= sprintf(" ORDER BY %s ", $order);
         }
@@ -124,7 +128,7 @@ class QueryBuilder
             $q .= sprintf(" limit %s ", (string)$limit);
         }
         $count = 1;
-        //print_r($q);
+        //exit(var_dump($q));
         $sql = $PDO->prepare($q);
         if (isset($params) && count($params)) {
             foreach ($params as $key => &$param) {

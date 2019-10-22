@@ -95,53 +95,53 @@ class Router
     {
         switch ($config) {
             case false:
-            {
-                self::$BASE_ULR = $this->INITIAL_STATE["path_root"];
-                $this->INITIAL_STATE["show_errors"] === true && Helpers::showErrors();
-                $this->INITIAL_STATE["cors"] === true && Helpers::cors();
-                $this->INITIAL_STATE["production_defines"] === true && Helpers::defines();
-                break;
-            }
+                {
+                    self::$BASE_ULR = $this->INITIAL_STATE["path_root"];
+                    $this->INITIAL_STATE["show_errors"] === true && Helpers::showErrors();
+                    $this->INITIAL_STATE["cors"] === true && Helpers::cors();
+                    $this->INITIAL_STATE["production_defines"] === true && Helpers::defines();
+                    break;
+                }
             case is_array($config):
-            {
-                isset($config["path_root"]) &&
-                is_string($config["path_root"]) &&
-                self::$BASE_ULR = $config["path_root"];
+                {
+                    isset($config["path_root"]) &&
+                    is_string($config["path_root"]) &&
+                    self::$BASE_ULR = $config["path_root"];
 
-                isset($config["show_errors"]) &&
-                $config["show_errors"] === true &&
-                Helpers::showErrors();
+                    isset($config["show_errors"]) &&
+                    $config["show_errors"] === true &&
+                    Helpers::showErrors();
 
-                isset($config["cors"]) &&
-                $config["cors"] === true &&
-                Helpers::cors();
+                    isset($config["cors"]) &&
+                    $config["cors"] === true &&
+                    Helpers::cors();
 
-                isset($config["cors"]) &&
-                $config["cors"] === true &&
-                Helpers::defines();
-                break;
-            }
+                    isset($config["cors"]) &&
+                    $config["cors"] === true &&
+                    Helpers::defines();
+                    break;
+                }
             case 'environment.production':
-            {
-                $envs = HttpHelper::getEnvFrom('.env.production');
-                self::$BASE_ULR = HttpHelper::stringIsOk($envs['path_root']) ? $envs['path_root'] : self::$BASE_ULR;
-                isset($envs['show_errors']) && $envs['show_errors'] === true && Helpers::showErrors();
-                isset($envs['cors']) && $envs['cors'] === true && Helpers::cors();
-                isset($envs['production_defines']) && $envs['production_defines'] === true && Helpers::defines();
-                break;
-            }
+                {
+                    $envs = HttpHelper::getEnvFrom('.env.production');
+                    self::$BASE_ULR = HttpHelper::stringIsOk($envs['path_root']) ? $envs['path_root'] : self::$BASE_ULR;
+                    isset($envs['show_errors']) && $envs['show_errors'] === true && Helpers::showErrors();
+                    isset($envs['cors']) && $envs['cors'] === true && Helpers::cors();
+                    isset($envs['production_defines']) && $envs['production_defines'] === true && Helpers::defines();
+                    break;
+                }
             case is_string($config):
-            {
-                self::$BASE_ULR = $config;
-                break;
-            }
+                {
+                    self::$BASE_ULR = $config;
+                    break;
+                }
             default:
-            {
-                Helpers::defines();
-                Helpers::cors();
-                Helpers::showErrors();
-                break;
-            }
+                {
+                    Helpers::defines();
+                    Helpers::cors();
+                    Helpers::showErrors();
+                    break;
+                }
         }
     }
 
@@ -287,7 +287,7 @@ class Router
         if ($size > 0) {
             $newThis = clone $this;
             $global = $this->getMiddlewares();
-            $global = $global['global'];
+            $global = isset($global['global']) ?: array();
             $callables = $this->getMiddlewareFrom($method, $route);
             $callables = array_merge(
                 isset($callables) && count($callables) && is_array($callables) ? $callables : array(),

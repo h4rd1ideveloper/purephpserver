@@ -564,22 +564,16 @@ class gerarremessaadmboletao extends Page
         $this->qrempresa->Close();
         $this->qrempresa->SQL = $sql;
         $this->qrempresa->Open();
-
         $pdf = new PDF('P');
-
         $pdf->nomemp = $this->qrempresa->RAZAOSOCIAL;
         $pdf->ncidade = $this->qrempresa->CIDADE;
-        $pdf->titulo = 'Relat�rio de Bolet�o - Per�odo De: ' . $this->Edit1->Text . ' At�: ' . $this->Edit2->Text;
-
+        $pdf->titulo = 'Relatório de Boletão - Período De: ' . $this->Edit1->Text . ' Até: ' . $this->Edit2->Text;
         $pdf->AddPage();
-
         $pdf->SetFillColor(172, 196, 242);
         $pdf->SetTextColor(0, 0, 0);
         $pdf->SetDrawColor(0, 0, 0);
         $pdf->SetLineWidth(.3);
-
         $fill = 0;
-
         $this->qrpesquisa->First();
 
         IF ($this->qrpesquisa->RecordCount > 0) {

@@ -223,8 +223,11 @@ class Response extends HttpHelper implements ResponseInterface
      */
     public function send($args, $from = false)
     {
-        $from !== false && AppController::view($from, $args);
-        echo $args;
+        if ($from !== false) {
+            AppController::view($from, $args);
+       } else {
+            echo $args;
+        }
     }
 
     /**
