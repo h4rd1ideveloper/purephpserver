@@ -220,7 +220,7 @@ class AjaxResolver
             );
             $html = '<option value=-1>GERAL</option>';
             foreach ($_db->getResult() as $row) {
-                if ($row['CPFCNPJ'] != '' && $row['NOME'] != '') {
+                if (Helpers::stringIsOk($row['CPFCNPJ']) && Helpers::stringIsOk($row['NOME'])) {
                     $html .= "<option value='" . $row['CPFCNPJ'] . "'>" . $row['NOME'] . '</option>';
                 }
             }
