@@ -20,14 +20,14 @@ class QueryBuilder
         }
         $q = sprintf(
         /** @lang text */
-            "UPDATE %s SET ",
+            'UPDATE %s SET ',
             $table
         );
 
         if (!is_array($value)) {
             $q .= sprintf(
             /** @lang text */
-                "%s",
+                '%s',
                 $value
             );
         } else {
@@ -35,7 +35,7 @@ class QueryBuilder
         }
         $q =
             /** @lang text */
-            self::keyAndValue($q . " WHERE ", $where, 'and', true);
+            self::keyAndValue($q . ' WHERE ', $where, 'and', true);
         return $q;
     }
 
@@ -158,7 +158,7 @@ class QueryBuilder
         $values = '';
         $fields = '';
         self::fillFieldsAndValues($values, $fields, $fieldsAndValues);
-        $insert .= sprintf("(%s) VALUES (%s)", $fields, $values);
+        $insert .= sprintf('(%s) VALUES (%s)', $fields, $values);
         return $insert;
     }
 
@@ -170,13 +170,14 @@ class QueryBuilder
     private static function fillFieldsAndValues(&$values, &$fields, $fieldsAndValues)
     {
         $i = 0;
+        $lasIndex = (count($fieldsAndValues) - 1);
         foreach ($fieldsAndValues as $field => $value) {
-            if ((count($fieldsAndValues) - 1) != $i++) {
+            if ($lasIndex !== $i++) {
                 $fields .= sprintf(' %s, ', $field);
-                $values .= sprintf(" '%s', ", $value);
+                $values .= Helpers::isMySQLFunction($value) ? sprintf(' %s, ', $value) : sprintf(" '%s', ", $value);
             } else {
                 $fields .= sprintf(' %s ', $field);
-                $values .= sprintf(" '%s' ", $value);
+                $values .= Helpers::isMySQLFunction($value) ? sprintf(' %s ', $value) : sprintf(" '%s' ", $value);
             }
         }
     }

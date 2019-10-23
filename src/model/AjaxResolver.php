@@ -27,7 +27,6 @@ class AjaxResolver
     {
         $_db = new Dao('177.184.16.56', 'rbm_yan', 'AolU+j*w', 'emprestascm_webscm6');
         $_db->connect();
-
         $de = $start; //Helpers::soNumero($start);
         $ate = $end; //Helpers::soNumero($end);
         $averbador = Helpers::soNumero($averbador);
@@ -46,7 +45,6 @@ class AjaxResolver
             And r.DESLIGADO = 'N' And r.BLOQUEADO = 'N' And
             c.SITUACAOPESSOACRONO <> 'N'
         ";
-
         if (Helpers::stringIsOk($nomeOuCpf)) {
             $where .= (Helpers::isOnlyNumbers($nomeOuCpf)) ?
                 " And r.CPFCNPJ = '$nomeOuCpf'" :
@@ -55,7 +53,6 @@ class AjaxResolver
         IF ($condominioValue != -1) {
             $where .= " And p.CODEMPREGADOR = '$condominioValue'";
         }
-
         IF (Helpers::stringIsOk($de) && Helpers::stringIsOk($ate)) {
             $where .= " And c.VENCIMENTO Between '$de' And '$ate'";
         }
@@ -69,7 +66,6 @@ class AjaxResolver
             $order
         );
         $results = $_db->getResult();
-
         IF ($_db->getNumResults() > 0) {
             $qtde_parcelas = $results[0]['QTDE_PARCEELAS'];
         } Else {
@@ -79,7 +75,6 @@ class AjaxResolver
             'qtde_parcelas' => $qtde_parcelas
         );
         $_db->disconnect();
-
         $_db2 = new Dao('177.184.16.56', 'rbm_yan', 'AolU+j*w', 'emprestascm_webscm6');
         $_db2->connect();
         $table = 'propostas p';
@@ -94,13 +89,11 @@ class AjaxResolver
         And o.DATAACEITE > '2016-10-05' AND o.CODSTATUS = 7
         And r.SITUACAOPESSOA = 'N' And r.DESLIGADO = 'N' And r.BLOQUEADO = 'N'
         And c.SITUACAOPESSOACRONO = 'N'";
-
         if (Helpers::stringIsOk($nomeOuCpf)) {
             $where .= (Helpers::isOnlyNumbers($nomeOuCpf)) ?
                 " And r.CPFCNPJ = '$nomeOuCpf'" :
                 " And r.NOME like '%$nomeOuCpf%'";
         }
-
         IF ($condominioValue !== '-1') {
             $where .= " And p.CODEMPREGADOR = '$condominioValue'";
         }
@@ -108,7 +101,6 @@ class AjaxResolver
         IF (Helpers::stringIsOk($de) && Helpers::stringIsOk($ate)) {
             $where .= " And c.VENCIMENTO Between '$de' And '$ate'";
         }
-
         $group = ' c.CODOPERACAO ';
         $order = ' emp.DESCRICAO, r.NOME, c.VENCIMENTO ';
         $_db2->select(
@@ -144,7 +136,6 @@ class AjaxResolver
                 );
             });
         }
-
         $_db2->disconnect();
         return $response;
     }
@@ -358,6 +349,7 @@ class AjaxResolver
 
     public static function attContratos($start, $end, $vencimento, $averbador, $nomeOuCpf, $condominioValue)
     {
+        $response = array();
         $dataatual = date('Y-m-d');
         $de = $start;
         $ate = $end;
@@ -414,8 +406,8 @@ class AjaxResolver
                 $group,
                 $order
             );
+            $_db2 = new Dao('177.184.16.56', 'rbm_yan', 'AolU+j*w', 'emprestascm_webscm6');
             IF ($_db->getNumResults()) {
-                $_db2 = new Dao('177.184.16.56', 'rbm_yan', 'AolU+j*w', 'emprestascm_webscm6');
                 $_db2->connect();
                 $_db2->select(
                     'empresas',
@@ -433,7 +425,7 @@ class AjaxResolver
                 }
                 $_db2->disconnect();
                 $_db2->connect();
-                $_db2->insert(
+                $response['insert_result']['boletao'] = $_db2->insert(
                     'boletao',
                     array(
                         'DTHR_INCLUSAO' => 'NOW()',
@@ -444,48 +436,47 @@ class AjaxResolver
                         'CNPJ_COND' => $cnpj_cond
                     )
                 );
-                $sql = "Insert Into boletao (DTHR_INCLUSAO, USU_INCLUSAO, VENCIMENTO_ENVIO, CNPJ_ADM, NOSSONUMERO, CNPJ_COND)
-                Values (NOW(), '$averbador', '$vencimento', '$averbador', '$nossonum', $cnpj_cond)";
-                mysql_query($sql) or die($sql);
-
-                $sql = "Select last_insert_id () As last_id from boletao";
-                $query = mysql_query($sql);
-                $campos = mysql_fetch_array($query);
-                $this->HiddenField1->Value = $campos['last_id'];
+                //$_db2->disconnect();
+                $_db2->connect();
+                $_db2->select(
+                    'boletao',
+                    'last_insert_id () As last_id'
+                );
+                $campos = $_db2->getResult();
                 $codboletao = $campos['last_id'];
-
-                $sql = "Insert into icrononossonumero (NOSSONUMERO, CODCRONOGRAMA, TIPO_BOLETO) Values
-                ('$nossonum', $codboletao, 'B')";
-                mysql_query($sql);
-
-                $sql = "Update empresas Set NOSSONUM_SEQ = NOSSONUM_SEQ + 1
-                Where CODEMPRESA = 1 ";
-                mysql_query($sql);
+                $_db2->disconnect();
+                $_db2->connect();
+                $response['insert_result']['icrononossonumero'] = $_db2->insert(
+                    'icrononossonumero',
+                    array('NOSSONUMERO' => $nossonum, 'CODCRONOGRAMA' => $codboletao, 'TIPO_BOLETO' => 'B')
+                );
+                $_db2->disconnect();
+                $_db2->connect();
+                $response['update_result']['empresas'] = $_db2->update(
+                    'empresas',
+                    array('CODEMPRESA' => '1'),
+                    'NOSSONUM_SEQ = NOSSONUM_SEQ + 1'
+                );
             }
-
             $total = 0;
-
+            $_db2->disconnect();
+            $_db2->connect();
             foreach ($_db->getResult() as $row) {
-                $contrato = $this->qrpesquisa->CODOPERACAO;
-                $parcela = str_pad($this->qrpesquisa->NDOC, 3, '0', STR_PAD_LEFT);
-                $contrato = $contrato . '-' . $parcela;
-
-                $codcronograma = $this->qrpesquisa->CODCRONOGRAMA;
-
-                $valor = $this->qrpesquisa->VL_FACE;
-
+                $contrato = $row['CODOPERACAO'];
+                $parcela = str_pad($row['NDOC'], 3, '0', STR_PAD_LEFT);
+                $contrato .= '-' . $parcela;
+                $codcronograma = $row['CODCRONOGRAMA'];
+                $valor = $row['VL_FACE'];
                 $total += $valor;
-
-                $sql = "Insert Into iboletao (CODBOLETAO, CONTRATO, VALOR, CODCRONOGRAMA)
-                Values ('" . $campos['last_id'] . "', '" . $contrato . "', '" . $valor . "', " . $codcronograma . ")";
-                $this->qrboletao->close();
-                $this->qrboletao->SQL = $sql;
-                $this->qrboletao->open();
-                $this->qrboletao->close();
-
-                $this->qrpesquisa->next();
+                $response['insert_result']['iboletao'][] = $_db2->insert(
+                    'iboletao',
+                    array('CODBOLETAO' => $campos['last_id'], 'CONTRATO' => $contrato, 'VALOR' => $valor, 'CODCRONOGRAMA' => $codcronograma)
+                );
             }
-            $this->Label16->Caption = number_format($total, 2, ',', '.');
+            $_db2->disconnect();
+            $_db->disconnect();
+            $response['total'] = number_format($total, 2, ',', '.');
+            return $response;
         }
         return array('error' => true, 'message' => "Vencimento não pode ser maior que a data atual[ data-atual:$dataatual, vencimento:$vencimento]", 'raw' => array($start, $end, $vencimento, $averbador, $nomeOuCpf, $condominioValue));
     }

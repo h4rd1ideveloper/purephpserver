@@ -173,7 +173,7 @@ class Dao extends QueryBuilder
                 $this->_con = true;
                 return $this->_con;
             } catch (PDOException $e) {
-                return $e->getMessage();
+                return $e->getMessage() . $e->getTraceAsString();
             }
         } else {
             return true;
@@ -207,7 +207,7 @@ class Dao extends QueryBuilder
             }
             return true;
         } catch (PDOException $e) {
-            print_r($e->getMessage() . '' . $e->getTraceAsString() . '');
+            print_r($e->getMessage() . $e->getTraceAsString());
             return false;
         }
     }
@@ -256,7 +256,7 @@ class Dao extends QueryBuilder
                 $this->numResults === 0 ? $this->result = null : true;
                 return true;
             } catch (PDOException $e) {
-                return $e->getMessage() . '' . $e->getTraceAsString() . '';
+                return $e->getMessage() . $e->getTraceAsString();
             }
         }
         return false;
@@ -295,7 +295,7 @@ class Dao extends QueryBuilder
         try {
             return $this->_db->prepare($insert)->execute();
         } catch (PDOException $e) {
-            return $e->getMessage() . '' . $e->getTraceAsString() . '';
+            return $e->getMessage() . $e->getTraceAsString();
         }
     }
 
@@ -320,7 +320,7 @@ class Dao extends QueryBuilder
         try {
             return $this->_db->prepare($deleteQ)->execute();
         } catch (PDOException $e) {
-            return $e->getMessage() . '' . $e->getTraceAsString() . '';
+            return $e->getMessage() . $e->getTraceAsString();
         }
     }
 }

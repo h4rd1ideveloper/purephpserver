@@ -197,28 +197,20 @@ class gerarremessaadmboletao extends Page
                 } Else {
                     $this->DBRepeater1->DataSource = '';
                 }
-
                 $total = 0;
-
-                While (!$this->qrpesquisa->EOF) {
-
+                While (!$this->HiddenField1->EOF) {
                     $contrato = $this->qrpesquisa->CODOPERACAO;
                     $parcela = str_pad($this->qrpesquisa->NDOC, 3, '0', STR_PAD_LEFT);
                     $contrato = $contrato . '-' . $parcela;
-
                     $codcronograma = $this->qrpesquisa->CODCRONOGRAMA;
-
                     $valor = $this->qrpesquisa->VL_FACE;
-
                     $total += $valor;
-
                     $sql = "Insert Into iboletao (CODBOLETAO, CONTRATO, VALOR, CODCRONOGRAMA)
                     Values ('" . $campos['last_id'] . "', '" . $contrato . "', '" . $valor . "', " . $codcronograma . ")";
                     $this->qrboletao->close();
                     $this->qrboletao->SQL = $sql;
                     $this->qrboletao->open();
                     $this->qrboletao->close();
-
                     $this->qrpesquisa->next();
                 }
 
