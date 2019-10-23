@@ -29,7 +29,7 @@ class PDF extends TCPDF
 
         $this->Cell($w[0], 5, '', 0, 0, 'L');
         $this->Cell($w[1], 5, $this->titulo, 0, 0, 'L');
-        $this->Cell($w[2], 5, 'Emissão: ' . date("d/m/Y - H:i:s"), 0, 0, 'R');
+        $this->Cell($w[2], 5, 'Emissão: ' . date('d/m/Y - H:i:s'), 0, 0, 'R');
         $this->Ln();
 
         $w = array(30, 160);

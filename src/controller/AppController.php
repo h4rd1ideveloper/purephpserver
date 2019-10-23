@@ -14,15 +14,18 @@ use App\model\AjaxResolver;
 final class AppController extends Controller
 {
     /**
-     * @param Request $req
      * @param Response $res
-     * @return string
+     * @return void
      */
     public static function index(Response $res)
     {
         $res->send(array(), 'pages/Listagem');
     }
 
+    /**
+     * @param Request $request
+     * @param Response $response
+     */
     public static function indexAfterPost(Request $request, Response $response)
     {
         $result = $response::jsonToArray(self::apiIndex($request));
@@ -33,6 +36,10 @@ final class AppController extends Controller
         }
     }
 
+    /**
+     * @param Request $req
+     * @return string
+     */
     public static function apiIndex(Request $req)
     {
         $body = $req->getParsedBody();
@@ -92,7 +99,10 @@ final class AppController extends Controller
         );
     }
 
-    public static function relatorio(Request $request, Response $response)
+    /**
+     * @param Request $request
+     */
+    public static function relatorio(Request $request)
     {
         $body = $request->getQueryParams();
         $nomeOuCpf = isset($body['nomeOuCpf']) && !empty($body['nomeOuCpf']) ? $body['nomeOuCpf'] : null;
@@ -111,5 +121,36 @@ final class AppController extends Controller
         } else {
             echo Request::toJson(array('error' => true, 'message' => 'miss something in body request', 'raw' => $body));
         }
+    }
+
+    /**
+     * @param Request $request
+     * @return bool|string
+     */
+    public static function atualizarContratos(Request $request)
+    {
+        $body = $request->getParsedBody();
+        if (isset(
+            $body['start'],
+            $body['end'],
+            $body['vencimento'],
+            $body['averbador'],
+            $body['nomeOuCpf'],
+            $body['condominioValue']
+        )) {
+            $result = AjaxResolver::attContratos(
+                $body['start'],
+                $body['end'],
+                $body['vencimento'],
+                $body['averbador'],
+                $body['nomeOuCpf'],
+                $body['condominioValue']
+            );
+            return $result === false ?
+                Request::toJson(array('error' => true, 'message' => 'something is worng inside AjaxResolver::condominios', 'raw' => array($result, $body))) :
+                $result;
+        }
+        return Request::toJson(array('error' => true, 'message' => 'miss something in body request', 'raw' => $body));
+
     }
 }

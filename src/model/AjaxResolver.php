@@ -101,16 +101,16 @@ class AjaxResolver
                 " And r.NOME like '%$nomeOuCpf%'";
         }
 
-        IF ($condominioValue != -1) {
+        IF ($condominioValue !== '-1') {
             $where .= " And p.CODEMPREGADOR = '$condominioValue'";
         }
 
-        IF ($de != '' && $ate != '') {
+        IF (Helpers::stringIsOk($de) && Helpers::stringIsOk($ate)) {
             $where .= " And c.VENCIMENTO Between '$de' And '$ate'";
         }
 
-        $group = " c.CODOPERACAO ";
-        $order = " emp.DESCRICAO, r.NOME, c.VENCIMENTO ";
+        $group = ' c.CODOPERACAO ';
+        $order = ' emp.DESCRICAO, r.NOME, c.VENCIMENTO ';
         $_db2->select(
             $table,
             $fields,
@@ -123,7 +123,7 @@ class AjaxResolver
             $total = Helpers::Reducer(
                 $_db2->getResult(),
                 function ($initialValue, $value, $key) {
-                    return (float)((float)$initialValue + (float)$value['VL_FACE']);
+                    return ((float)$initialValue + (float)$value['VL_FACE']);
                 },
                 0
             );
@@ -133,7 +133,7 @@ class AjaxResolver
                 $contrato = explode('-', $row['CODEMPRESTA']);
                 $contrato = $contrato[0];
                 $parcela = str_pad($row['NDOC'], 3, '0', STR_PAD_LEFT);
-                $contrato = $contrato . '-' . $parcela;
+                $contrato .= '-' . $parcela;
                 return array(
                     $row['EMPREGADOR'],
                     $row['CPFCNPJ'],
@@ -177,7 +177,6 @@ class AjaxResolver
             return $join;
         }
 
-        ;
         /**
          * @param $pesquisa
          * @param $cpfcnpj
@@ -192,7 +191,6 @@ class AjaxResolver
             return $sql;
         }
 
-        ;
         if (isset($cpfcnpj, $campo1, $campo2)) {
             $_db = new Dao('177.184.16.56', 'rbm_yan', 'AolU+j*w', 'emprestascm_webscm6');
             $_db->connect();
@@ -218,10 +216,10 @@ class AjaxResolver
                 $groupBy,
                 ' NOME'
             );
-            $html = '<option value=-1>GERAL</option>';
+            $html = '<option value="-1">GERAL</option>';
             foreach ($_db->getResult() as $row) {
                 if (Helpers::stringIsOk($row['CPFCNPJ']) && Helpers::stringIsOk($row['NOME'])) {
-                    $html .= "<option value='" . $row['CPFCNPJ'] . "'>" . $row['NOME'] . '</option>';
+                    $html .= sprintf("<option value='%s'>%s</option>", $row['CPFCNPJ'], $row['NOME']);
                 }
             }
             $_db->disconnect();
@@ -249,7 +247,7 @@ class AjaxResolver
         $pdf = new PDF('P');
         $pdf->nomemp = $qrempresa[0]['RAZAOSOCIAL'];
         $pdf->ncidade = $qrempresa[0]['CIDADE'];
-        $pdf->titulo = 'Relatório de Boletão - Período De: ' . $start . ' Até: ' . $end;
+        $pdf->titulo = 'Relatório de Boletão - Período De: ' . Helpers::ymdToDmy($start) . ' Até: ' . Helpers::ymdToDmy($end);
         $de = $start;
         $ate = $end;
         $pdf->AddPage();
@@ -267,9 +265,10 @@ class AjaxResolver
                 null,
                 "CPFCNPJ = '$averbador'",
                 null,
-                'By NOME'
+                'NOME'
             );
             $qraverbador = $_db2->getResult();
+            //exit(var_dump($_db2->getResult()));
             $qraverbador = $qraverbador[0];
             $fill = 1;
             $pdf->SetFont('Times', 'B', 8);
@@ -313,16 +312,16 @@ class AjaxResolver
                 " And r.NOME like '%$nomeOuCpf%'";
         }
 
-        IF ($condominioValue != -1) {
+        IF ($condominioValue !== '-1') {
             $where .= " And p.CODEMPREGADOR = '$condominioValue'";
         }
 
-        IF ($de != '' && $ate != '') {
+        IF (Helpers::stringIsOk($de) && Helpers::stringIsOk($ate)) {
             $where .= " And c.VENCIMENTO Between '$de' And '$ate'";
         }
 
-        $group = " c.CODOPERACAO ";
-        $order = " emp.DESCRICAO, r.NOME, c.VENCIMENTO ";
+        $group = ' c.CODOPERACAO ';
+        $order = ' emp.DESCRICAO, r.NOME, c.VENCIMENTO ';
         $_db->select(
             $table,
             $fields,
@@ -339,7 +338,7 @@ class AjaxResolver
             $pdf->Cell($w[1], 5, $row['CPFCNPJ'], 'B', 0, 'C', $fill);
             $pdf->Cell($w[2], 5, substr($row['NOME'], 0, 25), 'B', 0, 'L', $fill);
             $pdf->Cell($w[3], 5, $codEmpresta . '-' . $parcela, 'B', 0, 'C', $fill);
-            $pdf->Cell($w[4], 5, $row['VENCIMENTO'], 'B', 0, 'C', $fill);
+            $pdf->Cell($w[4], 5, Helpers::ymdToDmy($row['VENCIMENTO']), 'B', 0, 'C', $fill);
             $pdf->Cell($w[5], 5, number_format($row['VL_FACE'], 2, ',', '.'), 'B', 0, 'R', $fill);
             $pdf->Ln();
             $totvalor += $row['VL_FACE'];
@@ -356,4 +355,139 @@ class AjaxResolver
         ob_clean();
         $pdf->Output('relBoletao.pdf', 'D');
     }
+
+    public static function attContratos($start, $end, $vencimento, $averbador, $nomeOuCpf, $condominioValue)
+    {
+        $dataatual = date('Y-m-d');
+        $de = $start;
+        $ate = $end;
+        IF (($vencimento >= $dataatual) && $averbador !== '-1') {
+            $fields = '
+            emp.DESCRICAO As EMPREGADOR,
+            c.CODCRONOGRAMA,
+            o.CODOPERACAO,
+            p.NPARCELAS,
+            c.NDOC,
+            r.CODEMPRESTA as MATRICULA,
+            emp.CODEMPREGADOR,
+            c.VL_FACE,
+            p.CPFCNPJ,
+            r.NOME,
+            o.CODOPERACAO As CODEMPRESTA,
+            p.VALORFINANCIADO,
+            c.VENCIMENTO 
+            ';
+            $table = ' propostas p ';
+            $join = array(
+                'Inner Join rup r On r.CPFCNPJ = p.CPFCNPJ',
+                'left Join empregador emp On emp.CPFCNPJEMPREGADOR = p.CODEMPREGADOR',
+                'Inner Join operacao o On o.CODPROPOSTA = p.CODPROPOSTA',
+                'Inner Join cronograma c On c.CODOPERACAO = o.CODOPERACAO'
+            );
+            $where = "
+            p.CODAVERBADOR = '$averbador' And
+            (p.CODSTATUS = 11 Or p.CODSTATUS = 12) And
+            c.LIQUIDA is null And
+            r.DESLIGADO = 'N' And
+            r.BLOQUEADO = 'N' And
+            r.SITUACAOPESSOA = 'N' And
+            c.SITUACAOPESSOACRONO = 'N'
+            ";
+            IF (Helpers::stringIsOk($nomeOuCpf)) {
+                $where .= Helpers::isOnlyNumbers($nomeOuCpf) ? " And r.CPFCNPJ = '$nomeOuCpf'" : " And r.NOME like '%$nomeOuCpf%'";
+            }
+            IF ($condominioValue !== '-1') {
+                $where .= " And p.CODEMPREGADOR = '$condominioValue'";
+            }
+            IF (Helpers::stringIsOk($de) && Helpers::stringIsOk($ate)) {
+                $where .= " And c.VENCIMENTO Between '" . $de . "' And '" . $ate . "'";
+            }
+            $group = ' c.CODOPERACAO';
+            $order = 'emp.DESCRICAO, r.NOME, c.VENCIMENTO';
+            $_db = new Dao('177.184.16.56', 'rbm_yan', 'AolU+j*w', 'emprestascm_webscm6');
+            $_db->connect();
+            $_db->select(
+                $table,
+                $fields,
+                $join,
+                $where,
+                $group,
+                $order
+            );
+            IF ($_db->getNumResults()) {
+                $_db2 = new Dao('177.184.16.56', 'rbm_yan', 'AolU+j*w', 'emprestascm_webscm6');
+                $_db2->connect();
+                $_db2->select(
+                    'empresas',
+                    'NOSSONUM_SEQ',
+                    null,
+                    'CODEMPRESA = 1'
+                );
+                $campos = $_db2->getResult();
+                $campos = $campos[0];
+                $nossonum1 = $campos['NOSSONUM_SEQ'];
+                $nossonum = str_pad($nossonum1, 11, "0", STR_PAD_LEFT);
+                $cnpj_cond = 'Null';
+                IF (Helpers::stringIsOk($condominioValue) && $condominioValue !== '-1') {
+                    $cnpj_cond = $condominioValue;
+                }
+                $_db2->disconnect();
+                $_db2->connect();
+                $_db2->insert(
+                    'boletao',
+                    array(
+                        'DTHR_INCLUSAO' => 'NOW()',
+                        'USU_INCLUSAO' => $condominioValue,
+                        'VENCIMENTO_ENVIO' => $vencimento,
+                        'CNPJ_ADM' => $averbador,
+                        'NOSSONUMERO' => $nossonum,
+                        'CNPJ_COND' => $cnpj_cond
+                    )
+                );
+                $sql = "Insert Into boletao (DTHR_INCLUSAO, USU_INCLUSAO, VENCIMENTO_ENVIO, CNPJ_ADM, NOSSONUMERO, CNPJ_COND)
+                Values (NOW(), '$averbador', '$vencimento', '$averbador', '$nossonum', $cnpj_cond)";
+                mysql_query($sql) or die($sql);
+
+                $sql = "Select last_insert_id () As last_id from boletao";
+                $query = mysql_query($sql);
+                $campos = mysql_fetch_array($query);
+                $this->HiddenField1->Value = $campos['last_id'];
+                $codboletao = $campos['last_id'];
+
+                $sql = "Insert into icrononossonumero (NOSSONUMERO, CODCRONOGRAMA, TIPO_BOLETO) Values
+                ('$nossonum', $codboletao, 'B')";
+                mysql_query($sql);
+
+                $sql = "Update empresas Set NOSSONUM_SEQ = NOSSONUM_SEQ + 1
+                Where CODEMPRESA = 1 ";
+                mysql_query($sql);
+            }
+
+            $total = 0;
+
+            foreach ($_db->getResult() as $row) {
+                $contrato = $this->qrpesquisa->CODOPERACAO;
+                $parcela = str_pad($this->qrpesquisa->NDOC, 3, '0', STR_PAD_LEFT);
+                $contrato = $contrato . '-' . $parcela;
+
+                $codcronograma = $this->qrpesquisa->CODCRONOGRAMA;
+
+                $valor = $this->qrpesquisa->VL_FACE;
+
+                $total += $valor;
+
+                $sql = "Insert Into iboletao (CODBOLETAO, CONTRATO, VALOR, CODCRONOGRAMA)
+                Values ('" . $campos['last_id'] . "', '" . $contrato . "', '" . $valor . "', " . $codcronograma . ")";
+                $this->qrboletao->close();
+                $this->qrboletao->SQL = $sql;
+                $this->qrboletao->open();
+                $this->qrboletao->close();
+
+                $this->qrpesquisa->next();
+            }
+            $this->Label16->Caption = number_format($total, 2, ',', '.');
+        }
+        return array('error' => true, 'message' => "Vencimento não pode ser maior que a data atual[ data-atual:$dataatual, vencimento:$vencimento]", 'raw' => array($start, $end, $vencimento, $averbador, $nomeOuCpf, $condominioValue));
+    }
+
 }

@@ -3,6 +3,12 @@
   <component name="ChangeListManager">
     <list default="true" id="b2ee2aec-2c2e-4923-8a0b-4ebf0719d6cd" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/boletao/gerar-remessa-adm-boletao.php" beforeDir="false" afterPath="$PROJECT_DIR$/assets/boletao/gerar-remessa-adm-boletao.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/funcoes/index.php" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/assets/lib/Dao.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/assets/lib/Dao.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/assets/lib/Helpers.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/assets/lib/Helpers.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/assets/lib/PDF/PDF.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/assets/lib/PDF/PDF.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controller/AppController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/controller/AppController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/model/AjaxResolver.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/model/AjaxResolver.php" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -52,7 +58,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/index.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-7">
+            <state relative-caret-position="600">
               <caret line="29" column="29" selection-start-line="29" selection-start-column="29" selection-end-line="29" selection-end-column="29" />
             </state>
           </provider>
@@ -61,8 +67,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/controller/AppController.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-7">
-              <caret line="47" column="32" selection-start-line="47" selection-start-column="32" selection-end-line="47" selection-end-column="32" />
+            <state relative-caret-position="3288">
+              <caret line="140" column="48" selection-start-line="140" selection-start-column="48" selection-end-line="140" selection-end-column="48" />
               <folding>
                 <element signature="e#34#61#0#PHP" expanded="true" />
               </folding>
@@ -70,11 +76,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/model/AjaxResolver.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="224">
-              <caret line="216" column="23" selection-start-line="216" selection-start-column="23" selection-end-line="216" selection-end-column="23" />
+            <state relative-caret-position="384">
+              <caret line="435" column="24" lean-forward="true" selection-start-line="435" selection-start-column="24" selection-end-line="435" selection-end-column="24" />
               <folding>
                 <element signature="e#31#54#0#PHP" expanded="true" />
               </folding>
@@ -82,10 +88,52 @@
           </provider>
         </entry>
       </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/assets/lib/Dao.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="310">
+              <caret line="300" column="19" selection-start-line="300" selection-start-column="19" selection-end-line="300" selection-end-column="19" />
+              <folding>
+                <element signature="e#34#42#0#PHP" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/assets/boletao/gerar-remessa-adm-boletao.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="373">
+              <caret line="202" column="41" selection-start-line="202" selection-start-column="31" selection-end-line="202" selection-end-column="41" />
+              <folding>
+                <element signature="e#5393#7202#0#PHP" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$APPLICATION_CONFIG_DIR$/consoles/db/b8918baf-e3b4-4b4b-ab0c-ef02f3cfbee6/console.sql">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="672">
+              <caret line="28" column="33" selection-end-line="29" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/assets/lib/Helpers.php">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="583">
+              <caret line="35" column="107" selection-start-line="35" selection-start-column="107" selection-end-line="35" selection-end-column="107" />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/view/pages/Listagem.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
+            <state relative-caret-position="4584">
               <caret line="191" column="5" selection-start-line="191" selection-start-column="5" selection-end-line="191" selection-end-column="5" />
             </state>
           </provider>
@@ -95,7 +143,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>label19</find>
       <find>Label9</find>
       <find>$response</find>
       <find>$result</find>
@@ -124,6 +171,7 @@
       <find>relatori</find>
       <find>portal/api/</find>
       <find>relatorio</find>
+      <find>helper</find>
       <find>Button1</find>
     </findStrings>
     <dirStrings>
@@ -136,29 +184,29 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/assets/lib/Dao.php" />
         <option value="$PROJECT_DIR$/src/http/Response.php" />
-        <option value="$PROJECT_DIR$/src/assets/lib/Helpers.php" />
         <option value="$PROJECT_DIR$/src/routes/Router.php" />
         <option value="$PROJECT_DIR$/src/view/components/Components.php" />
         <option value="$PROJECT_DIR$/src/controller/Controller.php" />
         <option value="$PROJECT_DIR$/src/assets/lib/PDF/fpdf.php" />
-        <option value="$PROJECT_DIR$/assets/boletao/gerar-remessa-adm-boletao.php" />
         <option value="$PROJECT_DIR$/src/assets/lib/PDF/PFD.php" />
         <option value="$PROJECT_DIR$/src/assets/lib/PDF/FPDF.php" />
         <option value="$PROJECT_DIR$/src/assets/lib/assets/geraCCB_crefaz.php" />
         <option value="$PROJECT_DIR$/src/assets/lib/PDF/fpdf/fpdf.php" />
         <option value="$PROJECT_DIR$/src/assets/lib/PDF/tcpdf/config/tcpdf_config_alt.php" />
         <option value="$PROJECT_DIR$/src/assets/lib/PDF/tcpdf/tcpdf.php" />
-        <option value="$PROJECT_DIR$/src/assets/lib/PDF/PDF.php" />
         <option value="$PROJECT_DIR$/src/assets/lib/PDF/tcpdf/TCPDF.php" />
         <option value="$PROJECT_DIR$/src/assets/lib/PDF/tcpdf/include/tcpdf_static.php" />
-        <option value="$PROJECT_DIR$/src/controller/AppController.php" />
-        <option value="$APPLICATION_CONFIG_DIR$/consoles/db/b8918baf-e3b4-4b4b-ab0c-ef02f3cfbee6/console.sql" />
         <option value="$PROJECT_DIR$/src/assets/lib/QueryBuilder.php" />
         <option value="$PROJECT_DIR$/src/view/pages/Listagem.php" />
         <option value="$PROJECT_DIR$/index.php" />
+        <option value="$PROJECT_DIR$/src/assets/lib/PDF/PDF.php" />
+        <option value="$PROJECT_DIR$/src/controller/AppController.php" />
+        <option value="$APPLICATION_CONFIG_DIR$/consoles/db/b8918baf-e3b4-4b4b-ab0c-ef02f3cfbee6/console.sql" />
+        <option value="$PROJECT_DIR$/assets/boletao/gerar-remessa-adm-boletao.php" />
+        <option value="$PROJECT_DIR$/src/assets/lib/Helpers.php" />
         <option value="$PROJECT_DIR$/src/model/AjaxResolver.php" />
+        <option value="$PROJECT_DIR$/src/assets/lib/Dao.php" />
       </list>
     </option>
   </component>
@@ -201,9 +249,8 @@
     </include_path>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="123" />
-    <option name="y" value="217" />
-    <option name="width" value="1928" />
+    <option name="x" value="953" />
+    <option name="width" value="974" />
     <option name="height" value="1047" />
   </component>
   <component name="ProjectId" id="1SQnubB0QB6s0mcDxyPhZA9mHXt" />
@@ -215,8 +262,55 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="portal" type="b2602c69:ProjectViewProjectNode" />
+              <item name="portal" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="portal" type="b2602c69:ProjectViewProjectNode" />
+              <item name="portal" type="462c0819:PsiDirectoryNode" />
+              <item name="assets" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="portal" type="b2602c69:ProjectViewProjectNode" />
+              <item name="portal" type="462c0819:PsiDirectoryNode" />
+              <item name="assets" type="462c0819:PsiDirectoryNode" />
+              <item name="boletao" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="portal" type="b2602c69:ProjectViewProjectNode" />
+              <item name="portal" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="portal" type="b2602c69:ProjectViewProjectNode" />
+              <item name="portal" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="assets" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="portal" type="b2602c69:ProjectViewProjectNode" />
+              <item name="portal" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="assets" type="462c0819:PsiDirectoryNode" />
+              <item name="lib" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="portal" type="b2602c69:ProjectViewProjectNode" />
+              <item name="portal" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="assets" type="462c0819:PsiDirectoryNode" />
+              <item name="lib" type="462c0819:PsiDirectoryNode" />
+              <item name="PDF" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
       <pane id="Scope" />
-      <pane id="ProjectPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -313,12 +407,13 @@
       <workItem from="1571668342018" duration="18585000" />
       <workItem from="1571743904404" duration="31175000" />
       <workItem from="1571830179306" duration="562000" />
-      <workItem from="1571831086640" duration="222000" />
+      <workItem from="1571831086640" duration="4624000" />
+      <workItem from="1571835778973" duration="2321000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="50577000" />
+    <option name="totallyTimeSpent" value="57300000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -326,7 +421,7 @@
     <layout>
       <window_info id="Structure" order="0" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="1" side_tool="true" />
-      <window_info content_ui="combo" id="Project" order="2" visible="true" weight="0.16204691" />
+      <window_info active="true" content_ui="combo" id="Project" order="2" visible="true" weight="0.1641791" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32936078" />
       <window_info anchor="bottom" id="Run" order="2" />
@@ -336,7 +431,7 @@
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Database Changes" order="7" />
       <window_info anchor="bottom" id="Version Control" order="8" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="9" visible="true" weight="0.18080357" />
+      <window_info anchor="bottom" id="Terminal" order="9" weight="0.52120537" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
       <window_info anchor="bottom" id="Database Console" order="11" weight="0.40086675" />
       <window_info anchor="bottom" id="Docker" order="12" show_stripe_button="false" />
@@ -473,16 +568,6 @@
     <entry file="file://$APPLICATION_CONFIG_DIR$/consoles/db/5b224ef6-5d79-4c53-91de-0080bd0ded00/console.sql">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/assets/lib/Helpers.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="168">
-          <caret line="207" column="27" selection-start-line="207" selection-start-column="27" selection-end-line="207" selection-end-column="27" />
-          <folding>
-            <element signature="e#34#63#0#PHP" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/assets/boletao/gerar-remessa-adm-boletao.xml.php">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="158">
@@ -541,13 +626,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/assets/lib/PDF/PDF.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="12" column="6" selection-start-line="12" selection-start-column="6" selection-end-line="12" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/assets/lib/PDF/tcpdf/include/tcpdf_static.php">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="299">
@@ -571,16 +649,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/assets/lib/Dao.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="134">
-          <caret line="203" column="34" lean-forward="true" selection-start-line="203" selection-start-column="34" selection-end-line="203" selection-end-column="34" />
-          <folding>
-            <element signature="e#34#42#0#PHP" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/assets/lib/QueryBuilder.php">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="355">
@@ -591,50 +659,77 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$APPLICATION_CONFIG_DIR$/consoles/db/b8918baf-e3b4-4b4b-ab0c-ef02f3cfbee6/console.sql">
+    <entry file="file://$PROJECT_DIR$/src/assets/lib/PDF/PDF.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="476">
-          <caret line="28" column="52" selection-end-line="31" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/assets/boletao/gerar-remessa-adm-boletao.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="131">
-          <caret line="131" column="37" lean-forward="true" selection-start-line="131" selection-start-column="37" selection-end-line="131" selection-end-column="37" />
+        <state relative-caret-position="744">
+          <caret line="31" column="56" selection-start-line="31" selection-start-column="56" selection-end-line="31" selection-end-column="56" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/index.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-7">
+        <state relative-caret-position="600">
           <caret line="29" column="29" selection-start-line="29" selection-start-column="29" selection-end-line="29" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/view/pages/Listagem.php">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret line="191" column="5" selection-start-line="191" selection-start-column="5" selection-end-line="191" selection-end-column="5" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/controller/AppController.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-7">
-          <caret line="47" column="32" selection-start-line="47" selection-start-column="32" selection-end-line="47" selection-end-column="32" />
+        <state relative-caret-position="3288">
+          <caret line="140" column="48" selection-start-line="140" selection-start-column="48" selection-end-line="140" selection-end-column="48" />
           <folding>
             <element signature="e#34#61#0#PHP" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$APPLICATION_CONFIG_DIR$/consoles/db/b8918baf-e3b4-4b4b-ab0c-ef02f3cfbee6/console.sql">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="672">
+          <caret line="28" column="33" selection-end-line="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/view/pages/Listagem.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4584">
+          <caret line="191" column="5" selection-start-line="191" selection-start-column="5" selection-end-line="191" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/assets/boletao/gerar-remessa-adm-boletao.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="373">
+          <caret line="202" column="41" selection-start-line="202" selection-start-column="31" selection-end-line="202" selection-end-column="41" />
+          <folding>
+            <element signature="e#5393#7202#0#PHP" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/assets/lib/Helpers.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="583">
+          <caret line="35" column="107" selection-start-line="35" selection-start-column="107" selection-end-line="35" selection-end-column="107" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/model/AjaxResolver.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="224">
-          <caret line="216" column="23" selection-start-line="216" selection-start-column="23" selection-end-line="216" selection-end-column="23" />
+        <state relative-caret-position="384">
+          <caret line="435" column="24" lean-forward="true" selection-start-line="435" selection-start-column="24" selection-end-line="435" selection-end-column="24" />
           <folding>
             <element signature="e#31#54#0#PHP" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/assets/lib/Dao.php">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="310">
+          <caret line="300" column="19" selection-start-line="300" selection-start-column="19" selection-end-line="300" selection-end-column="19" />
+          <folding>
+            <element signature="e#34#42#0#PHP" expanded="true" />
           </folding>
         </state>
       </provider>

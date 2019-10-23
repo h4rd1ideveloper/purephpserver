@@ -296,11 +296,9 @@ class Dao extends QueryBuilder
      */
     public function insert($table, $fieldsAndValues)
     {
-        $insert = parent::queryInsert($table, $fieldsAndValues);
+        $insert = self::queryInsert($table, $fieldsAndValues);
         try {
-            $ins = $this->_db->prepare($insert);
-            $ins->execute();
-            return true;
+            return $this->_db->prepare($insert)->execute();
         } catch (PDOException $e) {
             return $e->getMessage() . '' . $e->getTraceAsString() . '';
         }
@@ -314,7 +312,7 @@ class Dao extends QueryBuilder
      */
     public function delete($table, $where)
     {
-        $deleteQ = parent::keyAndValue(
+        $deleteQ = self::keyAndValue(
             sprintf(
             /**@lang text */
                 'DELETE FROM %s WHERE ',
@@ -325,9 +323,7 @@ class Dao extends QueryBuilder
             true
         );
         try {
-            $del = $this->_db->prepare($deleteQ);
-            $del->execute();
-            return true;
+            return $this->_db->prepare($deleteQ)->execute();
         } catch (PDOException $e) {
             return $e->getMessage() . '' . $e->getTraceAsString() . '';
         }

@@ -128,7 +128,7 @@ class gerarremessaadmboletao extends Page
                 On o.CODPROPOSTA = p.CODPROPOSTA
                 Inner Join cronograma c
                 On c.CODOPERACAO = o.CODOPERACAO
-                Where p.CODAVERBADOR = '" . $averbador . "' And (p.CODSTATUS = 11 Or p.CODSTATUS = 12) And c.LIQUIDA is null
+                Where p.CODAVERBADOR = '$averbador' And (p.CODSTATUS = 11 Or p.CODSTATUS = 12) And c.LIQUIDA is null
                 And r.DESLIGADO = 'N'
                 And r.BLOQUEADO = 'N'
                 And r.SITUACAOPESSOA = 'N'
@@ -224,7 +224,6 @@ class gerarremessaadmboletao extends Page
 
                 IF (($this->qrpesquisa->RecordCount > 0) And (!$erro)) {
                     $this->Label16->Caption = number_format($total, 2, ',', '.');
-                    // echo "<script>alerta('Aten��o!', 'O vencimento do boleto tem que ser maior ou igual a data atual.', 'erro');</script>";
                 }
             }
         } Else {

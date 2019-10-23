@@ -33,16 +33,7 @@ class Helpers
      */
     public static function stringIsOk($string)
     {
-        return is_string($string) && $string !== null && !empty($string) && isset($string) && $string !== "";
-    }
-
-    /**
-     * @param $number
-     * @return bool
-     */
-    public static function isOnlyNumbers($number)
-    {
-        return preg_match("/^\d+$/", $number) ? true : false;
+        return is_string($string) && $string !== null && !empty($string) && isset($string) && $string !== '';
     }
 
     /**
@@ -331,5 +322,33 @@ class Helpers
             $initialValue = $callback($initialValue, $value, $key);
         }
         return $initialValue;
+    }
+
+    /**
+     * @param $strDate
+     * @return false|string
+     */
+    public static function ymdToDmy($strDate)
+    {
+        if (!self::stringIsOk($strDate)) {
+            throw new InvalidArgumentException('Parameter must be a valid string');
+        }
+        if (
+            !self::isOnlyNumbers(substr($strDate, 0, 4)) ||
+            !self::isOnlyNumbers(substr($strDate, 5, 2)) ||
+            !self::isOnlyNumbers(substr($strDate, 8, 2))
+        ) {
+            throw new InvalidArgumentException('Parameter must be a valid datetime with format y-m-d');
+        }
+        return date('d/m/Y', strtotime('2019-12-01'));
+    }
+
+    /**
+     * @param $number
+     * @return bool
+     */
+    public static function isOnlyNumbers($number)
+    {
+        return preg_match("/^\d+$/", $number) ? true : false;
     }
 }
