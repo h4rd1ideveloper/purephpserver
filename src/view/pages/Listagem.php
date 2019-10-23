@@ -3,24 +3,25 @@
 use App\view\components\Components;
 
 $vars = isset($vars) && count($vars) ? $vars : null;
-$flag = isset($vars, $vars['table']) && count($vars['table']) ? true : false;
-
+$flag = (isset($vars['table']) && count($vars['table']));
+$error = isset($vars['error']);
 Components::headerHTML(
     array(
         'title' => 'Boletão',
-        'src' => "<script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js' integrity='sha256-S1J4GVHHDMiirir9qsXWc8ZWw74PHHafpsHp5PXtjTs=' crossorigin='anonymous'></script><script src='/portal/src/view/assets/js/moment-with-locales.js'></script><script src='https://cdnjs.cloudflare.com/ajax/libs/rxjs/6.5.3/rxjs.umd.min.js' integrity='sha256-opvkRN8JcEjsFLLVkYM5d5n54MuZJBkljuRb5E4sQrk=' crossorigin='anonymous'></script>"
+        'src' => "<script src='https://cdn.jsdelivr.net/npm/sweetalert2@8.18.6/dist/sweetalert2.min.js'></script><link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/sweetalert2@8.18.6/dist/sweetalert2.min.css'><script src='https://cdn.jsdelivr.net/npm/sweetalert2@8'></script><script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js' integrity='sha256-S1J4GVHHDMiirir9qsXWc8ZWw74PHHafpsHp5PXtjTs=' crossorigin='anonymous'></script><script src='/portal/src/view/assets/js/moment-with-locales.js'></script><script src='https://cdnjs.cloudflare.com/ajax/libs/rxjs/6.5.3/rxjs.umd.min.js' integrity='sha256-opvkRN8JcEjsFLLVkYM5d5n54MuZJBkljuRb5E4sQrk=' crossorigin='anonymous'></script>"
     )
 );
 ?>
+
 
 <nav class="navbar navbar-light bg-light background-custom">
     <a class="navbar-brand text-white" href="/portal/">Boletão</a>
 </nav>
 
 <main class="container-fluid">
-    <form action="http://localhost/portal/boletos" method="post" enctype="multipart/form-data"
+    <form id="formulario" action="http://localhost/portal/boletos" method="post" enctype="multipart/form-data"
           class="mt-5 container text-black-50">
-        <input type="hidden" name="averbador" value="43454594000113"/>
+        <input type="hidden" name="averbador" id="averbador" value="43454594000113"/>
 
         <div class="form-group row">
             <div class="col-4">
@@ -67,15 +68,16 @@ Components::headerHTML(
 
                     <a id="relatorio"
                        target="_blank" href="http://localhost/portal" type="button"
-                       class="mx-auto rounded btn btn-sm btn-primary">
+                       class="mx-auto rounded btn btn-sm btn-primary" role="button">
                         <span class="mx-2">Relatorio</span>
                     </a>
                     <button id="attContrato" type="button" class="mx-auto btn btn-sm btn-primary">
                         <span class="mx-2">Atualizar Contrato</span>
                     </button>
-                    <button id="grBoleto" type="button" class=" mx-auto btn btn-sm btn-primary">
+                    <a id="grBoleto" href="http://localhost/portal" target="_blank" type="button"
+                       class=" mx-auto btn btn-sm btn-primary disabled" role="button" aria-disabled="true">
                         <span class="mx-2">Gerar Boletão</span>
-                    </button>
+                    </a>
                 <?php endif; ?>
                 <input type="hidden" name="averbador" value="43454594000113"/>
 
@@ -117,13 +119,6 @@ Components::headerHTML(
     </section>
 </main>
 <script>
-
-
-    window.cancelFormSubmit = function (e) {
-        e.preventDefault();
-        return false;
-    };
-
     function atualizaUrlDeRelatorio() {
         let nomeOuCpf = '';
         if ($("#nomeOuCpf").val()) {
@@ -136,23 +131,23 @@ Components::headerHTML(
             "href",
             url
         );
-        console.log(url)
     }
 
     function startEventChange(e) {
         moment.locale('pt-BR');
         e.preventDefault();
         const {target} = e;
-        if (moment(target.value).isAfter($("#end").val())) {
+        const end = $("#end");
+        if (moment(target.value).isAfter(end.val())) {
             $(target).removeClass('is-valid');
             $(target).addClass('is-invalid');
-            $("#end").removeClass('is-valid');
-            $("#end").addClass('is-invalid');
+            end.removeClass('is-valid');
+            end.addClass('is-invalid');
         } else {
             $(target).removeClass('is-invalid');
             $(target).addClass('is-valid');
-            $("#end").removeClass('is-invalid');
-            $("#end").addClass('is-valid');
+            end.removeClass('is-invalid');
+            end.addClass('is-valid');
         }
         atualizaUrlDeRelatorio();
     }
@@ -161,16 +156,17 @@ Components::headerHTML(
         moment.locale('pt-BR');
         e.preventDefault();
         const {target} = e;
-        if (moment(target.value).isBefore($("#start").val())) {
+        const start = $("#start");
+        if (moment(target.value).isBefore(start.val())) {
             $(target).removeClass('is-valid');
             $(target).addClass('is-invalid');
-            $("#start").removeClass('is-valid');
-            $("#start").addClass('is-invalid');
+            start.removeClass('is-valid');
+            start.addClass('is-invalid');
         } else {
             $(target).removeClass('is-invalid');
             $(target).addClass('is-valid');
-            $("#start").removeClass('is-invalid');
-            $("#start").addClass('is-valid');
+            start.removeClass('is-invalid');
+            start.addClass('is-valid');
         }
         atualizaUrlDeRelatorio();
     }
@@ -188,24 +184,97 @@ Components::headerHTML(
             $(target).removeClass('is-invalid');
             $(target).addClass('is-valid');
         }
-        console.log(flag, now, target.value)
+    }
+
+    function hendleSubmitForm(e) {
+        e.preventDefault();
+        if ($('input.is-invalid').length > 0) {
+            Toast.fire({
+                type: 'warning',
+                title: 'Preencha corretamente os campos'
+            });
+            return false;
+        }
+        e.target.submit();
+        return true;
+    }
+
+    function attContrato(e) {
+        e.preventDefault();
+        $("#attContrato").attr("disabled", "disabled");
+        const data = {
+            start: $("#start").val(),
+            end: $("#end").val(),
+            vencimento: $("#vencimento").val(),
+            averbador: $("#averbador").val(),
+            nomeOuCpf: $("#nomeOuCpf").val(),
+            condominioValue: $("#condominioValue").val()
+        };
+        const gb = $(`#grBoleto`);
+        gb.addClass('disabled');//
+        gb.attr('aria-disabled');
+        axios({
+            url: 'portal/api/contratos/atualizar',
+            method: 'PATCH',
+            data
+        }).then(({data}) => {
+            console.table(data);
+            if (
+                data &&
+                data['select_result'] &&
+                data['select_result']['boletao'] &&
+                data['select_result']['boletao'][0] &&
+                data['select_result']['boletao'][0]['last_id'] &&
+                data['select_result']['boletao'][0]['last_id'] !== undefined &&
+                data['select_result']['boletao'][0]['last_id'] !== "undefined" &&
+                data['select_result']['boletao'][0]['last_id'] !== null &&
+                data['select_result']['boletao'][0]['last_id']
+            ) {
+                gb.prop('href', `//emprestacap.com.br/teste/webagente+/boleto_bradesco.php?cod=${data['select_result']['boletao'][0]['last_id']}`);
+                gb.removeClass('disabled');//
+                gb.removeAttr('aria-disabled');
+                Toast.fire({
+                    type: 'success',
+                    title: 'Os vencimentos foram Atualizados'
+                });
+                $("#attContrato").removeAttr("disabled")
+            }
+        }).catch(error => {
+            console.error(error);
+            Toast.fire({
+                type: 'error',
+                title: 'Falha ao atualizar vencimentos'
+            });
+            $("#attContrato").removeAttr("disabled");
+            gb.removeClass('disabled');//
+            gb.removeAttr('aria-disabled');
+        });
+        return false;
     }
 
     (
         ($) => {
             return $('document').ready(function () {
+                window.Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+                $("#formulario").on('submit', hendleSubmitForm);
                 condominio = $('#condominioValue');
-
+                $("#attContrato").on('click', attContrato);
                 moment.locale('pt-BR');
                 condominio.html('<option> Carregando...</option>');
-                const cpfcnpj = 'a.CPFCNPJ = ' + '43454594000113'; //document.getElementById('ComboBox1').value;
+                const cpfcnpj = 'a.CPFCNPJ = ' + $("#averbador").val(); //document.getElementById('ComboBox1').value;
                 const campo1 = "e.CPFCNPJEMPREGADOR";
                 const campo2 = "e.DESCRICAO";
                 $.ajax({
                     method: "POST",
-                    url: "http://localhost/portal/api/comdominios",
+                    url: 'http://localhost/portal/api/comdominios',
                     data: {cpfcnpj, campo1, campo2}
                 }).done(function (data) {
+                    console.log(data);
                     condominio.html(data);
                     atualizaUrlDeRelatorio();
                 });
@@ -220,10 +289,18 @@ Components::headerHTML(
             });
         }
     )
-    ($ = window.jQuery, axios = window.axios)
-
-
+    ($ = window.jQuery, axios = window.axios, Swal = window.Swal)
 </script>
+<?php
+if ($error):
+    ?>
+    <script>
+        Toast.fire({
+            type: 'error',
+            title: 'Algo deu errado, contate o ADM do sistema'
+        });
+    </script>
+<?php endif; ?>
 <?php
 Components::footerHTML();
 ?>

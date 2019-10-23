@@ -19,11 +19,11 @@ use InvalidArgumentException;
  * @see die
  * @see Request {@RequestInterface}
  * @see Response {@ResponseInterface}
- * @method get(string $string, Closure $param)
- * @method post(string $string, Closure $param)
- * @method patch(string $string, Closure $param)
- * @method put(string $string, Closure $param)
- * @method delete(string $string, Closure $param)
+ * @method get(string $string, Closure $param, ?Closure|array $closure = false)
+ * @method post(string $string, Closure $param, ?Closure|array $closure = false)
+ * @method patch(string $string, Closure $param, ?Closure|array $closure = false)
+ * @method put(string $string, Closure $param, ?Closure|array $closure = false)
+ * @method delete(string $string, Closure $param, ?Closure|array $closure = false)
  * @method middleware(Closure|array $param)
  */
 class Router
@@ -185,32 +185,40 @@ class Router
         if ($method === 'middleware') {
             $actionMiddleware = $args[0];
             if (is_array($actionMiddleware)) {
-                foreach ($actionMiddleware as $middlewareFunction) {
-                    if (!is_callable($middlewareFunction)) {
-                        throw new InvalidArgumentException("Pass a array of Closures in method middleware");
-                    } elseif ($this->currentCallReference !== null) {
-                        $ref_method = $this->currentCallReference[0];
-                        $ref_route = $this->currentCallReference[1];
-                        $this->setMiddleware($middlewareFunction, $ref_method, $ref_route);
-                    } else {
-                        $this->setMiddleware($middlewareFunction);
-                    }
-                }
+                $this->addMiddlewares($actionMiddleware);
             } elseif ($this->currentCallReference !== null) {
-                $ref_method = $this->currentCallReference[0];
-                $ref_route = $this->currentCallReference[1];
-                $this->setMiddleware($actionMiddleware, (string)$ref_method, (string)$ref_route);
+                if (isset($this->currentCallReference[0])) {
+                    $ref_method = $this->currentCallReference[0];
+                }
+                if (isset($this->currentCallReference[1])) {
+                    $ref_route = $this->currentCallReference[1];
+                }
+                if (isset($ref_method, $ref_route)) {
+                    $this->setMiddleware($actionMiddleware, (string)$ref_method, (string)$ref_route);
+                }
             } else {
                 $this->setMiddleware($actionMiddleware);
             }
         } else {
-            $route = $args[0];
-            $action = $args[1];
+            if (isset($args[0])) {
+                $route = $args[0];
+            }
+            if (isset($args[1])) {
+                $action = $args[1];
+            }
+            $middleware = isset($args[2]) ? $args[2] : null;
             if (!isset($action) || !is_callable($action)) {
                 return false;
             }
-            $this->routes[$method][$route] = $action;
-            $this->currentCallReference = array($method, $route);
+            if ($middleware !== null && is_callable($middleware) && isset($route)) {
+                $this->setMiddleware($middleware, $method, $route);
+            } elseif (is_array($middleware)) {
+                $this->addMiddlewares($middleware);
+            }
+            if (isset($route)) {
+                $this->routes[$method][$route] = $action;
+                $this->currentCallReference = array($method, $route);
+            }
         }
         return true;
     }
@@ -223,6 +231,28 @@ class Router
     private function validate($method)
     {
         return in_array($method, array('get', 'post', 'patch', 'put', 'delete', 'middleware'));
+    }
+
+    private function addMiddlewares(array $actionMiddleware)
+    {
+        foreach ($actionMiddleware as $middlewareFunction) {
+            if (!is_callable($middlewareFunction)) {
+                throw new InvalidArgumentException("Pass a array of Closures in method middleware");
+            }
+            if ($this->currentCallReference !== null) {
+                if (isset($this->currentCallReference[0])) {
+                    $ref_method = $this->currentCallReference[0];
+                }
+                if (isset($this)) {
+                    $ref_route = $this->currentCallReference[1];
+                }
+                if (isset($ref_method, $ref_route)) {
+                    $this->setMiddleware($middlewareFunction, $ref_method, $ref_route);
+                }
+            } else {
+                $this->setMiddleware($middlewareFunction);
+            }
+        }
     }
 
     /**
@@ -238,7 +268,9 @@ class Router
                 '$key must be a valid string [ok:%s-%s, ok:%s-%s] ',
                 $method, $route, !Helpers::stringIsOk($method), !Helpers::stringIsOk($route)
             ));
-        } elseif ($method !== false && $route !== false) {
+        }
+
+        if ($method !== false && $route !== false) {
             $key = sprintf("%s%s", $method, $route);
             $this->middlewares[$key][] = $middleware;
         } else {
@@ -257,9 +289,9 @@ class Router
      */
     public function run()
     {
-        !isset($this->routes[$this->method]) && die(/**@Debugger */
+        !isset($this->routes[$this->method]) && $this->response->withStatus(405) && die(/**@Debugger */
         print_r(array('405 Method not allowed', $this->method, $this->route)));
-        !isset($this->routes[$this->method][$this->route]) && die(/**@Debugger */
+        !isset($this->routes[$this->method][$this->route]) && $this->response->withStatus(404) && die(/**@Debugger */
         print_r(array('404 Error', $this->method, $this->route)));
         self::$params = $this->getParams($this->method);
         $finalThis = $this->executeMiddleware($this->method, $this->route);
@@ -287,7 +319,7 @@ class Router
         if ($size > 0) {
             $newThis = clone $this;
             $global = $this->getMiddlewares();
-            $global = isset($global['global']) ?: array();
+            $global = isset($global['global']) ? $global['global'] : array();
             $callables = $this->getMiddlewareFrom($method, $route);
             $callables = array_merge(
                 isset($callables) && count($callables) && is_array($callables) ? $callables : array(),

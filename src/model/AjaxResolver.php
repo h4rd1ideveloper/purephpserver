@@ -406,6 +406,9 @@ class AjaxResolver
                 $group,
                 $order
             );
+            $response
+            ['select_result']
+            [str_replace(' ', '_', $table)] = $_db->getResult();
             $_db2 = new Dao('177.184.16.56', 'rbm_yan', 'AolU+j*w', 'emprestascm_webscm6');
             IF ($_db->getNumResults()) {
                 $_db2->connect();
@@ -416,15 +419,16 @@ class AjaxResolver
                     'CODEMPRESA = 1'
                 );
                 $campos = $_db2->getResult();
+                $response
+                ['select_result']
+                ['empresas'] = $campos;
                 $campos = $campos[0];
                 $nossonum1 = $campos['NOSSONUM_SEQ'];
                 $nossonum = str_pad($nossonum1, 11, "0", STR_PAD_LEFT);
                 $cnpj_cond = 'Null';
-                IF (Helpers::stringIsOk($condominioValue) && $condominioValue !== '-1') {
+                IF ($condominioValue !== '-1' && Helpers::stringIsOk($condominioValue)) {
                     $cnpj_cond = $condominioValue;
                 }
-                $_db2->disconnect();
-                $_db2->connect();
                 $response['insert_result']['boletao'] = $_db2->insert(
                     'boletao',
                     array(
@@ -436,31 +440,26 @@ class AjaxResolver
                         'CNPJ_COND' => $cnpj_cond
                     )
                 );
-                //$_db2->disconnect();
-                $_db2->connect();
                 $_db2->select(
                     'boletao',
                     'last_insert_id () As last_id'
                 );
                 $campos = $_db2->getResult();
-                $codboletao = $campos['last_id'];
-                $_db2->disconnect();
-                $_db2->connect();
+                $response
+                ['select_result']
+                ['boletao'] = $campos;
+                $codboletao = isset($campos[0]['last_id']) ? $campos[0]['last_id'] : 0;
                 $response['insert_result']['icrononossonumero'] = $_db2->insert(
                     'icrononossonumero',
                     array('NOSSONUMERO' => $nossonum, 'CODCRONOGRAMA' => $codboletao, 'TIPO_BOLETO' => 'B')
                 );
-                $_db2->disconnect();
-                $_db2->connect();
                 $response['update_result']['empresas'] = $_db2->update(
                     'empresas',
-                    array('CODEMPRESA' => '1'),
+                    array('CODEMPRESA' => 1),
                     'NOSSONUM_SEQ = NOSSONUM_SEQ + 1'
                 );
             }
             $total = 0;
-            $_db2->disconnect();
-            $_db2->connect();
             foreach ($_db->getResult() as $row) {
                 $contrato = $row['CODOPERACAO'];
                 $parcela = str_pad($row['NDOC'], 3, '0', STR_PAD_LEFT);
@@ -470,7 +469,7 @@ class AjaxResolver
                 $total += $valor;
                 $response['insert_result']['iboletao'][] = $_db2->insert(
                     'iboletao',
-                    array('CODBOLETAO' => $campos['last_id'], 'CONTRATO' => $contrato, 'VALOR' => $valor, 'CODCRONOGRAMA' => $codcronograma)
+                    array('CODBOLETAO' => isset($codboletao) ? $codboletao : 0, 'CONTRATO' => $contrato, 'VALOR' => $valor, 'CODCRONOGRAMA' => $codcronograma)
                 );
             }
             $_db2->disconnect();

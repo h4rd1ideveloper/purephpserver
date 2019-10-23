@@ -201,8 +201,8 @@ class HttpHelper extends Helpers
         }
         $request = new Request(
             $method,
-            HttpHelper::getUriFromGlobals(),
-            HttpHelper::getHeaderList(),
+            self::getUriFromGlobals(),
+            self::getHeaderList(),
             new CachingStream(new LazyOpenStream('php://input', 'r+')),
             $version
         );
@@ -256,6 +256,14 @@ class HttpHelper extends Helpers
         }
 
         return $uri;
+    }
+
+    /**
+     * @return string
+     */
+    protected static function httpsOrHttp()
+    {
+        return !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http';
     }
 
     /**
@@ -966,13 +974,5 @@ class HttpHelper extends Helpers
             return null;
         }
         return $summary;
-    }
-
-    /**
-     * @return string
-     */
-    protected static function httpsOrHttp()
-    {
-        return !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http';
     }
 }

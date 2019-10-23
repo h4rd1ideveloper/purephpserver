@@ -12,6 +12,12 @@ use App\http\Response;
 use App\routes\Dispatch;
 use App\routes\Router;
 
+$jsonMiddleware = function () {
+    return function (Request $request, Response $response, Closure $closure) {
+        $response->withHeader('Content-Type', 'application/json');
+        $closure($request, $response);
+    };
+};
 try {
     $routerConfig = array(
         'path_root' => '/portal',
@@ -29,26 +35,26 @@ try {
     $app->post('/boletos', static function (Request $request, Response $response) {
         AppController::indexAfterPost($request, $response);
     });
-
+    $app->get('/api/json', static function () {
+        return /**@lang JSON */ '{"key":"value"}';
+    });
 
     ///EndPoint API
+    $app->patch('/api/contratos/atualizar', static function (Request $request, Response $response) {
+        return AppController::atualizarContratos($request, $response);
+    });
     $app->post('/api/boletos', static function (Request $request, Response $response) {
-        $response->withHeader('Content-Type', 'application/json');
         return AppController::apiIndex($request);
     });
-
     $app->get('/api/relatorio', static function (Request $request, Response $response) {
-        AppController::relatorio($request, $response);
+        AppController::relatorio($request);
     });
-
     $app->post('/api/comdominios', static function (Request $request) {
         return AppController::listCondominiosBy($request);
     });
-    /**
-     *
-     */
+
     $app->run();
 } catch (Exception $e) {
-    echo 'Fail to init Router Server', $e->getMessage(), $e->getCode(), $e->getTraceAsString();
+    echo 'Fail to init Router Server: MSG', $e->getMessage(), 'CODE:', $e->getCode(), 'TRACE:', $e->getTraceAsString();
 }
 

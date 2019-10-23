@@ -6,6 +6,7 @@ use App\assets\lib\Helpers;
 use App\http\Request;
 use App\http\Response;
 use App\model\AjaxResolver;
+use Exception;
 
 /**
  * Class AppController
@@ -87,14 +88,15 @@ final class AppController extends Controller
      * @Description All about content revice from request user
      * @param Request $req
      * @return string
+     * @throws Exception
      */
     public static function allAboutTheRequest(Request $req)
     {
         return $req::toJson(
             array(
-                "body" => $req::jsonToArray($req->getBody()->getContents()),
-                "params" => $req->getQueryParams(),
-                "parsedBody" => $req->getParsedBody()
+                'body' => $req->getParsedBodyContent(),
+                'params' => $req->getQueryParams(),
+                'parsedBody' => $req->getParsedBody(),
             )
         );
     }
@@ -125,11 +127,12 @@ final class AppController extends Controller
 
     /**
      * @param Request $request
-     * @return bool|string
+     * @return array|string
+     * @throws Exception
      */
-    public static function atualizarContratos(Request $request)
+    public static function atualizarContratos(Request $request, Response $response)
     {
-        $body = $request->getParsedBody();
+        $body = $request->getParsedBodyContent();
         if (isset(
             $body['start'],
             $body['end'],
@@ -146,10 +149,12 @@ final class AppController extends Controller
                 $body['nomeOuCpf'],
                 $body['condominioValue']
             );
-            return $result === false ?
-                Request::toJson(array('error' => true, 'message' => 'something is worng inside AjaxResolver::condominios', 'raw' => array($result, $body))) :
-                $result;
+            if (isset($result['error']) && $result['error'] == true) {
+                $response->withStatus(400);
+            }
+            return Request::toJson($result);
         }
+        $response->withStatus(400);
         return Request::toJson(array('error' => true, 'message' => 'miss something in body request', 'raw' => $body));
 
     }

@@ -225,7 +225,7 @@ class Response extends HttpHelper implements ResponseInterface
     {
         if ($from !== false) {
             AppController::view($from, $args);
-       } else {
+        } else {
             echo $args;
         }
     }
@@ -242,13 +242,12 @@ class Response extends HttpHelper implements ResponseInterface
         $this->assertStatusCodeRange($code);
         $new = clone $this;
         $new->statusCode = $code;
-        if ($reasonPhrase == '' && isset(self::$PHRASES[$new->statusCode])) {
+        if ($reasonPhrase === '' && isset(self::$PHRASES[$new->statusCode])) {
             $reasonPhrase = self::$PHRASES[$new->statusCode];
         }
         $new->reasonPhrase = $reasonPhrase;
         $s = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-        parent::setHeader(sprintf("%s/%s %s %s", strtoupper($s), $new->getProtocolVersion(), $new->getStatusCode(), $new->getReasonPhrase()));
-
+        self::setHeader(sprintf('%s/%s %s %s', strtoupper($s), $new->getProtocolVersion(), $new->getStatusCode(), $new->getReasonPhrase()));
         return $new;
     }
 

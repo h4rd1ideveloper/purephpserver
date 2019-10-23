@@ -200,7 +200,7 @@ class Request extends HttpHelper implements RequestInterface
     {
         $host = $this->uri->getHost();
 
-        if ($host == '') {
+        if ($host === '') {
             return;
         }
 
@@ -223,7 +223,7 @@ class Request extends HttpHelper implements RequestInterface
      * @param array $content
      * @return string
      */
-    public static final function toJson($content = array())
+    final public static function toJson($content = array())
     {
         return parent::toJson($content);
     }
@@ -303,6 +303,27 @@ class Request extends HttpHelper implements RequestInterface
     }
 
     /**
+     * @throws Exception
+     */
+    public function getParsedBodyContent()
+    {
+        return HttpHelper::jsonToArray($this->getBody()->getContents());
+    }
+
+    /**
+     * getBody()
+     * @return StreamInterface
+     * @throws Exception
+     */
+    public function getBody()
+    {
+        if (!$this->stream) {
+            $this->stream = HttpHelper::stream_for('');
+        }
+        return $this->stream;
+    }
+
+    /**
      * @return array
      */
     public function getUploadedFiles()
@@ -327,7 +348,6 @@ class Request extends HttpHelper implements RequestInterface
     {
         $new = clone $this;
         $new->parsedBody = $data;
-        //var_dump($data,"her");
         return $new;
     }
 
@@ -541,19 +561,6 @@ class Request extends HttpHelper implements RequestInterface
         unset($new->headers[$header], $new->headerNames[$normalized]);
 
         return $new;
-    }
-
-    /**
-     * getBody()
-     * @return StreamInterface
-     */
-    public function getBody()
-    {
-        if (!$this->stream) {
-            $this->stream = HttpHelper::stream_for('');
-        }
-
-        return $this->stream;
     }
 
     /**

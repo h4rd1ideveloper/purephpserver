@@ -248,13 +248,9 @@ class Dao extends QueryBuilder
         if ($this->tableExists($table)) {
             $q = self::queryUpdate($table, $value, $where);
             $this->numResults = null;
+            //exit($q);
             try {
-                $sql = $this->_db->prepare($q);
-                $sql->execute();
-                $this->result = $sql->fetchAll(PDO::FETCH_ASSOC);
-                $this->numResults = count($this->result);
-                $this->numResults === 0 ? $this->result = null : true;
-                return true;
+                return $this->_db->prepare($q)->execute();
             } catch (PDOException $e) {
                 return $e->getMessage() . $e->getTraceAsString();
             }

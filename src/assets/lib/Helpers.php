@@ -37,15 +37,15 @@ class Helpers
     }
 
     /**
-     * @param $string
+     * @param $string string
      * @return false|int
      */
     public static function isMySQLFunction($string)
     {
-        if (self::stringIsOk($string)) {
+        if (empty($string)) {
             throw new InvalidArgumentException('Parameter $string must be a valid string not and empty');
         }
-        return preg_match_all('/\(|\)/', $string);
+        return preg_match_all('/\(|\)/', (string)$string);
     }
 
     /**

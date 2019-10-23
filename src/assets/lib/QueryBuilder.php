@@ -174,10 +174,10 @@ class QueryBuilder
         foreach ($fieldsAndValues as $field => $value) {
             if ($lasIndex !== $i++) {
                 $fields .= sprintf(' %s, ', $field);
-                $values .= Helpers::isMySQLFunction($value) ? sprintf(' %s, ', $value) : sprintf(" '%s', ", $value);
+                $values .= Helpers::stringIsOk($value) && Helpers::isMySQLFunction($value) ? sprintf(' %s, ', $value) : sprintf(" '%s', ", $value);
             } else {
                 $fields .= sprintf(' %s ', $field);
-                $values .= Helpers::isMySQLFunction($value) ? sprintf(' %s ', $value) : sprintf(" '%s' ", $value);
+                $values .= Helpers::stringIsOk($value) && Helpers::isMySQLFunction($value) ? sprintf(' %s ', $value) : sprintf(" '%s' ", $value);
             }
         }
     }
