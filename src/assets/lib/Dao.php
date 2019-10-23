@@ -67,10 +67,8 @@ class Dao extends QueryBuilder
      * @param string $db_type Tipo
      * @param string $db_path Path
      * @param string $db_host Host
-     *
-     * @return Dao  $this
      */
-    public function __construct($db_host, $db_user, $db_pass, $db_name, $db_type = "mysql", $db_path = null)
+    public function __construct($db_host, $db_user, $db_pass, $db_name, $db_type = 'mysql', $db_path = null)
     {
         $this->_db_host = $db_host;
         $this->_db_user = $db_user;
@@ -83,7 +81,7 @@ class Dao extends QueryBuilder
             case "mysql":
                 $this->_connection_string = sprintf(
                 /** @lang text */
-                    "mysql:host=%s;dbname=%s",
+                    'mysql:host=%s;dbname=%s',
                     $db_host,
                     $db_name
                 );
@@ -91,21 +89,21 @@ class Dao extends QueryBuilder
             case "sqlite":
                 $this->_connection_string = sprintf(
                 /** @lang text */
-                    "sqlite:%s",
+                    'sqlite:%s',
                     $db_path
                 );
                 break;
             case "oracle":
                 $this->_connection_string = sprintf(
                 /** @lang text */
-                    "OCI:dbname=%s;charset=UTF-8",
+                    'OCI:dbname=%s;charset=UTF-8',
                     $db_name
                 );
                 break;
             case "dblib":
                 $this->_connection_string = sprintf(
                 /** @lang text */
-                    "dblib:host=%s;dbname=%s",
+                    'dblib:host=%s;dbname=%s',
                     $db_host,
                     $db_name
                 );
@@ -113,7 +111,7 @@ class Dao extends QueryBuilder
             case "postgresql":
                 $this->_connection_string = sprintf(
                 /** @lang text */
-                    "pgsql:host=%s dbname=%s",
+                    'pgsql:host=%s dbname=%s',
                     $db_host,
                     $db_name
                 );
@@ -121,13 +119,12 @@ class Dao extends QueryBuilder
             case "sqlsrv":
                 $this->_connection_string = sprintf(
                 /** @lang text */
-                    "sqlsrv:Server=%s;Database=%s",
+                    'sqlsrv:Server=%s;Database=%s',
                     $db_host,
                     $db_name
                 );
                 break;
         }
-        return $this;
     }
 
     /**
@@ -135,7 +132,7 @@ class Dao extends QueryBuilder
      */
     public function __destruct()
     {
-        self::disconnect();
+        $this->disconnect();
     }
 
     /**
@@ -201,7 +198,7 @@ class Dao extends QueryBuilder
     {
         $this->numResults = null;
         try {
-            $sql = parent::querySelect($this->_db, $table, $columns, $join, $where, $group, $order, $limit, $bind);
+            $sql = self::querySelect($this->_db, $table, $columns, $join, $where, $group, $order, $limit, $bind);
             $sql->execute();
             $this->result = $sql->fetchAll(PDO::FETCH_ASSOC);
             $this->numResults = count($this->result);
@@ -249,7 +246,7 @@ class Dao extends QueryBuilder
     public function update($table, $where, $value)
     {
         if ($this->tableExists($table)) {
-            $q = parent::queryUpdate($table, $value, $where);
+            $q = self::queryUpdate($table, $value, $where);
             $this->numResults = null;
             try {
                 $sql = $this->_db->prepare($q);
@@ -271,11 +268,9 @@ class Dao extends QueryBuilder
      */
     private function tableExists($table)
     {
-
         $this->numResults = null;
         try {
-            $sql = parent::querySelect($this->_db, $table, '*');
-
+            $sql = self::querySelect($this->_db, $table, '*');
             $sql->execute();
             $this->result = $sql->fetchAll(PDO::FETCH_OBJ);
             $this->numResults = count($this->result);
@@ -284,7 +279,7 @@ class Dao extends QueryBuilder
             }
             return true;
         } catch (PDOException $e) {
-            return sprintf("%s%s", $e->getMessage(), $e->getTraceAsString());
+            return sprintf('%s%s', $e->getMessage(), $e->getTraceAsString());
         }
     }
 

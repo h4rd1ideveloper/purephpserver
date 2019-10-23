@@ -2,14 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b2ee2aec-2c2e-4923-8a0b-4ebf0719d6cd" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/boletao/gerar-remessa-adm-boletao.php" beforeDir="false" afterPath="$PROJECT_DIR$/assets/boletao/gerar-remessa-adm-boletao.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/funcoes/index.php" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/assets/lib/Dao.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/assets/lib/Dao.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/assets/lib/Helpers.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/assets/lib/Helpers.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/assets/lib/PDF/PDF.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/assets/lib/PDF/PDF.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/controller/AppController.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/controller/AppController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/model/AjaxResolver.php" beforeDir="false" afterPath="$PROJECT_DIR$/src/model/AjaxResolver.php" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -91,8 +84,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/assets/lib/Dao.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="310">
-              <caret line="300" column="19" selection-start-line="300" selection-start-column="19" selection-end-line="300" selection-end-column="19" />
+            <state relative-caret-position="-4279">
+              <caret line="121" column="27" selection-start-line="121" selection-start-column="27" selection-end-line="121" selection-end-column="27" />
               <folding>
                 <element signature="e#34#42#0#PHP" expanded="true" />
               </folding>
@@ -408,12 +401,12 @@
       <workItem from="1571743904404" duration="31175000" />
       <workItem from="1571830179306" duration="562000" />
       <workItem from="1571831086640" duration="4624000" />
-      <workItem from="1571835778973" duration="2321000" />
+      <workItem from="1571835778973" duration="2674000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="57300000" />
+    <option name="totallyTimeSpent" value="57653000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -421,7 +414,7 @@
     <layout>
       <window_info id="Structure" order="0" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="1" side_tool="true" />
-      <window_info active="true" content_ui="combo" id="Project" order="2" visible="true" weight="0.1641791" />
+      <window_info content_ui="combo" id="Project" order="2" visible="true" weight="0.1641791" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32936078" />
       <window_info anchor="bottom" id="Run" order="2" />
@@ -431,7 +424,7 @@
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Database Changes" order="7" />
       <window_info anchor="bottom" id="Version Control" order="8" />
-      <window_info anchor="bottom" id="Terminal" order="9" weight="0.52120537" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="9" visible="true" weight="0.05580357" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
       <window_info anchor="bottom" id="Database Console" order="11" weight="0.40086675" />
       <window_info anchor="bottom" id="Docker" order="12" show_stripe_button="false" />
@@ -726,8 +719,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/assets/lib/Dao.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="310">
-          <caret line="300" column="19" selection-start-line="300" selection-start-column="19" selection-end-line="300" selection-end-column="19" />
+        <state relative-caret-position="-4279">
+          <caret line="121" column="27" selection-start-line="121" selection-start-column="27" selection-end-line="121" selection-end-column="27" />
           <folding>
             <element signature="e#34#42#0#PHP" expanded="true" />
           </folding>
