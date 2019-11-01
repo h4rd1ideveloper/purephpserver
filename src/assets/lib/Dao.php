@@ -266,7 +266,16 @@ class Dao extends QueryBuilder
     {
         $this->numResults = null;
         try {
-            $sql = self::querySelect($this->_db, $table, '*');
+            $sql = self::querySelect(
+                $this->_db,
+                'information_schema.tables',
+                'count( table_name) as ok',
+                null,
+                "table_schema = '$this->_db_name' and TABLE_NAME = '$table'",
+                null,
+                null,
+                '1'
+            );
             $sql->execute();
             $this->result = $sql->fetchAll(PDO::FETCH_OBJ);
             $this->numResults = count($this->result);

@@ -20,6 +20,7 @@ class Dispatch
      * @var array
      */
     private $closures = array();
+    private $middles = array();
 
     /**
      * Dispatch constructor.
@@ -46,6 +47,26 @@ class Dispatch
     private function setClosures($closures)
     {
         $this->closures = $closures;
+    }
+
+    /**
+     * @param string $key
+     * @return Closure
+     */
+    public function getMiddleware(string $key): Closure
+    {
+        return $this->middles[$key];
+    }
+
+    /**
+     * @param Closure $middleware
+     * @param string $key
+     * @return Dispatch
+     */
+    public function setMiddleware(Closure $middleware, string $key): self
+    {
+        $this->middles[$key] = $middleware;
+        return $this;
     }
 
     /**

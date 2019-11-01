@@ -48,7 +48,7 @@ abstract class Controller
         $url = sprintf("%s://%s", isset($_SERVER['HTTPS']) ? 'https' : 'http', $_SERVER['HTTP_HOST']);
         $becauseIsOldVersionOfThePHP = explode('?', $_SERVER['REQUEST_URI']);
         $folders = $becauseIsOldVersionOfThePHP[0];
-        header(sprintf("Location:%s%s?r=%s", $url, $folders, $to));
+        header(sprintf("Location:%s%s%s", $url, $folders, $to));
         exit();
     }
 

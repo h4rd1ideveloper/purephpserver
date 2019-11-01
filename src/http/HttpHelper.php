@@ -4,6 +4,7 @@
 namespace App\http;
 
 use App\assets\lib\Helpers;
+use Closure;
 use Exception;
 use InvalidArgumentException;
 use Iterator;
@@ -117,6 +118,7 @@ class HttpHelper extends Helpers
 
     /**
      * @return Response
+     * @throws Exception
      */
     public static function responseFactory()
     {
@@ -155,17 +157,19 @@ class HttpHelper extends Helpers
      */
     protected static function parseEnvFile($pathEnv)
     {
+
         try {
             $envAsString = Request::createCachingStreamOfLazyOpenStream($pathEnv, 'r+')->getContents();
+            //exit(print_r(explode(PHP_EOL, trim($envAsString))));
             return self::MagicMap(
                 explode(PHP_EOL, trim($envAsString)),
                 //keys
-                function ($value, $notUsedKey) {
+                function ($value, $key) {
                     $entries_becauseIsOldVersionOfThePHP = explode('=', $value);
                     return trim($entries_becauseIsOldVersionOfThePHP[0]);
                 },
                 //Values
-                function ($value, $notUsedKey) {
+                function ($value, $key) {
                     $entries_becauseIsOldVersionOfThePHP = explode('=', $value);
                     return $entries_becauseIsOldVersionOfThePHP[1] === 'true' || $entries_becauseIsOldVersionOfThePHP[0] === 'false' ?
                         (bool)$entries_becauseIsOldVersionOfThePHP[1] :
@@ -974,5 +978,44 @@ class HttpHelper extends Helpers
             return null;
         }
         return $summary;
+    }
+
+    /**
+     * @return Closure
+     */
+    public static function applicationJson()
+    {
+        return function (Request $request, Closure $closure) {
+            $request->withHeader('Content-Type', 'application/json');
+            $closure($request);
+        };
+
+    }
+
+
+    /**
+     * @param Request $request
+     * @return array|string
+     */
+    public static function getBodyByMethod(Request $request)
+    {
+        switch (strtolower($request->getMethod())) {
+            case 'get':
+            {
+                return $request->getQueryParams();
+            }
+            case 'post':
+            {
+                return $request->getParsedBody();
+            }
+            default:
+            {
+                try {
+                    return $request->getParsedBodyContent();
+                } catch (Exception $e) {
+                    return $e->getMessage() . $e->getTraceAsString();
+                }
+            }
+        }
     }
 }

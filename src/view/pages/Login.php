@@ -1,110 +1,73 @@
-<!DOCTYPE html >
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <meta http - equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-    <title>Portal ADM BOLETOS EMPRESTA</title>
-    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.min.css"/>
-    <link rel="stylesheet" type="text/css" href="css/libs/font-awesome.css"/>
-    <link rel="stylesheet" type="text/css" href="css/libs/nanoscroller.css"/>
-    <link rel="stylesheet" type="text/css" href="css/compiled/theme_styles.css"/>
-    <link rel="stylesheet" type="text/css" href="css/libs/ns-default.css"/>
-    <link rel="stylesheet" type="text/css" href="css/libs/ns-style-bar.css"/>
-    <link rel="stylesheet" type="text/css" href="css/libs/ns-style-attached.css"/>
-    <link rel="stylesheet" type="text/css" href="css/libs/ns-style-other.css"/>
-    <link rel="stylesheet" type="text/css" href="css/libs/ns-style-theme.css"/>
-    <link href='//fonts.googleapis.com/css?family=Open+Sans:400,600,700,300|Titillium+Web:200,300,400' rel='stylesheet'
-          type='text/css'>
-    <link rel="stylesheet" type="text/css" href="css/css.css"/>
-    <link type="image/x-icon" href="favicon.png" rel="shortcut icon"/>
-    <!--[if lt IE 9]>
-    <script src="js/html5shiv.js"></script>
-    <script src="js/respond.min.js"></script>
-    <![endif]-->
+<?php
 
-</head>
+use App\assets\lib\Helpers;
+use App\view\components\Components;
 
-
-<body id="login-page">
-<div class="container">
-    <div class="row">
-        <div class="col-xs-12">
-            <div id="login-box">
-                <div id="login-box-holder">
-                    <div class="row">
-                        <div class="col-xs-12">
-                            <header id="login-header">
-                                <div id="login-logo">
-                                    <img src="img/logo-login.png" alt=""/>
-                                </div>
-                            </header>
-                            <div id="login-box-inner">
-                                <div class="input-group pt-50 pb-50" id="dvaguarde" style="width:100%; display: none;">
-                                    <div class="row">
-                                        <div class="col-xs-12 text-center">
-                                            <span class="loader"> carregando</span><br><br><br><br>
-                                            <span id="msglogin"> Efetuando login </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div id="dvlogin">
-                                    <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                                        <input class="form-control" type="text" autocomplete="false"
-                                               placeholder="Usuario" id="login" value="">
-                                    </div>
-                                    <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-key"></i></span>
-                                        <input type="password" class="form-control" placeholder="Senha" id="senha">
-                                    </div>
-                                    <div id="remember-me-wrapper">
-                                        <div class="row">
-                                            <div class="col-xs-6">
-                                                <div class="checkbox-nice">
-                                                    <input type="checkbox" id="lembrar" value="1" checked="checked"/>
-                                                    <label for="lembrar"> Lembrar</label>
-                                                </div>
-                                            </div>
-                                            <a href="#" id="login-forget-link" class="col-xs-6">
-                                                Esqueceu a senha ?
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-xs-12">
-                                            <button type="button" class="btn btn-success col-xs-12 btlogin"> Login
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-
+Components
+    ::headerHTML(array('title' => 'Developer Web Page'))
+    ::navbarHTML(
+        [
+            'page_href' => 'login',
+            'page_title' => 'Login/Cadastrar-se',
+            'nav_items' => [
+                'Inicio' => 'home'
+            ]
+        ],
+        'dark'
+    );
+?>
+    <main class="container-fluid h-100">
+        <div class="container rounded py-5 bg-light">
+            <div class="d-none">
+                <form class="container mt-5">
+                    <fieldset class="form-group row">
+                        <legend class="col-form-legend col-sm-1-12">Dados</legend>
+                        <div class="col-sm-1-12">
+                            <div class="form-group">
+                                <label for=""></label>
+                                <input type="email" class="form-control" name="" id="" aria-describedby="emailHelpId"
+                                       placeholder="">
+                                <small id="emailHelpId" class="form-text text-muted">Usuario ou Nome</small>
                             </div>
                         </div>
+                    </fieldset>
+                    <div class="form-group row">
+                        <div class="offset-sm-2 col-sm-10">
+                            <button type="submit" class="btn btn-primary">Logar</button>
+                        </div>
                     </div>
-                </div>
-
-
+                </form>
             </div>
-
-
+            <div class="row">
+                <form action="<?= Helpers::baseURL() ?>user/login" method="post" enctype="multipart/form-data"
+                      class="col-12 col-md-6 mx-auto my-5  text-black-50 bg-dark rounded p-5">
+                    <fieldset class="form-group row">
+                        <legend class="col-form-legend col-sm-1-12 text-muted mb-5">Confirmar dados</legend>
+                        <div class="col-12 mb-5">
+                            <div class="form-group">
+                                <input type="email"
+                                       class="border-bottom form-control  border-top-0 border-left-0 border-right-0"
+                                       name="login" id="login" aria-describedby="emailHelpId" placeholder="Login">
+                                <small id="emailHelpId" class="form-text text-muted">Usuario</small>
+                            </div>
+                            <div class="form-group">
+                                <input type="password"
+                                       class="border-bottom form-control  border-top-0 border-left-0 border-right-0"
+                                       name="pass" id="pass" aria-describedby="passwordHelpId" placeholder="Senha">
+                                <small id="passwordHelpId" class="form-text text-muted">(a-Z|0-9|!@#$%¨&*()_+=-)</small>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <div class="form-group row">
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-block btn-primary ">Entrar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
-</div>
-
-
-<script src="js/jquery.js"></script>
-<script src="js/bootstrap.js"></script>
-<script src="js/jquery.nanoscroller.min.js"></script>
-<script src="js/js.js"></script>
-
-<script src="js/modernizr.custom.js"></script>
-<script src="js/classie.js"></script>
-<script src="js/notificationFx.js"></script>
-
-
-<script src="js/scripts.js"></script>
-<script>
-    var hashv = '15714049825da9bcb62d4bb' </script>
-</body>
-</html>
+    </main>
+<?php
+Components
+    ::captureError($vars['error'] ?? false)
+    ::footerHTML();

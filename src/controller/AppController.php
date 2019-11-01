@@ -3,9 +3,11 @@
 namespace App\controller;
 
 use App\assets\lib\Helpers;
+use App\http\HttpHelper;
 use App\http\Request;
 use App\http\Response;
 use App\model\AjaxResolver;
+use App\model\User;
 use Exception;
 
 /**
@@ -14,74 +16,47 @@ use Exception;
  */
 final class AppController extends Controller
 {
+    public static $credentials = null;
+
+    public function __construct()
+    {
+        self::$credentials = [
+            'host' => DB_HOST,
+            'user' => DB_USER,
+            'pass' => DB_PASS,
+            'name' => DB_NAME
+        ];
+    }
+
     /**
      * @param Response $res
      * @return void
      */
     public static function index(Response $res)
     {
-        $res->send(array(), 'pages/Listagem');
-    }
-
-    /**
-     * @param Request $request
-     * @param Response $response
-     */
-    public static function indexAfterPost(Request $request, Response $response)
-    {
-        $result = $response::jsonToArray(self::apiIndex($request));
-        if (isset($result['error'])) {
-            self::redirect('/');
+        if (isset($_SESSION['user']) && !empty($_SESSION['user'])) {
+            $user = self::userFactory();
+            $login = explode('#|#', $_SESSION['user'])[0];
+            $pass = explode('#|#', $_SESSION['user'])[1];
+            $user = $user->findUser($login, $pass);
+            if (count($user)) {
+                $res->send(
+                    [
+                        'error' => false,
+                        'user' => $user
+                    ],
+                    'pages/Home'
+                );
+            }
         } else {
-            self::view('pages/Listagem', $result);
+            self::redirect('login');
         }
     }
 
-    /**
-     * @param Request $req
-     * @return string
-     */
-    public static function apiIndex(Request $req)
+    private static function userFactory(): User
     {
-        $body = $req->getParsedBody();
-        $nomeOuCpf = isset($body['nomeOuCpf']) ? $body['nomeOuCpf'] : null;
-        if (
-            isset($body['start'], $body['end'], $body['averbador'], $body['condominioValue']) &&
-            Helpers::stringIsOk($body['start']) &&
-            Helpers::stringIsOk($body['end']) &&
-            Helpers::stringIsOk($body['averbador']) &&
-            Helpers::stringIsOk($body['condominioValue'])
-        ) {
-            return Helpers::toJson(
-                AjaxResolver::boletos(
-                    $body['start'],
-                    $body['end'],
-                    $body['averbador'],
-                    $nomeOuCpf,
-                    $body['condominioValue']
-                )
-            );
-        }
-        return Helpers::toJson(array('error' => true, 'message' => 'Something is missin on Request Body', 'raw' => $body));
+        return new User(self::$credentials);
     }
-
-    /**
-     * @param Request $request
-     * @return array|bool|string
-     */
-    public static function listCondominiosBy(Request $request)
-    {
-        $body = $request->getParsedBody();
-        //exit(var_dump($body['cpfcnpj'], $body['campo1'], $body['campo2']));
-        if (isset($body['cpfcnpj'], $body['campo1'], $body['campo2'])) {
-            $result = AjaxResolver::condominios($body['cpfcnpj'], $body['campo1'], $body['campo2']);
-            return $result === false ?
-                Request::toJson(array('error' => true, 'message' => 'something is worng inside AjaxResolver::condominios', 'raw' => array($result, $body))) :
-                $result;
-        }
-        return Request::toJson(array('error' => true, 'message' => 'miss something in body request', 'raw' => $body));
-    }
-
 
     /**
      * allAboutTheRequest
@@ -93,69 +68,87 @@ final class AppController extends Controller
     public static function allAboutTheRequest(Request $req)
     {
         return $req::toJson(
-            array(
+            [
                 'body' => $req->getParsedBodyContent(),
                 'params' => $req->getQueryParams(),
                 'parsedBody' => $req->getParsedBody(),
-            )
+            ]
         );
     }
 
     /**
-     * @param Request $request
+     * @param Response $response
      */
-    public static function relatorio(Request $request)
+    public static function dashboard(Response $response)
     {
-        $body = $request->getQueryParams();
-        $nomeOuCpf = isset($body['nomeOuCpf']) && !empty($body['nomeOuCpf']) ? $body['nomeOuCpf'] : null;
-        if (
-            isset($body['start'], $body['end'], $body['averbador'], $body['condominioValue']) &&
-            Helpers::stringIsOk($body['start']) &&
-            Helpers::stringIsOk($body['end']) &&
-            Helpers::stringIsOk($body['averbador']) &&
-            Helpers::stringIsOk($body['condominioValue'])
-        ) {
-            AjaxResolver::relatorio($body['start'],
-                $body['end'],
-                $body['averbador'],
-                $nomeOuCpf,
-                $body['condominioValue']);
-        } else {
-            echo Request::toJson(array('error' => true, 'message' => 'miss something in body request', 'raw' => $body));
-        }
+        $login = explode('#|#', $_SESSION['user'])[0];
+        $pass = explode('#|#', $_SESSION['user'])[1];
+        $user = self::userFactory()->findUser($login, $pass);
+        $response->send(
+            [
+                'error' => false,
+                'user' => $user
+            ],
+            'pages/Home'
+        );
+    }
+
+    /**
+     * @return string
+     */
+    public static function apiUsers()
+    {
+        return Helpers::toJson((new AjaxResolver(true))::getAllUsers());
     }
 
     /**
      * @param Request $request
-     * @return array|string
-     * @throws Exception
+     * @return string
      */
-    public static function atualizarContratos(Request $request, Response $response)
+    public static function apiUser(Request $request)
     {
-        $body = $request->getParsedBodyContent();
-        if (isset(
-            $body['start'],
-            $body['end'],
-            $body['vencimento'],
-            $body['averbador'],
-            $body['nomeOuCpf'],
-            $body['condominioValue']
-        )) {
-            $result = AjaxResolver::attContratos(
-                $body['start'],
-                $body['end'],
-                $body['vencimento'],
-                $body['averbador'],
-                $body['nomeOuCpf'],
-                $body['condominioValue']
-            );
-            if (isset($result['error']) && $result['error'] == true) {
-                $response->withStatus(400);
-            }
-            return Request::toJson($result);
-        }
-        $response->withStatus(400);
-        return Request::toJson(array('error' => true, 'message' => 'miss something in body request', 'raw' => $body));
+        $id = isset($request->getQueryParams()['id']) ? $request->getQueryParams()['id'] : '';
+        $user = (new AjaxResolver(true))::getUserById($id);
+        $user = count($user) ? $user : ['error' => false, 'message' => "User not fount by id $id"];
+        return Helpers::toJson(Helpers::stringIsOk($id) ? $user : ['error' => true, 'message' => 'missing id parameter', 'raw' => [$id, $request->getQueryParams()]]);
+    }
 
+    /**
+     * @param Request $request
+     * @return array
+     */
+    public static function apiLogin(Request $request)
+    {
+        $body = HttpHelper::getBodyByMethod($request);
+        if (
+            isset($body['login'], $body['pass']) &&
+            count(self::userFactory()->findUser($body['login'], $body['pass']))
+        ) {
+            session_start();
+            $_SESSION['user'] = ($body['login'] . '#|#' . $body['pass']);
+            self::redirect(Helpers::baseURL('home'));
+        }
+        return ['error' => true, 'message' => 'Missing parameters login and password', 'raw' => $body];
+    }
+
+    /**
+     * @param Request $request
+     * @return array
+     */
+    public static function apiSign(Request $request)
+    {
+        $body = HttpHelper::getBodyByMethod($request);
+        if (isset($body['login'], $body['pass'])) {
+            return (
+            (new AjaxResolver(true))
+                ::CreateNewUser(
+                    $body['login'],
+                    $body['pass'],
+                    $body['name'] ?: '',
+                    $body['meta'] ?: ''
+                )
+            );
+        }
+        return ['error' => true, 'message' => 'Missing parameters name login and password', 'raw' => $body];
     }
 }

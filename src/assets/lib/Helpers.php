@@ -2,8 +2,8 @@
 
 namespace App\assets\lib;
 
+use Closure;
 use InvalidArgumentException;
-use Traversable;
 
 /**
  * Class Helpers
@@ -13,6 +13,13 @@ use Traversable;
  */
 class Helpers
 {
+
+    public static function baseURL(string $to = '')
+    {
+        $host = $_SERVER['HTTP_HOST'];
+        $redirectUrl = explode('/', str_replace('index', '', $_SERVER['REDIRECT_URL']));
+        return sprintf('//%s%s/%s/%s', $host, $redirectUrl[0], $redirectUrl[1], $to);
+    }
 
     /**
      * @param $str
@@ -86,11 +93,6 @@ class Helpers
         define('ENEL_FIELDS', getenv('ENEL_FIELDS'));
         define('ENEL_TABLE', getenv('ENEL_TABLE'));
         //Dev defines
-        define("DB_type", "mysql");
-        define("DB_HOST", "localhost");
-        define("DB_USER", "root");
-        define("DB_PASS", "");
-        define("DB_NAME", "crefazscm_webscm");
     }
 
     /**
@@ -210,19 +212,12 @@ class Helpers
      */
     public static function Map($array, $callback)
     {
-        if (!function_exists('is_iterable')) {
-
-            function is_iterable($obj)
-            {
-                return is_array($obj) || (is_object($obj) && ($obj instanceof Traversable));
-            }
-        }
-        if (!is_callable($callback) || !is_iterable($array)) {
+        if (!is_callable($callback) || !is_array($array)) {
             throw new InvalidArgumentException('$callback must be a callable (function)');
         }
         $returned = array();
         foreach ($array as $key => $value) {
-            $returned[] = $callback($value, $key);
+            $returned[$key] = $callback($value, $key);
         }
         return $returned;
     }
@@ -235,14 +230,7 @@ class Helpers
      */
     public static function Entries($anyIterable)
     {
-        if (!function_exists('is_iterable')) {
-
-            function is_iterable($obj)
-            {
-                return is_array($obj) || (is_object($obj) && ($obj instanceof Traversable));
-            }
-        }
-        if (!is_iterable($anyIterable)) {
+        if (!is_array($anyIterable)) {
             throw new InvalidArgumentException("");
         }
         $entries = array();
@@ -315,19 +303,11 @@ class Helpers
      * @param $array
      * @param $callback
      * @param array $initialValue
-     * @param array $args
      * @return int
      */
     public static function Reducer($array, $callback, $initialValue = array())
     {
-        if (!function_exists('is_iterable')) {
-
-            function is_iterable($objR)
-            {
-                return is_array($objR) || (is_object($objR) && ($objR instanceof Traversable));
-            }
-        }
-        if (!is_callable($callback) || !is_iterable($array)) {
+        if (!is_callable($callback) || !is_array($array)) {
             throw new InvalidArgumentException('$callback must be a callable (function)');
         }
         foreach ($array as $key => $value) {
@@ -362,5 +342,23 @@ class Helpers
     public static function isOnlyNumbers($number)
     {
         return preg_match("/^\d+$/", $number) ? true : false;
+    }
+
+    /**
+     * @param array $array
+     * @param Closure $closure
+     * @param Closure $callback
+     * @return array
+     */
+    public static function MagicMap(array $array, Closure $closure, Closure $callback)
+    {
+        if (!is_callable($callback) || !is_callable($closure) || !is_array($array)) {
+            throw new InvalidArgumentException('$callback must be a callable (function)');
+        }
+        $returned = array();
+        foreach ($array as $key => $value) {
+            $returned[$closure($value, $key)] = $callback($value, $key);
+        }
+        return $returned;
     }
 }

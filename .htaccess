@@ -4,4 +4,4 @@ Options -Indexes +FollowSymLinks
 RewriteRule ^index\.php$ - [L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule . portal/index.php [L]
+RewriteRule . purephpserver/index.php [L]

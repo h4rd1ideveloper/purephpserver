@@ -127,13 +127,10 @@ class QueryBuilder
         if ($limit != null) {
             $q .= sprintf(" limit %s ", (string)$limit);
         }
-        $count = 1;
-        //exit(var_dump($q));
         $sql = $PDO->prepare($q);
         if (isset($params) && count($params)) {
             foreach ($params as $key => &$param) {
                 $sql->bindParam($key, $param);
-                //print_r("<br/>" . $key . " " . $param);
             }
         }
         return $sql;

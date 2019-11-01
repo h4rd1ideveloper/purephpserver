@@ -42,7 +42,7 @@ class Request extends HttpHelper implements RequestInterface
      */
     private $queryString;
     /**
-     * @var
+     * @var array
      */
     private $queryParams;
     /**
@@ -390,7 +390,7 @@ class Request extends HttpHelper implements RequestInterface
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     public function getQueryParams()
     {

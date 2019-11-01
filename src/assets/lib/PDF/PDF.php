@@ -3,12 +3,9 @@
 
 namespace App\assets\lib\PDF;
 
+use App\assets\lib\PDF\tcpdf\TCPDF;
 
-use TCPDF;
-
-require_once 'fpdf/fpdf.php';
 require_once 'tcpdf/config/tcpdf_config_alt.php';
-require_once 'tcpdf/TCPDF.php';
 
 class PDF extends TCPDF
 {
@@ -19,7 +16,7 @@ class PDF extends TCPDF
     function Header()
     {
         $this->SetFont('Times', 'B', 8);
-        $this->Image('img/logoempresa.jpg', 10, 10, 21, 11, 'JPEG');
+        //$this->Image('../../..', 10, 10, 21, 11, 'JPEG');
 
         $w = array(30, 130, 30);
         $this->Cell($w[0], 5, '', 0, 0, 'L');

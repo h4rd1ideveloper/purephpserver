@@ -95,53 +95,62 @@ class Router
     {
         switch ($config) {
             case false:
-                {
-                    self::$BASE_ULR = $this->INITIAL_STATE["path_root"];
-                    $this->INITIAL_STATE["show_errors"] === true && Helpers::showErrors();
-                    $this->INITIAL_STATE["cors"] === true && Helpers::cors();
-                    $this->INITIAL_STATE["production_defines"] === true && Helpers::defines();
-                    break;
-                }
+            {
+                self::$BASE_ULR = $this->INITIAL_STATE["path_root"];
+                $this->INITIAL_STATE["show_errors"] === true && Helpers::showErrors();
+                $this->INITIAL_STATE["cors"] === true && Helpers::cors();
+                $this->INITIAL_STATE["production_defines"] === true && Helpers::defines();
+                break;
+            }
             case is_array($config):
-                {
-                    isset($config["path_root"]) &&
-                    is_string($config["path_root"]) &&
-                    self::$BASE_ULR = $config["path_root"];
+            {
+                isset($config["path_root"]) &&
+                is_string($config["path_root"]) &&
+                self::$BASE_ULR = $config["path_root"];
 
-                    isset($config["show_errors"]) &&
-                    $config["show_errors"] === true &&
-                    Helpers::showErrors();
+                isset($config["show_errors"]) &&
+                $config["show_errors"] === true &&
+                Helpers::showErrors();
 
-                    isset($config["cors"]) &&
-                    $config["cors"] === true &&
-                    Helpers::cors();
+                isset($config["cors"]) &&
+                $config["cors"] === true &&
+                Helpers::cors();
 
-                    isset($config["cors"]) &&
-                    $config["cors"] === true &&
-                    Helpers::defines();
-                    break;
-                }
+                isset($config["cors"]) &&
+                $config["cors"] === true &&
+                Helpers::defines();
+                break;
+            }
             case 'environment.production':
-                {
-                    $envs = HttpHelper::getEnvFrom('.env.production');
-                    self::$BASE_ULR = HttpHelper::stringIsOk($envs['path_root']) ? $envs['path_root'] : self::$BASE_ULR;
-                    isset($envs['show_errors']) && $envs['show_errors'] === true && Helpers::showErrors();
-                    isset($envs['cors']) && $envs['cors'] === true && Helpers::cors();
-                    isset($envs['production_defines']) && $envs['production_defines'] === true && Helpers::defines();
-                    break;
+            {
+                $envs = HttpHelper::getEnvFrom('.env.production');
+                self::$BASE_ULR = HttpHelper::stringIsOk($envs['path_root']) ? $envs['path_root'] : self::$BASE_ULR;
+                isset($envs['show_errors']) && $envs['show_errors'] === true && Helpers::showErrors();
+                isset($envs['cors']) && $envs['cors'] === true && Helpers::cors();
+                isset($envs['production_defines']) && $envs['production_defines'] === true && Helpers::defines();
+                if (isset($envs['DB_type'], $envs['DB_HOST'], $envs['DB_USER'], $envs['DB_PASS'], $envs['DB_NAME'])) {
+                    define("DB_type", $envs['DB_type']);
+                    define("DB_HOST", $envs['DB_HOST']);
+                    define("DB_USER", $envs['DB_USER']);
+                    define("DB_PASS", $envs['DB_PASS']);
+                    define("DB_NAME", $envs['DB_NAME']);
+
                 }
+                //exit(print_r($envs));
+                break;
+            }
             case is_string($config):
-                {
-                    self::$BASE_ULR = $config;
-                    break;
-                }
+            {
+                self::$BASE_ULR = $config;
+                break;
+            }
             default:
-                {
-                    Helpers::defines();
-                    Helpers::cors();
-                    Helpers::showErrors();
-                    break;
-                }
+            {
+                Helpers::defines();
+                Helpers::cors();
+                Helpers::showErrors();
+                break;
+            }
         }
     }
 
@@ -186,38 +195,35 @@ class Router
             $actionMiddleware = $args[0];
             if (is_array($actionMiddleware)) {
                 $this->addMiddlewares($actionMiddleware);
-            } elseif ($this->currentCallReference !== null) {
-                if (isset($this->currentCallReference[0])) {
+            } elseif (is_callable($actionMiddleware)) {
+                if (
+                    $this->currentCallReference !== null &&
+                    isset($this->currentCallReference[0]) &&
+                    isset($this->currentCallReference[1])
+                ) {
                     $ref_method = $this->currentCallReference[0];
-                }
-                if (isset($this->currentCallReference[1])) {
                     $ref_route = $this->currentCallReference[1];
-                }
-                if (isset($ref_method, $ref_route)) {
                     $this->setMiddleware($actionMiddleware, (string)$ref_method, (string)$ref_route);
+                } else {
+                    $this->setMiddleware($actionMiddleware);
                 }
             } else {
-                $this->setMiddleware($actionMiddleware);
-            }
-        } else {
-            if (isset($args[0])) {
-                $route = $args[0];
-            }
-            if (isset($args[1])) {
-                $action = $args[1];
-            }
-            $middleware = isset($args[2]) ? $args[2] : null;
-            if (!isset($action) || !is_callable($action)) {
                 return false;
             }
-            if ($middleware !== null && is_callable($middleware) && isset($route)) {
-                $this->setMiddleware($middleware, $method, $route);
-            } elseif (is_array($middleware)) {
-                $this->addMiddlewares($middleware);
-            }
-            if (isset($route)) {
+        } elseif (isset($args[1]) && isset($args[0])) {
+            $route = $args[0];
+            $action = $args[1];
+            $middleware = isset($args[2]) ? $args[2] : null;
+            if (isset($action, $route) && is_callable($action)) {
+                if ($middleware !== null && is_callable($middleware)) {
+                    $this->setMiddleware($middleware, $method, $route);
+                } elseif (is_array($middleware)) {
+                    $this->addMiddlewares($middleware);
+                }
                 $this->routes[$method][$route] = $action;
                 $this->currentCallReference = array($method, $route);
+            } else {
+                return false;
             }
         }
         return true;
@@ -289,13 +295,16 @@ class Router
      */
     public function run()
     {
+        $alternativeRoute = substr($this->route, 0, (strlen($this->route) - 1));
         !isset($this->routes[$this->method]) && $this->response->withStatus(405) && die(/**@Debugger */
         print_r(array('405 Method not allowed', $this->method, $this->route)));
-        !isset($this->routes[$this->method][$this->route]) && $this->response->withStatus(404) && die(/**@Debugger */
-        print_r(array('404 Error', $this->method, $this->route)));
+        !isset($this->routes[$this->method][$this->route]) && !isset($this->routes[$this->method][$alternativeRoute])
+        && $this->response->withStatus(404) && die(/**@Debugger */
+        print_r(array('404 Error', $this->method, $this->route, $alternativeRoute)));
+        $route = isset($this->routes[$this->method][$this->route]) ? $this->route : $alternativeRoute;
         self::$params = $this->getParams($this->method);
-        $finalThis = $this->executeMiddleware($this->method, $this->route);
-        die($finalThis->routes[$finalThis->method][$finalThis->route]($finalThis->request, $finalThis->response));
+        $finalThis = $this->executeMiddleware($this->method, $route);
+        die($finalThis->routes[$finalThis->method][$route]($finalThis->request, $finalThis->response));
     }
 
     /**
@@ -325,7 +334,6 @@ class Router
                 isset($callables) && count($callables) && is_array($callables) ? $callables : array(),
                 isset($global) && count($global) && is_array($global) ? $global : array()
             );
-            //var_dump($method, $route, $global, $this->getMiddlewareFrom($method, $route), $callables);
             foreach ($callables as $callable) {
                 $callable(
                     $this->getRequest(),
