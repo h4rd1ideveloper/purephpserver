@@ -17,7 +17,7 @@ Components
     );
 ?>
     <main class="container-fluid h-100">
-        <div class="container rounded py-5 bg-light">
+        <div class="container rounded py-5">
             <div class="d-none">
                 <form class="container mt-5">
                     <fieldset class="form-group row">
