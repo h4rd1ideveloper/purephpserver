@@ -24,11 +24,16 @@ class ComposerStaticInit2ee48c20b1efb3d38488e3802c83d3f9
         'S' => 
         array (
             'Symfony\\Polyfill\\Ctype\\' => 23,
+            'Server\\' => 7,
         ),
         'P' => 
         array (
             'Psr\\Http\\Message\\' => 17,
             'Prophecy\\' => 9,
+        ),
+        'L' => 
+        array (
+            'Lib\\' => 4,
         ),
         'I' => 
         array (
@@ -60,15 +65,23 @@ class ComposerStaticInit2ee48c20b1efb3d38488e3802c83d3f9
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-ctype',
         ),
+        'Server\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/core/routes',
+        ),
         'Psr\\Http\\Message\\' => 
         array (
-            0 => __DIR__ . '/../..' . '/src/http',
+            0 => __DIR__ . '/../..' . '/core/http',
             1 => __DIR__ . '/..' . '/psr/http-factory/src',
             2 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
         'Prophecy\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpspec/prophecy/src/Prophecy',
+        ),
+        'Lib\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/lib',
         ),
         'Interop\\Http\\Factory\\' => 
         array (

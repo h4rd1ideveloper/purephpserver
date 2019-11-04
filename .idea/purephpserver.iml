@@ -2,8 +2,10 @@
 <module type="WEB_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/src/http" isTestSource="false" packagePrefix="Psr\Http\Message\" />
+      <sourceFolder url="file://$MODULE_DIR$/core/routes" isTestSource="false" packagePrefix="Server\" />
+      <sourceFolder url="file://$MODULE_DIR$/lib" isTestSource="false" packagePrefix="Lib\" />
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" packagePrefix="App\" />
+      <sourceFolder url="file://$MODULE_DIR$/core/http" isTestSource="false" packagePrefix="Psr\Http\Message\" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/composer" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/doctrine/instantiator" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/http-interop/http-factory-tests" />

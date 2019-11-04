@@ -1,10 +1,10 @@
 <?php
 
-use App\assets\lib\Helpers;
 use App\view\components\Components;
+use Lib\Helpers;
 
 Components
-    ::headerHTML(array('title' => 'Developer Web Page'))
+    ::headerHTML(['title' => 'Developer Web Page'])
     ::navbarHTML(
         [
             'page_href' => 'login',

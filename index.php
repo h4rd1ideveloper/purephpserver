@@ -1,20 +1,21 @@
 <?php
-//declare(strict_types=1); only php-7
+declare(strict_types=1);
 require_once __DIR__ . '/vendor/autoload.php';
 
 /***
  * Setup config
  */
 
-use App\assets\lib\Helpers;
 use App\controller\AppController;
-use App\http\Request;
-use App\http\Response;
-use App\routes\Dispatch;
-use App\routes\Router;
+use Lib\Helpers;
+use Psr\Http\Message\Request;
+use Psr\Http\Message\Response;
+use Psr\Http\Message\Uri;
+use Server\Dispatch;
+use Server\Router;
 
 try {
-    $app = new Router('environment.production');
+    $app = new Router('.env');
     $Dispatcher = new Dispatch();
     $Dispatcher
         ->setMiddleware(
@@ -36,6 +37,9 @@ try {
                 $next($request, $response->withHeader('Content-Type', 'application/json'), $next);
             }, 'json'
         );
+    $app->get('/test/regex/:d', static function () {
+        return new Request('', new Uri('/hello/{name}'), '', '', '');
+    });
 
     //Views
     $app->get('/', static function (Request $request, Response $response) {

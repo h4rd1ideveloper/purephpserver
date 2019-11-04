@@ -5,7 +5,7 @@ use App\view\components\Components;
 $vars = isset($vars) && count($vars) ? $vars : false;
 
 Components
-    ::headerHTML(array('title' => 'Developer Web Page'))
+    ::headerHTML(['title' => 'Developer Web Page'])
     ::navbarHTML(
         [
             'page_href' => 'home',

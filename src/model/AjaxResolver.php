@@ -1,11 +1,6 @@
 <?php
 
-
 namespace App\model;
-
-
-use App\assets\lib\Dao;
-
 
 /**
  * Class AjaxResolver
@@ -93,6 +88,6 @@ class AjaxResolver
     public static function getUserByToken($login, $pass)
     {
         $user = new User(self::$credentials);
-        return $user->findUser($user::userToken($login, $pass));
+        return $user->findUser($login, $pass);
     }
 }

@@ -2,10 +2,10 @@
 
 namespace App\controller;
 
-use App\assets\lib\Helpers;
-use App\http\HttpHelper;
-use App\http\Request;
-use App\http\Response;
+use Lib\Helpers;
+use Psr\Http\Message\HttpHelper;
+use Psr\Http\Message\Request;
+use Psr\Http\Message\Response;
 use App\model\AjaxResolver;
 use App\model\User;
 use Exception;

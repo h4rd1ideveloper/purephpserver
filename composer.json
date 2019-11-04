@@ -15,7 +15,9 @@
   "autoload": {
     "psr-4": {
       "App\\": "src/",
-      "Psr\\Http\\Message\\": "src/http/"
+      "Server\\": "core/routes",
+      "Psr\\Http\\Message\\": "core/http/",
+      "Lib\\": "lib/"
     }
   },
   "require-dev": {
@@ -29,7 +31,8 @@
     "ralouphie/getallheaders": "^2.0.5 || ^3.0.0",
     "ext-pdo": "*",
     "ext-json": "*",
-    "ext-mysqli": "*"
+    "ext-mysqli": "*",
+    "ext-simplexml": "*"
   },
   "provide": {
     "psr/http-factory-implementation": "1.0",

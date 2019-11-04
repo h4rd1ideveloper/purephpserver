@@ -2,10 +2,9 @@
 
 namespace App\model;
 
-use App\assets\lib\Bcrypt;
-use App\assets\lib\Dao;
-use App\assets\lib\Helpers;
 use InvalidArgumentException;
+use Lib\Bcrypt;
+use Lib\Helpers;
 
 /**
  * Class User

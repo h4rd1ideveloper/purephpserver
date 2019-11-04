@@ -2,8 +2,8 @@
 
 namespace App\view\components;
 
-use App\assets\lib\Helpers;
 use InvalidArgumentException;
+use Lib\Helpers;
 
 /**
  * Class Components
@@ -50,10 +50,10 @@ public static function headerHTML(array $config)
     return new static();
     }
     /**
-     * @param array $config
+     * @TODO param array $config
      * @return Components
      */
-    public static function footerHTML(array $config = array()):Components
+    public static function footerHTML():Components
     {
     ?>
     <script>
@@ -87,14 +87,14 @@ public static function headerHTML(array $config)
             throw new InvalidArgumentException("Atributo headers é obrigatorio e deve ser um array de valores escalar");
         }
         $html = '';
-        $html .= Helpers::Reducer($data['headers'], function ($initial, $currentValue, $index) {
+        $html .= Helpers::Reducer($data['headers'], function ($initial, $currentValue) {
                 return $initial . "<th scope='col'>$currentValue</th>";
             }, "<table id='$id' class='table table-hover'><thead><tr>") . '</tr></thead>';
-        $html .= Helpers::Reducer($data['body'], function ($initial, $currentValue, $index) {
+        $html .= Helpers::Reducer($data['body'], function ($initial, $currentValue) {
                 if (!is_array($currentValue)) {
                     throw new InvalidArgumentException("Atributo body é obrigatorio e deve ser um array de array valores escalar");
                 }
-                return $initial . Helpers::Reducer($currentValue, function ($init, $v, $key) {
+                return $initial . Helpers::Reducer($currentValue, function ($init, $v) {
                         return $init . "<th class='text-black-50' scope='row'>$v</th>";
                     }, '<tr>') . '</tr>';
             }, '<tbody>') . '</tbody></table>';
