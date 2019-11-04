@@ -6,7 +6,7 @@ use Lib\Helpers;
 use PDO;
 use PDOStatement;
 
-class QueryBuilder
+abstract class QueryBuilder
 {
     /**
      * @param $table    string
