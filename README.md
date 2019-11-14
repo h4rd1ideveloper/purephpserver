@@ -59,7 +59,7 @@ Make a change in your file and instantanously see your updates!
 ### Todos
 
  - Write MORE Tests
- - Add Night Mode
+ - Register Routes as Regex
 
 License
 ----
