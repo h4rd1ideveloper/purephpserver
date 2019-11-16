@@ -11,25 +11,22 @@ use Lib\Helpers;
 use Psr\Http\Message\HttpHelper;
 use Psr\Http\Message\Request;
 use Psr\Http\Message\Response;
-use Psr\Http\Message\Uri;
 
 $app = HttpHelper::AppFactory('.env');
-$app->get('/test/regex/:d', static function () {
-    return new Request('', new Uri('/hello/{name}'), '', '', '');
-});
 
 //Views
-$app->get('/', static function (Request $request, Response $response) {
-    AppController::index($response);
+$app->get('/', static function (Request $request) {
+    //AppController::index($response);
+    return new Response(200, ['Content-Type' => 'application/json'], ['error' => false, 'message' => 'ok']);
 });
-$app->get('/home', static function (Request $request, Response $response) {
-    AppController::dashboard($response);
+$app->get('/home', static function (Request $request) {
+    AppController::dashboard(new Response());
 });
 
-$app->get('/login', static function (Request $request, Response $response) {
+$app->get('/login', static function (Request $request) {
     AppController::view('pages/Login');
 });
-$app->post('/user/login', static function (Request $request, Response $response) {
+$app->post('/user/login', static function (Request $request) {
     AppController::apiLogin($request);
 });
 
@@ -39,7 +36,7 @@ $app->post('/user/login', static function (Request $request, Response $response)
 $app->post('/api/json/user/create', static function (Request $request) {
     return Helpers::toJson(AppController::apiSign($request));
 });
-///
+
 $app->get('/api/json/user/login', static function (Request $request) {
     return AppController::apiLogin($request);
 });

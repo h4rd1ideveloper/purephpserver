@@ -84,7 +84,7 @@ class Router
         $this->init($config);
         $this->method = self::methodFromGlobal();
         $this->route = self::routeFromGlobal();
-        $this->response = HttpHelper::responseFactory();
+        //$this->response = HttpHelper::responseFactory();
         $this->request = HttpHelper::requestFromGlobalsFactory($this->method, self::versionFromGlobal());
     }
 
@@ -271,15 +271,22 @@ class Router
     public function run()
     {
         $alternativeRoute = substr($this->route, 0, (strlen($this->route) - 1));
-        !isset($this->routes[$this->method]) && $this->response->withStatus(405) && die(/**@Debugger */
-        print_r(array('405 Method not allowed', $this->method, $this->route)));
-        !isset($this->routes[$this->method][$this->route]) && !isset($this->routes[$this->method][$alternativeRoute])
-        && $this->response->withStatus(404) && die(/**@Debugger */
-        print_r(array('404 Error', $this->method, $this->route, $alternativeRoute)));
+
+        !isset($this->routes[$this->method]) &&
+        die(
+        new Response(405, ['Content-Type' => 'application/json'], ['405 Method not allowed', $this->method, $this->route])
+        );
+
+        !isset($this->routes[$this->method][$this->route]) &&
+        !isset($this->routes[$this->method][$alternativeRoute]) &&
+        die(
+        new Response(404, ['Content-Type' => 'application/json'], ['404 Error', $this->method, $this->route, $alternativeRoute])
+        );
+
         $route = isset($this->routes[$this->method][$this->route]) ? $this->route : $alternativeRoute;
         self::$params = $this->getParams($this->method);
         $finalThis = $this->executeMiddleware($this->method, $route);
-        die($finalThis->routes[$finalThis->method][$route]($finalThis->request, $finalThis->response));
+        die($finalThis->routes[$finalThis->method][$route]($finalThis->request));
     }
 
     /**

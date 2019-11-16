@@ -80,12 +80,17 @@ class HttpHelper extends Helpers
     }
 
     /**
+     * @param int $status
+     * @param array $headers
+     * @param null $body
+     * @param string $version
+     * @param null $reason
      * @return Response
      * @throws Exception
      */
-    public static function responseFactory()
+    public static function responseFactory($status = 200, $headers = array(), $body = null, $version = '1.1', $reason = null)
     {
-        return new Response();
+        return new Response($status, $headers, $body, $version, $reason);
     }
 
     /**
@@ -996,6 +1001,9 @@ class HttpHelper extends Helpers
                 fwrite($fp, sprintf('%s', $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL . $e->getCode() . PHP_EOL . $e->getLine()));
                 fclose($fp);
             }
+            exit(
+                new Response(500, ['Content-Type' => 'application/json'], ['error' => true, 'message' => $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL . $e->getCode() . PHP_EOL . $e->getLine(), 'context' => [$string]])
+            );
         }
     }
 

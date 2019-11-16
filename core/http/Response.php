@@ -106,7 +106,7 @@ class Response extends HttpHelper implements ResponseInterface
         $this->statusCode = $status;
 
         if ($body !== '' && $body !== null) {
-            $this->stream = HttpHelper::stream_for($body);
+            $this->stream = HttpHelper::stream_for(is_array($body) ? self::toJson($body) : $body);
         }
 
         $this->setHeaders($headers);
@@ -150,6 +150,8 @@ class Response extends HttpHelper implements ResponseInterface
                 $this->headerNames[$normalized] = $header;
                 $this->headers[$header] = $value;
             }
+            $aux = implode(', ', $this->headers[$header]);
+            HttpHelper::setHeader("$header: $aux");
         }
     }
 
@@ -215,6 +217,62 @@ class Response extends HttpHelper implements ResponseInterface
         }, $values);
     }
 
+    public function __toString(): string
+    {
+        foreach ($this->headers as $key => $value) {
+            if (!is_string($key)) {
+                self::setHeader(explode(':', $value)[0] . ':' . explode(':', $value)[1]);
+            } else {
+                self::setHeader(
+                    sprintf(
+                        '%s: %s',
+                        $key,
+                        implode(' ,', is_string($value) ? [$value] : $value)
+                    )
+                );
+            }
+        }
+        $s = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        self::setHeader(sprintf('%s/%s %s %s', strtoupper($s), $this->getProtocolVersion(), $this->getStatusCode(), $this->getReasonPhrase()));
+        return $this->getBody()->getContents();
+    }
+
+    /**
+     * @return string
+     */
+    public function getProtocolVersion()
+    {
+        return $this->protocol;
+    }
+
+    /**
+     * @return int
+     */
+    public function getStatusCode()
+    {
+        return $this->statusCode;
+    }
+
+    /**
+     * @return string
+     */
+    public function getReasonPhrase()
+    {
+        return $this->reasonPhrase;
+    }
+
+    /**
+     * @return StreamInterface
+     * @throws Exception
+     */
+    public function getBody()
+    {
+        if (!$this->stream) {
+            $this->stream = HttpHelper::stream_for('');
+        }
+        return $this->stream;
+    }
+
     /**
      * @param $args
      * @param bool $from
@@ -244,8 +302,6 @@ class Response extends HttpHelper implements ResponseInterface
             $reasonPhrase = self::$PHRASES[$new->statusCode];
         }
         $new->reasonPhrase = $reasonPhrase;
-        $s = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-        self::setHeader(sprintf('%s/%s %s %s', strtoupper($s), $new->getProtocolVersion(), $new->getStatusCode(), $new->getReasonPhrase()));
         return $new;
     }
 
@@ -257,30 +313,6 @@ class Response extends HttpHelper implements ResponseInterface
         if (filter_var($statusCode, FILTER_VALIDATE_INT) === false) {
             throw new InvalidArgumentException('Status code must be an integer value.');
         }
-    }
-
-    /**
-     * @return string
-     */
-    public function getProtocolVersion()
-    {
-        return $this->protocol;
-    }
-
-    /**
-     * @return int
-     */
-    public function getStatusCode()
-    {
-        return $this->statusCode;
-    }
-
-    /**
-     * @return string
-     */
-    public function getReasonPhrase()
-    {
-        return $this->reasonPhrase;
     }
 
     /**
@@ -324,7 +356,7 @@ class Response extends HttpHelper implements ResponseInterface
     {
         $this->assertHeader($header);
         $value = $this->normalizeHeaderValue($value);
-        parent::setHeader(sprintf("%s: %s", $header, implode(',', $value)));
+        // parent::setHeader(sprintf("%s: %s", $header, implode(',', $value)));
         $normalized = strtolower($header);
         $new = clone $this;
         if (isset($new->headerNames[$normalized])) {
@@ -344,10 +376,6 @@ class Response extends HttpHelper implements ResponseInterface
     {
         $this->assertHeader($header);
         $value = $this->normalizeHeaderValue($value);
-        $newValue = $this->normalizeHeaderValue(array_merge($this->headers[$header], $value));
-        //header_remove($header);
-        //var_dump(sprintf("%s: %s", $header, implode(", ", $newValue)));
-        parent::setHeader(sprintf("%s: %s", $header, implode(", ", $newValue)));
         $normalized = strtolower($header);
         $new = clone $this;
         if (isset($new->headerNames[$normalized])) {
@@ -375,17 +403,6 @@ class Response extends HttpHelper implements ResponseInterface
         $new = clone $this;
         unset($new->headers[$header], $new->headerNames[$normalized]);
         return $new;
-    }
-
-    /**
-     * @return StreamInterface
-     */
-    public function getBody()
-    {
-        if (!$this->stream) {
-            $this->stream = HttpHelper::stream_for('');
-        }
-        return $this->stream;
     }
 
     /**
