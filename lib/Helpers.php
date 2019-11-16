@@ -14,7 +14,11 @@ use InvalidArgumentException;
 class Helpers
 {
 
-    public static function baseURL(string $to = '')
+    /**
+     * @param string $to
+     * @return string
+     */
+    public static function baseURL(string $to = ''): string
     {
         $host = $_SERVER['HTTP_HOST'];
         $redirectUrl = explode('/', str_replace('index', '', $_SERVER['REDIRECT_URL']));
@@ -25,54 +29,24 @@ class Helpers
      * @param $str
      * @return string|string[]|null
      */
-    public static function soNumero($str)
+    public static function soNumero(string $str)
     {
-        if (!self::stringIsOk($str)) {
-            throw new InvalidArgumentException('Parameter must be a valid string');
-        }
         return preg_replace("/[^0-9]/", "", $str);
-
-    }
-
-    /**
-     * @param $string
-     * @return bool
-     */
-    public static function stringIsOk($string)
-    {
-        return is_string($string) && $string !== null && !empty($string) && isset($string) && $string !== '';
     }
 
     /**
      * @param $string string
      * @return false|int
      */
-    public static function isMySQLFunction($string)
+    public static function isMySQLFunction(string $string): bool
     {
-        if (empty($string)) {
-            throw new InvalidArgumentException('Parameter $string must be a valid string not and empty');
-        }
-        return preg_match_all('/\(|\)/', (string)$string);
-    }
-
-    /**
-     * @param string $test
-     * @param bool $int
-     * @param bool|int|string $default
-     * @return string
-     */
-    public static function orEmpty($test, $int = false, $default = false)
-    {
-        if ($default === false) {
-            $default = $int ? 0 : '';
-        }
-        return self::stringIsOk((string)$test) ? $test : $default;
+        return (bool)preg_match_all('/\(.*\)/', (string)$string);
     }
 
     /**
      * Helpers constructor.
      */
-    public static function showErrors()
+    public static function showErrors(): void
     {
         error_reporting(E_ALL | E_STRICT);
         ini_set('display_errors', 1);
@@ -83,7 +57,7 @@ class Helpers
     /**
      * Define the constants that app will use
      */
-    public static function defines()
+    public static function defines(): void
     {
         define('PRODUCTION_DB_NAME', getenv('PRODUCTION_DB_NAME'));
         define('PRODUCTION_DB_USER', getenv('PRODUCTION_DB_USER'));
@@ -97,10 +71,10 @@ class Helpers
 
     /**
      * Format any Object or Array to JSON string
-     * @param $toJson
+     * @param string|array|bool|int $toJson
      * @return string
      */
-    public static function toJson($toJson)
+    public static function toJson($toJson): string
     {
         /**
          * Because old version of the php dont contain  JSON_UNESCAPED_UNICODE const = (int 256)
@@ -108,7 +82,7 @@ class Helpers
          * @see JSON_UNESCAPED_UNICODE
          * @deprecated old pattern  ///(?<!\\\\)\\\\u(\w{4})/
          */
-        return preg_replace_callback('/\\\\u(\w{4})/', function ($matches) {
+        return preg_replace_callback('/\\\\u(\w{4})/', static function (array $matches): string {
             return html_entity_decode('&#x' . $matches[1] . ';', ENT_COMPAT, 'UTF-8');
         }, json_encode($toJson));
     }
@@ -119,7 +93,7 @@ class Helpers
      * @param bool $noReapt
      * @return array
      */
-    public static function objectKeys($OBJ, $noReapt = true)
+    public static function objectKeys(array $OBJ, bool $noReapt = true): array
     {
         $arr = array();
         foreach ($OBJ as $key => $valueNotUsedHer) {
@@ -137,7 +111,7 @@ class Helpers
      * @param $value mixed
      * @param $arr
      */
-    public static function insertIfNotExist($value, &$arr)
+    public static function insertIfNotExist($value, array &$arr): void
     {
         if (!in_array($value, $arr)) {
             $arr[] = $value;
@@ -149,7 +123,7 @@ class Helpers
      * @param array $OBJ
      * @return array
      */
-    public static function objectValues($OBJ)
+    public static function objectValues(array $OBJ): array
     {
         $arr = array();
         foreach ($OBJ as $keyNotUsedHer => $value) {
@@ -164,7 +138,7 @@ class Helpers
      * @param $arr
      * @return array
      */
-    public static function getRowsById($ids, $arr)
+    public static function getRowsById(array $ids, array $arr): array
     {
         $source = array();
         foreach ($ids as $id) {
@@ -176,20 +150,19 @@ class Helpers
     /**
      * Init Headers
      */
-    public static function cors()
+    public static function cors(): void
     {
         header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Headers: *");
         header("Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS");
         header("Accept: application/json, application/x-www-form-urlencoded, multipart/form-data, application/xhtml+xml, application/xml;q=0.9, multipart/*, text/plain, text/html,  image/webp, */*;q=0.8");
-        header("Accept-Encoding: compress, gzip"); //
-
+        header("Accept-Encoding: compress, gzip");
     }
 
     /**
      * @param string|null $headerContent
      */
-    public static function setHeader($headerContent = 'Content-Type: application/json')
+    public static function setHeader(string $headerContent = 'Content-Type: application/json'): void
     {
         header(sprintf("%s", $headerContent));
     }
@@ -198,7 +171,7 @@ class Helpers
      * @param $data
      * @return array
      */
-    public static function jsonToArray($data)
+    public static function jsonToArray(string $data): array
     {
         return json_decode($data, true);
     }
@@ -206,15 +179,12 @@ class Helpers
     /**
      * Map From
      * array Map like a javascript
-     * @param $array
-     * @param $callback
+     * @param array $array
+     * @param Closure $callback
      * @return array
      */
-    public static function Map($array, $callback)
+    public static function Map(array $array, Closure $callback): array
     {
-        if (!is_callable($callback) || !is_array($array)) {
-            throw new InvalidArgumentException('$callback must be a callable (function)');
-        }
         $returned = array();
         foreach ($array as $key => $value) {
             $returned[$key] = $callback($value, $key);
@@ -228,11 +198,8 @@ class Helpers
      * @return array
      * @throws InvalidArgumentException
      */
-    public static function Entries($anyIterable)
+    public static function Entries(array $anyIterable): array
     {
-        if (!is_array($anyIterable)) {
-            throw new InvalidArgumentException("");
-        }
         $entries = array();
         foreach ($anyIterable as $key => $value) {
             $entries[] = array($key, $value);
@@ -245,9 +212,9 @@ class Helpers
      * @param $value
      * @param string $type
      * @param bool $options
-     * @return bool|mixed
+     * @return bool
      */
-    public static function isSQLInjection($value, $type = 'string', $options = false)
+    public static function isSQLInjection(string $value, string $type = 'string', $options = false): bool
     {
         $filters = array(
             'bool' => array(FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE),
@@ -288,7 +255,7 @@ class Helpers
         );
         $flag = array();
         foreach ($blackList as $blackWord) {
-            if ((bool)(strpos(strtoupper($value), strtoupper($blackWord)) !== false)) {
+            if (self::containSubString($value, $blackWord)) {
                 $flag[] = true;
             }
         }
@@ -299,17 +266,25 @@ class Helpers
     }
 
     /**
+     * @param $target
+     * @param $toSearch
+     * @param int $offset
+     * @return bool
+     */
+    public static function containSubString(string $target, string $toSearch, int $offset = 0): bool
+    {
+        return (bool)(strpos(strtoupper($target), strtoupper($toSearch), $offset) !== false);
+    }
+
+    /**
      * array Reducer like a javascript
      * @param $array
      * @param $callback
-     * @param array $initialValue
+     * @param mixed $initialValue
      * @return int
      */
-    public static function Reducer($array, $callback, $initialValue = array())
+    public static function Reducer(array $array, Closure $callback, $initialValue = array()): int
     {
-        if (!is_callable($callback) || !is_array($array)) {
-            throw new InvalidArgumentException('$callback must be a callable (function)');
-        }
         foreach ($array as $key => $value) {
             $initialValue = $callback($initialValue, $value, $key);
         }
@@ -320,11 +295,9 @@ class Helpers
      * @param $strDate
      * @return false|string
      */
-    public static function ymdToDmy($strDate)
+    public static function ymdToDmy(string $strDate)
     {
-        if (!self::stringIsOk($strDate)) {
-            throw new InvalidArgumentException('Parameter must be a valid string');
-        }
+        self::orEmpty($strDate, false, '0000-00-00');
         if (
             !self::isOnlyNumbers(substr($strDate, 0, 4)) ||
             !self::isOnlyNumbers(substr($strDate, 5, 2)) ||
@@ -332,14 +305,37 @@ class Helpers
         ) {
             throw new InvalidArgumentException('Parameter must be a valid datetime with format y-m-d');
         }
-        return date('d/m/Y', strtotime('2019-12-01'));
+        return date('d/m/Y', strtotime($strDate));
+    }
+
+    /**
+     * @param string $test
+     * @param bool $int
+     * @param bool|int|string $default
+     * @return string
+     */
+    public static function orEmpty(string $test, bool $int = false, $default = false): string
+    {
+        if ($default === false) {
+            $default = $int ? 0 : '';
+        }
+        return self::stringIsOk((string)$test) ? $test : $default;
+    }
+
+    /**
+     * @param $string
+     * @return bool
+     */
+    public static function stringIsOk(string $string): bool
+    {
+        return isset($string) && !empty($string) && is_string($string);
     }
 
     /**
      * @param $number
      * @return bool
      */
-    public static function isOnlyNumbers($number)
+    public static function isOnlyNumbers(string $number): bool
     {
         return preg_match("/^\d+$/", $number) ? true : false;
     }
@@ -350,11 +346,8 @@ class Helpers
      * @param Closure $callback
      * @return array
      */
-    public static function MagicMap(array $array, Closure $closure, Closure $callback)
+    public static function MagicMap(array $array, Closure $closure, Closure $callback): array
     {
-        if (!is_callable($callback) || !is_callable($closure) || !is_array($array)) {
-            throw new InvalidArgumentException('$callback must be a callable (function)');
-        }
         $returned = array();
         foreach ($array as $key => $value) {
             $returned[$closure($value, $key)] = $callback($value, $key);

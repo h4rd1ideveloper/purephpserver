@@ -2,14 +2,19 @@
 
 namespace App\model;
 
+use Exception;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 use PDO;
 use PDOException;
+use Psr\Http\Message\HttpHelper;
 
 /**
  * Class Dao
  */
 class Dao extends QueryBuilder
 {
+    protected $logger;
     /**
      * @var PDO $_db DB
      */
@@ -65,9 +70,18 @@ class Dao extends QueryBuilder
      * @param string $db_type Tipo
      * @param string $db_path Path
      * @param string $db_host Host
+     * @throws Exception
      */
-    public function __construct($db_host, $db_user, $db_pass, $db_name, $db_type = 'mysql', $db_path = null)
+    public function __construct(string $db_host, string $db_user, string $db_pass, string $db_name, string $db_type = 'mysql', string $db_path = null)
     {
+        try {
+            $this->logger = new Logger('name');
+            $this->logger->pushHandler(new StreamHandler('DB_CONNECTION.log', Logger::WARNING));
+        } catch (Exception $exception) {
+            $fp = HttpHelper::try_fopen('DB_CONNECTION.log', 'wb');
+            fwrite($fp, sprintf('%s\n%s\n%s\n%s\n', $exception->getMessage(), $exception->getTraceAsString(), $exception->getLine(), $exception->getCode()));
+            fclose($fp);
+        }
         $this->_db_host = $db_host;
         $this->_db_user = $db_user;
         $this->_db_pass = $db_pass;
@@ -134,11 +148,11 @@ class Dao extends QueryBuilder
     }
 
     /**
-     * Disconecta ($con==false)
+     * disconnect ($con==false)
      *
      * @return bool
      */
-    public function disconnect()
+    public function disconnect(): bool
     {
         if ($this->_con) {
             unset($this->_db);
@@ -151,7 +165,7 @@ class Dao extends QueryBuilder
     /**
      * @return PDO
      */
-    public function getDB()
+    public function getDB(): PDO
     {
         return $this->_db;
     }
@@ -161,7 +175,7 @@ class Dao extends QueryBuilder
      *
      * @return bool True ou False
      */
-    public function connect()
+    public function connect(): bool
     {
         if (!$this->_con) {
             try {
@@ -171,7 +185,8 @@ class Dao extends QueryBuilder
                 $this->_con = true;
                 return $this->_con;
             } catch (PDOException $e) {
-                return $e->getMessage() . $e->getTraceAsString();
+                $this->logger->critical($e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL . $e->getCode() . PHP_EOL . $e->getLine(), [$this->_connection_string, $this->_db_user, $this->_db_pass, $this->_db]);
+                return false;
             }
         } else {
             return true;
@@ -185,14 +200,14 @@ class Dao extends QueryBuilder
      * @param string $columns colunas
      * @param string|array $join Junção
      * @param array $where Condicional
-     * @param null $group
+     * @param string $group
      * @param string $order Ordenação
-     * @param integer $limit limit
+     * @param integer|string $limit limit
      *
      * @param bool $bind
      * @return bool
      */
-    public function select($table, $columns = "*", $join = null, $where = null, $group = null, $order = null, $limit = null, $bind = true)
+    public function select(string $table, string $columns = "*", $join = null, $where = null, string $group = null, string $order = null, $limit = null, bool $bind = true): bool
     {
         $this->numResults = null;
         try {
@@ -205,7 +220,7 @@ class Dao extends QueryBuilder
             }
             return true;
         } catch (PDOException $e) {
-            print_r($e->getMessage() . $e->getTraceAsString());
+            $this->logger->critical($e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL . $e->getCode() . PHP_EOL . $e->getLine(), [$this->_db, $table, $columns, $join, $where, $group, $order, $limit, $bind]);
             return false;
         }
     }
@@ -214,7 +229,7 @@ class Dao extends QueryBuilder
      * Resultado da query
      * select ou insert??'';
      *
-     * @return array
+     * @return array|bool
      */
     public function getResult()
     {
@@ -227,7 +242,7 @@ class Dao extends QueryBuilder
      *
      * @return int
      */
-    public function getNumResults()
+    public function getNumResults(): int
     {
         return $this->numResults;
     }
@@ -237,11 +252,11 @@ class Dao extends QueryBuilder
      * update("$table","$values","$rows = null")
      *
      * @param string $table
-     * @param $where
-     * @param $value
+     * @param array $where
+     * @param string|array $value
      * @return bool|array $result OU FALSE
      */
-    public function update($table, $where, $value)
+    public function update(string $table, array $where, $value): bool
     {
         if ($this->tableExists($table)) {
             $q = self::queryUpdate($table, $value, $where);
@@ -250,7 +265,8 @@ class Dao extends QueryBuilder
             try {
                 return $this->_db->prepare($q)->execute();
             } catch (PDOException $e) {
-                return $e->getMessage() . $e->getTraceAsString();
+                $this->logger->critical($e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL . $e->getCode() . PHP_EOL . $e->getLine(), [$q, $table, $value, $where]);
+                return false;
             }
         }
         return false;
@@ -260,7 +276,7 @@ class Dao extends QueryBuilder
      * @param $table
      * @return bool|string
      */
-    private function tableExists($table)
+    private function tableExists(string $table): bool
     {
         $this->numResults = null;
         try {
@@ -282,7 +298,20 @@ class Dao extends QueryBuilder
             }
             return true;
         } catch (PDOException $e) {
-            return sprintf('%s%s', $e->getMessage(), $e->getTraceAsString());
+            $this->logger->critical(
+                $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL . $e->getCode() . PHP_EOL . $e->getLine(),
+                [
+                    $this->_db,
+                    'information_schema.tables',
+                    'count( table_name) as ok',
+                    null,
+                    "table_schema = '$this->_db_name' and TABLE_NAME = '$table'",
+                    null,
+                    null,
+                    '1'
+                ]
+            );
+            return false;
         }
     }
 
@@ -298,7 +327,8 @@ class Dao extends QueryBuilder
         try {
             return $this->_db->prepare($insert)->execute();
         } catch (PDOException $e) {
-            return $e->getMessage() . $e->getTraceAsString();
+            $this->logger->critical($e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL . $e->getCode() . PHP_EOL . $e->getLine(), [$insert, $table, $fieldsAndValues]);
+            return false;
         }
     }
 
@@ -323,7 +353,15 @@ class Dao extends QueryBuilder
         try {
             return $this->_db->prepare($deleteQ)->execute();
         } catch (PDOException $e) {
-            return $e->getMessage() . $e->getTraceAsString();
+            $this->logger->critical(
+                $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL . $e->getCode() . PHP_EOL . $e->getLine(),
+                [
+                    $deleteQ,
+                    sprintf(/**@lang text */ 'DELETE FROM %s WHERE ', $table),
+                    $where
+                ]
+            );
+            return false;
         }
     }
 }

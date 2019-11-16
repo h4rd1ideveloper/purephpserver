@@ -8,7 +8,10 @@ use Exception;
 use InvalidArgumentException;
 use Iterator;
 use Lib\Helpers;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 use RuntimeException;
+use Server\Router;
 
 /**
  * Class HttpHelper
@@ -16,6 +19,7 @@ use RuntimeException;
  */
 class HttpHelper extends Helpers
 {
+
     /**
      * Create a new stream based on the input type.
      *
@@ -73,41 +77,6 @@ class HttpHelper extends Helpers
             return new PumpStream($resource, $options);
         }
         throw new InvalidArgumentException('Invalid resource type: ' . gettype($resource));
-    }
-
-    /**
-     * Safely opens a PHP stream resource using a filename.
-     *
-     * When fopen fails, PHP normally raises a warning. This function adds an
-     * error handler that checks for errors and throws an exception instead.
-     *
-     * @param string $filename File to open
-     * @param string $mode Mode used to open the file
-     *
-     * @return resource
-     * @throws RuntimeException if the file cannot be opened
-     */
-    public static function try_fopen($filename, $mode)
-    {
-        $ex = null;
-        set_error_handler(function ($errno, $errstr) use ($filename, $mode, &$ex) {
-            $ex = new RuntimeException(sprintf(
-                'Unable to open %s using mode %s: %s',
-                $filename,
-                $mode,
-                $errstr
-            ));
-        });
-
-        $handle = fopen($filename, $mode);
-        restore_error_handler();
-
-        if ($ex) {
-            /** @var $ex RuntimeException */
-            throw $ex;
-        }
-
-        return $handle;
     }
 
     /**
@@ -680,6 +649,7 @@ class HttpHelper extends Helpers
      * @param string $message Response message string.
      *
      * @return Response
+     * @throws Exception
      */
     public static function parse_response($message)
     {
@@ -986,7 +956,6 @@ class HttpHelper extends Helpers
 
     }
 
-
     /**
      * @param Request $request
      * @return array|string
@@ -1011,5 +980,56 @@ class HttpHelper extends Helpers
                 }
             }
         }
+    }
+
+    public static function AppFactory(string $string): Router
+    {
+        try {
+            return new Router($string);
+        } catch (Exception $e) {
+            try {
+                $logger = new Logger('AppFactory');
+                $logger->pushHandler(new StreamHandler('HttpHelper_AppFactory.log', Logger::WARNING));
+                $logger->critical($e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL . $e->getCode() . PHP_EOL . $e->getLine(), [$string]);
+            } catch (Exception $exception) {
+                $fp = HttpHelper::try_fopen('DB_CONNECTION.log', 'wb');
+                fwrite($fp, sprintf('%s', $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL . $e->getCode() . PHP_EOL . $e->getLine()));
+                fclose($fp);
+            }
+        }
+    }
+
+    /**
+     * Safely opens a PHP stream resource using a filename.
+     *
+     * When fopen fails, PHP normally raises a warning. This function adds an
+     * error handler that checks for errors and throws an exception instead.
+     *
+     * @param string $filename File to open
+     * @param string $mode Mode used to open the file
+     *
+     * @return resource
+     * @throws RuntimeException if the file cannot be opened
+     */
+    public static function try_fopen(string $filename, string $mode)
+    {
+        $ex = null;
+        set_error_handler(function ($errno, $errstr) use ($filename, $mode, &$ex) {
+            $ex = new RuntimeException(sprintf(
+                'Unable to open %s using mode %s: %s',
+                $filename,
+                $mode,
+                $errstr
+            ));
+        });
+
+        $handle = fopen($filename, $mode);
+        restore_error_handler();
+
+        if ($ex) {
+            /** @var $ex RuntimeException */
+            throw $ex;
+        }
+        return $handle;
     }
 }

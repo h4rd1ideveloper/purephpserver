@@ -216,10 +216,10 @@ class Request extends HttpHelper implements RequestInterface
     }
 
     /**
-     * @param array $content
+     * @param string|array|bool|int $content
      * @return string
      */
-    final public static function toJson($content = array())
+    final public static function toJson($content = array()): string
     {
         return parent::toJson($content);
     }

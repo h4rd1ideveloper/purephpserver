@@ -32,7 +32,9 @@
     "ext-pdo": "*",
     "ext-json": "*",
     "ext-mysqli": "*",
-    "ext-simplexml": "*"
+    "ext-simplexml": "*",
+    "psr/log": "^1.1",
+    "monolog/monolog": "^2.0"
   },
   "provide": {
     "psr/http-factory-implementation": "1.0",

@@ -14,7 +14,7 @@ abstract class QueryBuilder
      * @param $where    array
      * @return bool|string
      */
-    public static function queryUpdate($table, $value, $where)
+    public static function queryUpdate(string $table, $value, array $where)
     {
         if (!$table) {
             return false;
@@ -49,7 +49,7 @@ abstract class QueryBuilder
      * @param bool $bind
      * @return array|string;
      */
-    protected static function keyAndValue($q, $keyAndValue, $delimiter = 'and', $quote = false, $bind = false)
+    protected static function keyAndValue(string $q, array $keyAndValue, string $delimiter = 'and', bool $quote = false, bool $bind = false): array
     {
         $i = 0;
         if ($bind === false) {
@@ -64,12 +64,12 @@ abstract class QueryBuilder
             }
             return $q;
         } else {
-            $paramsToBind = array();
+            $paramsToBind = [];
             foreach ($keyAndValue as $key => $value) {
                 $q .= ($i++ == 0) ? sprintf(" %s = :%s ", $key, $key) : sprintf(" %s %s = :%s ", $delimiter, $key, $key);
                 $paramsToBind[":" . $key] = $value;
             }
-            return array($q, $paramsToBind);
+            return [$q, $paramsToBind];
         }
     }
 
@@ -79,13 +79,13 @@ abstract class QueryBuilder
      * @param null|string $columns string
      * @param null|string|array $join string
      * @param null|array|string $where array
-     * @param null $group
+     * @param string $group
      * @param null|string $order string
      * @param null|string $limit string
      * @param $bind bool
      * @return bool|PDOStatement
      */
-    public static function querySelect($PDO, $table, $columns = "*", $join = null, $where = null, $group = null, $order = null, $limit = null, $bind = false)
+    public static function querySelect(PDO $PDO, string $table, string $columns = "*", $join = null, $where = null, string $group = null, string $order = null, string $limit = null, bool $bind = false): PDOStatement
     {
         if (!$table) {
             return false;
@@ -126,7 +126,7 @@ abstract class QueryBuilder
             $q .= sprintf(" ORDER BY %s ", $order);
         }
         if ($limit != null) {
-            $q .= sprintf(" limit %s ", (string)$limit);
+            $q .= sprintf(" limit %s ", $limit);
         }
         $sql = $PDO->prepare($q);
         if (isset($params) && count($params)) {
@@ -143,7 +143,7 @@ abstract class QueryBuilder
      * @param $fieldsAndValues
      * @return bool|string
      */
-    public static function queryInsert($table, $fieldsAndValues)
+    public static function queryInsert(string $table, array $fieldsAndValues): string
     {
         if (!$table) {
             return false;
@@ -165,7 +165,7 @@ abstract class QueryBuilder
      * @param $fields
      * @param $fieldsAndValues
      */
-    private static function fillFieldsAndValues(&$values, &$fields, $fieldsAndValues)
+    private static function fillFieldsAndValues(string &$values, string &$fields, array $fieldsAndValues): void
     {
         $i = 0;
         $lasIndex = (count($fieldsAndValues) - 1);
