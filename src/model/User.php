@@ -2,15 +2,27 @@
 
 namespace App\model;
 
-use InvalidArgumentException;
-use Lib\Bcrypt;
-use Lib\Helpers;
+use App\Abstraction\UserAbstraction;
+use Exception;
 
 /**
  * Class User
  */
-class User extends Bcrypt
+class User extends UserAbstraction
 {
+    /**
+     * @param array $credentials
+     * @return User
+     */
+    public static function userFactory(array $credentials): User
+    {
+        try {
+            return new User($credentials);
+        } catch (Exception $e) {
+
+        }
+    }
+
     /**
      * @var Dao|null
      */
@@ -19,6 +31,7 @@ class User extends Bcrypt
     /**
      * User constructor.
      * @param array $credentials
+     * @throws Exception
      */
     public function __construct(array $credentials)
     {
@@ -30,6 +43,7 @@ class User extends Bcrypt
         );
         $this->DB->connect();
     }
+
 
     /**
      * User constructor.
@@ -47,11 +61,11 @@ class User extends Bcrypt
 
     /**
      * Return all users in $_SESSION['users']
-     * @param bool $orderBy
-     * @param bool $limit
+     * @param string|null $orderBy
+     * @param string|null $limit
      * @return array|bool
      */
-    public function listAll($orderBy = false, $limit = false): array
+    public function listAll(?string $orderBy = null, ?string $limit = null): array
     {
         $this->DB->select(
             'users',
@@ -59,68 +73,44 @@ class User extends Bcrypt
             null,
             null,
             null,
-            $orderBy ?: null,
-            $limit ?: null
+            $orderBy,
+            $limit
         );
         return $this->DB->getResult();
     }
 
     /**
-     * @param array $params
+     * @param UserAbstraction $user
      * @return array
      */
-    public function createUser(array $params): array
+    public function createUser(UserAbstraction $user): array
     {
-        if (isset($params['login'], $params['pass'], $params['meta'])) {
-            $params['token'] = self::userToken($params['login'], $params['pass']);
-            if (!count($this->findUser($params['login'], $params['pass']))) {
-                $this->DB->insert('users', $params);
-                return ['error' => false, 'message' => 'Usuario criado com sucesso', 'raw' => $params];
-            }
-            return [
-                'error' => true,
-                'message' => 'Ja existe um usuario cadastrado com estes dados',
-                'raw' => ['existente' => $this->DB->getResult(), 'enviado' => $params]
-            ];
+        if (!count($this->findUser($user))) {
+            $this->DB->insert('users', $user->getDatabaseSchemaRegistration());
+            return ['error' => false, 'message' => 'User created', 'raw' => $user->getDatabaseSchemaRegistration()];
         }
         return [
             'error' => true,
-            'message' => 'Nome e senha, são obrigatorios para criação de um novo usuario',
-            'raw' => $params
+            'message' => 'There is already a user with the same credentials.',
+            'raw' => ['exist' => $this->DB->getResult(), 'send' => $user->getDatabaseSchemaRegistration()]
         ];
     }
 
     /**
-     * @param string $login
-     * @param string $uncrypPass
-     * @return string
-     */
-    public static function userToken(string $login, string $uncrypPass)
-    {
-        if (!Helpers::stringIsOk($login) || !Helpers::stringIsOk($uncrypPass)) {
-            throw new InvalidArgumentException('login and pass must be a valid string');
-        }
-        return self::hash($login . $uncrypPass);
-    }
-
-    /**
-     * @param string $login
-     * @param string $pass
+     * @param UserAbstraction $user
      * @return array
      */
-    public function findUser(string $login, string $pass)
+    public function findUser(UserAbstraction $user)
     {
         $this->DB->select(
             'users',
             '*',
             null,
-            [
-                'login' => $login,
-                'pass' => $pass
-            ]
+            $this->getDatabaseSchemaFinder()
         );
         return $this->DB->getResult();
     }
+
 
     /**
      * @param integer|string $id
@@ -138,7 +128,7 @@ class User extends Bcrypt
     }
 
     /**
-     * @param $id
+     * @param string|int $id
      * @return array
      */
     public function findUserById($id)

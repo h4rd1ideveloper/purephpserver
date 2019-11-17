@@ -2,13 +2,15 @@
 
 namespace App\controller;
 
+use App\Abstraction\UserAbstraction;
+use App\model\AjaxResolver;
+use App\model\User;
+use Exception;
 use Lib\Helpers;
 use Psr\Http\Message\HttpHelper;
 use Psr\Http\Message\Request;
 use Psr\Http\Message\Response;
-use App\model\AjaxResolver;
-use App\model\User;
-use Exception;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Class AppController
@@ -16,8 +18,14 @@ use Exception;
  */
 final class AppController extends Controller
 {
+    /**
+     * @var array|null
+     */
     public static $credentials = null;
 
+    /**
+     * AppController constructor.
+     */
     public function __construct()
     {
         self::$credentials = [
@@ -35,7 +43,7 @@ final class AppController extends Controller
     public static function index(Response $res)
     {
         if (isset($_SESSION['user']) && !empty($_SESSION['user'])) {
-            $user = self::userFactory();
+            $user = User::userFactory();
             $login = explode('#|#', $_SESSION['user'])[0];
             $pass = explode('#|#', $_SESSION['user'])[1];
             $user = $user->findUser($login, $pass);
@@ -53,10 +61,6 @@ final class AppController extends Controller
         }
     }
 
-    private static function userFactory(): User
-    {
-        return new User(self::$credentials);
-    }
 
     /**
      * allAboutTheRequest
@@ -83,7 +87,7 @@ final class AppController extends Controller
     {
         $login = explode('#|#', $_SESSION['user'])[0];
         $pass = explode('#|#', $_SESSION['user'])[1];
-        $user = self::userFactory()->findUser($login, $pass);
+        $user = User::userFactory(self::$credentials)->findUser($login, $pass);
         $response->send(
             [
                 'error' => false,
@@ -121,8 +125,11 @@ final class AppController extends Controller
     {
         $body = HttpHelper::getBodyByMethod($request);
         if (
-            isset($body['login'], $body['pass']) &&
-            count(self::userFactory()->findUser($body['login'], $body['pass']))
+            Helpers::stringIsOk($body['login']) &&
+            Helpers::stringIsOk($body['pass']) &&
+            count(
+                User::userFactory(self::$credentials)->findUser(new UserAbstraction($body['login'], $body['pass']))
+            )
         ) {
             session_start();
             $_SESSION['user'] = ($body['login'] . '#|#' . $body['pass']);
@@ -133,22 +140,33 @@ final class AppController extends Controller
 
     /**
      * @param Request $request
-     * @return array
+     * @return Response
+     * @throws Exception
      */
-    public static function apiSign(Request $request)
+    public static function apiSign(Request $request): ResponseInterface
     {
         $body = HttpHelper::getBodyByMethod($request);
-        if (isset($body['login'], $body['pass'])) {
-            return (
-            (new AjaxResolver(true))
-                ::CreateNewUser(
-                    $body['login'],
-                    $body['pass'],
-                    $body['name'] ?: '',
-                    $body['meta'] ?: ''
-                )
+        if (
+            Helpers::stringIsOk($body['login']) &&
+            Helpers::stringIsOk($body['pass']) &&
+            Helpers::stringIsOk($body['name'])
+        ) {
+            $user = new User(self::$credentials);
+            $result = $user->createUser(
+                (new UserAbstraction($body['login'], $body['pass']))
+                    ->setName($body['name'])
+                    ->setMeta($body['meta'])
+            );
+            return new Response(
+                isset($result['error']) && $result['error'] ? 400 : 201,
+                HttpHelper::JSON_H,
+                $result
             );
         }
-        return ['error' => true, 'message' => 'Missing parameters name login and password', 'raw' => $body];
+        return new Response(
+            400,
+            HttpHelper::JSON_H,
+            ['error' => true, 'message' => 'Missing parameters name login and password', 'raw' => $body]
+        );
     }
 }

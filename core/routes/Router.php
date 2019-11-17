@@ -6,6 +6,8 @@ use Closure;
 use Exception;
 use InvalidArgumentException;
 use Lib\Helpers;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 use Psr\Http\Message\HttpHelper;
 use Psr\Http\Message\Request;
 use Psr\Http\Message\Response;
@@ -50,10 +52,6 @@ class Router
         "production_defines" => true
     );
     /**
-     * @var Response
-     */
-    private $response;
-    /**
      * @var string
      */
     private $method;
@@ -84,7 +82,6 @@ class Router
         $this->init($config);
         $this->method = self::methodFromGlobal();
         $this->route = self::routeFromGlobal();
-        //$this->response = HttpHelper::responseFactory();
         $this->request = HttpHelper::requestFromGlobalsFactory($this->method, self::versionFromGlobal());
     }
 
@@ -214,6 +211,9 @@ class Router
         return in_array($method, array('get', 'post', 'patch', 'put', 'delete', 'middleware'));
     }
 
+    /**
+     * @param array $actionMiddleware
+     */
     private function addMiddlewares(array $actionMiddleware)
     {
         foreach ($actionMiddleware as $middlewareFunction) {
@@ -259,6 +259,9 @@ class Router
         }
     }
 
+    /**
+     *
+     */
     public function debugger()
     {
         var_dump($this->routes);
@@ -267,6 +270,7 @@ class Router
     /**
      * Closure Executor
      * RUN
+     * @throws Exception
      */
     public function run()
     {
@@ -284,8 +288,11 @@ class Router
         );
 
         $route = isset($this->routes[$this->method][$this->route]) ? $this->route : $alternativeRoute;
+
         self::$params = $this->getParams($this->method);
+
         $finalThis = $this->executeMiddleware($this->method, $route);
+
         die($finalThis->routes[$finalThis->method][$route]($finalThis->request));
     }
 
@@ -319,10 +326,8 @@ class Router
             foreach ($callables as $callable) {
                 $callable(
                     $this->getRequest(),
-                    $this->getResponse(),
-                    function (Request $request, Response $response) use ($newThis) {
+                    function (Request $request) use ($newThis) {
                         $newThis->setRequest($request);
-                        $newThis->setResponse($response);
                     }
                 );
             }
@@ -382,18 +387,17 @@ class Router
     }
 
     /**
-     * @return Response
+     * @return array
      */
-    public function getResponse()
+    public function __invoke()
     {
-        return $this->response;
+        return get_object_vars($this);
     }
 
-    /**
-     * @param Response $response
-     */
-    public function setResponse(Response $response)
+    public function runException(string $message): void
     {
-        $this->response = $response;
+        $logger = new Logger('Runner');
+        $logger->pushHandler(new StreamHandler('Router_run.log', Logger::WARNING));
+        $logger->critical('Fail to execute run Router ->' . $message, $this());
     }
 }

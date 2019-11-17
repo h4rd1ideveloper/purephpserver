@@ -150,8 +150,6 @@ class Response extends HttpHelper implements ResponseInterface
                 $this->headerNames[$normalized] = $header;
                 $this->headers[$header] = $value;
             }
-            $aux = implode(', ', $this->headers[$header]);
-            HttpHelper::setHeader("$header: $aux");
         }
     }
 
@@ -220,9 +218,9 @@ class Response extends HttpHelper implements ResponseInterface
     public function __toString(): string
     {
         foreach ($this->headers as $key => $value) {
-            if (!is_string($key)) {
-                self::setHeader(explode(':', $value)[0] . ':' . explode(':', $value)[1]);
-            } else {
+            if (is_int($key)) {
+                self::setHeader(explode(':', $value[0])[0] . ':' . explode(':', $value[0])[1]);
+            } else{
                 self::setHeader(
                     sprintf(
                         '%s: %s',
@@ -356,7 +354,6 @@ class Response extends HttpHelper implements ResponseInterface
     {
         $this->assertHeader($header);
         $value = $this->normalizeHeaderValue($value);
-        // parent::setHeader(sprintf("%s: %s", $header, implode(',', $value)));
         $normalized = strtolower($header);
         $new = clone $this;
         if (isset($new->headerNames[$normalized])) {

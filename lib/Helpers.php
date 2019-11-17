@@ -312,23 +312,25 @@ class Helpers
      * @param string $test
      * @param bool $int
      * @param bool|int|string $default
-     * @return string
+     * @return string|int
      */
-    public static function orEmpty(string $test, bool $int = false, $default = false): string
+    public static function orEmpty(?string $test, bool $int = false, $default = false)
     {
-        if ($default === false) {
+        if ($int) {
+            $default = ($default === false) ? 0 : (int)$default;
+        } elseif ($int === false) {
             $default = $int ? 0 : '';
         }
-        return self::stringIsOk((string)$test) ? $test : $default;
+        return self::stringIsOk($test) ? $test : $default;
     }
 
     /**
-     * @param $string
+     * @param string|int $string
      * @return bool
      */
-    public static function stringIsOk(string $string): bool
+    public static function stringIsOk($string): bool
     {
-        return isset($string) && !empty($string) && is_string($string);
+        return isset($string) && !empty($string) && (is_string($string) || is_int($string) || is_double($string));
     }
 
     /**
@@ -342,15 +344,15 @@ class Helpers
 
     /**
      * @param array $array
-     * @param Closure $closure
-     * @param Closure $callback
+     * @param Closure $closureKey
+     * @param Closure $callbackValue
      * @return array
      */
-    public static function MagicMap(array $array, Closure $closure, Closure $callback): array
+    public static function MagicMap(array $array, Closure $closureKey, Closure $callbackValue): array
     {
         $returned = array();
         foreach ($array as $key => $value) {
-            $returned[$closure($value, $key)] = $callback($value, $key);
+            $returned[$closureKey($value, $key)] = $callbackValue($value, $key);
         }
         return $returned;
     }

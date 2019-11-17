@@ -19,6 +19,7 @@ use Server\Router;
  */
 class HttpHelper extends Helpers
 {
+    const JSON_H = ['Content-Type' => 'application/json'];
 
     /**
      * Create a new stream based on the input type.
