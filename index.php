@@ -12,7 +12,8 @@ $app = HttpHelper::AppFactory('.env');
  *  Views
  */
 $app->get('/', static function () {
-    return new Response(200, ['Content-Type' => ['application/json']], ['error' => false, 'message' => 'ok']);
+    //return new Response(200, ['Content-Type' => ['application/json']], ['error' => false, 'message' => 'ok']);
+    AppController::view('pages/index');
 });
 $app->get('/home', static function () {
     AppController::dashboard(new Response());
@@ -35,6 +36,7 @@ $app->get('/api/json/user/login', static function (Request $request) {
 /**
  * Resolver
  */
+
 try {
     $app->run();
 } catch (Exception $e) {

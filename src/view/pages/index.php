@@ -1,6 +1,7 @@
 <?php
 
 use App\view\components\Components;
+use Lib\Helpers;
 
 $vars = isset($vars) && count($vars) ? $vars : false;
 
@@ -26,7 +27,7 @@ Components
             <!-- <h1 class="text-light"><a href="#intro" class="scrollto"><span>Rapid</span></a></h1>-->
             <a class="scrollto navbar-brand" href="#header">
                 <img
-                        alt="" class="img-fluid" src="img/logo-via-logohub.png"
+                        alt="" class="img-fluid" src="<?= Helpers::baseURL() ?>src/view/assets/img/logo-via-logohub.png"
                         style="transform: perspective(100px)translate3d(0px, 0px, 29px)scale3d(1, 1, 1.5);!important;"
                 />
             </a>
@@ -76,7 +77,7 @@ Components
             </div>
 
             <div class="col-md-6 intro-img order-md-last order-first">
-                <img alt="" class="img-fluid" src="img/intro-img.svg">
+                <img alt="" class="img-fluid" src="<?= Helpers::baseURL() ?>src/view/assets/img/intro-img.svg">
             </div>
         </div>
 
@@ -95,7 +96,7 @@ Components
 
                 <div class="col-lg-5 col-md-6">
                     <div class="about-img">
-                        <img alt="" src="img/about-img.jpg">
+                        <img alt="" src="<?= Helpers::baseURL() ?>src/view/assets/img/about-img.jpg">
                     </div>
                 </div>
 
@@ -222,7 +223,7 @@ Components
 
                 <div class="col-lg-6">
                     <div class="why-us-img">
-                        <img alt="" class="img-fluid" src="img/why-us.jpg">
+                        <img alt="" class="img-fluid" src="<?= Helpers::baseURL() ?>src/view/assets/img/why-us.jpg">
                     </div>
                 </div>
 
@@ -325,7 +326,7 @@ Components
 
             <div class="row feature-item">
                 <div class="col-lg-6 wow fadeInUp">
-                    <img alt="" class="img-fluid" src="img/features-1.svg">
+                    <img alt="" class="img-fluid" src="<?= Helpers::baseURL() ?>src/view/assets/img/features-1.svg">
                 </div>
                 <div class="col-lg-6 wow fadeInUp pt-5 pt-lg-0">
                     <h4>Voluptatem dignissimos provident quasi corporis voluptates sit assumenda.</h4>
@@ -344,7 +345,7 @@ Components
 
             <div class="row feature-item mt-5 pt-5">
                 <div class="col-lg-6 wow fadeInUp order-1 order-lg-2">
-                    <img alt="" class="img-fluid" src="img/features-2.svg">
+                    <img alt="" class="img-fluid" src="<?= Helpers::baseURL() ?>src/view/assets/img/features-2.svg">
                 </div>
 
                 <div class="col-lg-6 wow fadeInUp pt-4 pt-lg-0 order-2 order-lg-1">
@@ -394,7 +395,8 @@ Components
 
                 <div class="col-lg-4 col-md-6 portfolio-item filter-app">
                     <div class="portfolio-wrap">
-                        <img alt="" class="img-fluid" src="img/portfolio/app1.jpg">
+                        <img alt="" class="img-fluid"
+                             src="<?= Helpers::baseURL() ?>src/view/assets/img/portfolio/app1.jpg">
                         <div class="portfolio-info">
                             <h4><a href="#">App 1</a></h4>
                             <p>App</p>
@@ -410,7 +412,8 @@ Components
 
                 <div class="col-lg-4 col-md-6 portfolio-item filter-web" data-wow-delay="0.1s">
                     <div class="portfolio-wrap">
-                        <img alt="" class="img-fluid" src="img/portfolio/web3.jpg">
+                        <img alt="" class="img-fluid"
+                             src="<?= Helpers::baseURL() ?>src/view/assets/img/portfolio/web3.jpg">
                         <div class="portfolio-info">
                             <h4><a href="#">Web 3</a></h4>
                             <p>Web</p>
@@ -426,7 +429,8 @@ Components
 
                 <div class="col-lg-4 col-md-6 portfolio-item filter-app" data-wow-delay="0.2s">
                     <div class="portfolio-wrap">
-                        <img alt="" class="img-fluid" src="img/portfolio/app2.jpg">
+                        <img alt="" class="img-fluid"
+                             src="<?= Helpers::baseURL() ?>src/view/assets/img/portfolio/app2.jpg">
                         <div class="portfolio-info">
                             <h4><a href="#">App 2</a></h4>
                             <p>App</p>
@@ -442,7 +446,8 @@ Components
 
                 <div class="col-lg-4 col-md-6 portfolio-item filter-card">
                     <div class="portfolio-wrap">
-                        <img alt="" class="img-fluid" src="img/portfolio/card2.jpg">
+                        <img alt="" class="img-fluid"
+                             src="<?= Helpers::baseURL() ?>src/view/assets/img/portfolio/card2.jpg">
                         <div class="portfolio-info">
                             <h4><a href="#">Card 2</a></h4>
                             <p>Card</p>
@@ -458,7 +463,8 @@ Components
 
                 <div class="col-lg-4 col-md-6 portfolio-item filter-web" data-wow-delay="0.1s">
                     <div class="portfolio-wrap">
-                        <img alt="" class="img-fluid" src="img/portfolio/web2.jpg">
+                        <img alt="" class="img-fluid"
+                             src="<?= Helpers::baseURL() ?>src/view/assets/img/portfolio/web2.jpg">
                         <div class="portfolio-info">
                             <h4><a href="#">Web 2</a></h4>
                             <p>Web</p>
@@ -474,7 +480,8 @@ Components
 
                 <div class="col-lg-4 col-md-6 portfolio-item filter-app" data-wow-delay="0.2s">
                     <div class="portfolio-wrap">
-                        <img alt="" class="img-fluid" src="img/portfolio/app3.jpg">
+                        <img alt="" class="img-fluid"
+                             src="<?= Helpers::baseURL() ?>src/view/assets/img/portfolio/app3.jpg">
                         <div class="portfolio-info">
                             <h4><a href="#">App 3</a></h4>
                             <p>App</p>
@@ -490,7 +497,8 @@ Components
 
                 <div class="col-lg-4 col-md-6 portfolio-item filter-card">
                     <div class="portfolio-wrap">
-                        <img alt="" class="img-fluid" src="img/portfolio/card1.jpg">
+                        <img alt="" class="img-fluid"
+                             src="<?= Helpers::baseURL() ?>src/view/assets/img/portfolio/card1.jpg">
                         <div class="portfolio-info">
                             <h4><a href="#">Card 1</a></h4>
                             <p>Card</p>
@@ -506,7 +514,8 @@ Components
 
                 <div class="col-lg-4 col-md-6 portfolio-item filter-card" data-wow-delay="0.1s">
                     <div class="portfolio-wrap">
-                        <img alt="" class="img-fluid" src="img/portfolio/card3.jpg">
+                        <img alt="" class="img-fluid"
+                             src="<?= Helpers::baseURL() ?>src/view/assets/img/portfolio/card3.jpg">
                         <div class="portfolio-info">
                             <h4><a href="#">Card 3</a></h4>
                             <p>Card</p>
@@ -522,7 +531,8 @@ Components
 
                 <div class="col-lg-4 col-md-6 portfolio-item filter-web" data-wow-delay="0.2s">
                     <div class="portfolio-wrap">
-                        <img alt="" class="img-fluid" src="img/portfolio/web1.jpg">
+                        <img alt="" class="img-fluid"
+                             src="<?= Helpers::baseURL() ?>src/view/assets/img/portfolio/web1.jpg">
                         <div class="portfolio-info">
                             <h4><a href="#">Web 1</a></h4>
                             <p>Web</p>
@@ -557,7 +567,8 @@ Components
                     <div class="owl-carousel testimonials-carousel wow fadeInUp">
 
                         <div class="testimonial-item">
-                            <img alt="" class="testimonial-img" src="img/testimonial-1.jpg">
+                            <img alt="" class="testimonial-img"
+                                 src="<?= Helpers::baseURL() ?>src/view/assets/img/testimonial-1.jpg">
                             <h3>Saul Goodman</h3>
                             <h4>Ceo &amp; Founder</h4>
                             <p>
@@ -568,7 +579,8 @@ Components
                         </div>
 
                         <div class="testimonial-item">
-                            <img alt="" class="testimonial-img" src="img/testimonial-2.jpg">
+                            <img alt="" class="testimonial-img"
+                                 src="<?= Helpers::baseURL() ?>src/view/assets/img/testimonial-2.jpg">
                             <h3>Sara Wilsson</h3>
                             <h4>Designer</h4>
                             <p>
@@ -579,7 +591,8 @@ Components
                         </div>
 
                         <div class="testimonial-item">
-                            <img alt="" class="testimonial-img" src="img/testimonial-3.jpg">
+                            <img alt="" class="testimonial-img"
+                                 src="<?= Helpers::baseURL() ?>src/view/assets/img/testimonial-3.jpg">
                             <h3>Jena Karlis</h3>
                             <h4>Store Owner</h4>
                             <p>
@@ -589,7 +602,8 @@ Components
                         </div>
 
                         <div class="testimonial-item">
-                            <img alt="" class="testimonial-img" src="img/testimonial-4.jpg">
+                            <img alt="" class="testimonial-img"
+                                 src="<?= Helpers::baseURL() ?>src/view/assets/img/testimonial-4.jpg">
                             <h3>Matt Brandon</h3>
                             <h4>Freelancer</h4>
                             <p>
@@ -622,7 +636,7 @@ Components
 
                 <div class="col-lg-3 col-md-6 wow fadeInUp">
                     <div class="member">
-                        <img alt="" class="img-fluid" src="img/team-1.jpg">
+                        <img alt="" class="img-fluid" src="<?= Helpers::baseURL() ?>src/view/assets/img/team-1.jpg">
                         <div class="member-info">
                             <div class="member-info-content">
                                 <h4>Walter White</h4>
@@ -640,7 +654,7 @@ Components
 
                 <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
                     <div class="member">
-                        <img alt="" class="img-fluid" src="img/team-2.jpg">
+                        <img alt="" class="img-fluid" src="<?= Helpers::baseURL() ?>src/view/assets/img/team-2.jpg">
                         <div class="member-info">
                             <div class="member-info-content">
                                 <h4>Sarah Jhonson</h4>
@@ -658,7 +672,7 @@ Components
 
                 <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.2s">
                     <div class="member">
-                        <img alt="" class="img-fluid" src="img/team-3.jpg">
+                        <img alt="" class="img-fluid" src="<?= Helpers::baseURL() ?>src/view/assets/img/team-3.jpg">
                         <div class="member-info">
                             <div class="member-info-content">
                                 <h4>William Anderson</h4>
@@ -676,7 +690,7 @@ Components
 
                 <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.3s">
                     <div class="member">
-                        <img alt="" class="img-fluid" src="img/team-4.jpg">
+                        <img alt="" class="img-fluid" src="<?= Helpers::baseURL() ?>src/view/assets/img/team-4.jpg">
                         <div class="member-info">
                             <div class="member-info-content">
                                 <h4>Amanda Jepson</h4>
@@ -708,14 +722,14 @@ Components
             </header>
 
             <div class="owl-carousel clients-carousel">
-                <img alt="" src="img/clients/client-1.png">
-                <img alt="" src="img/clients/client-2.png">
-                <img alt="" src="img/clients/client-3.png">
-                <img alt="" src="img/clients/client-4.png">
-                <img alt="" src="img/clients/client-5.png">
-                <img alt="" src="img/clients/client-6.png">
-                <img alt="" src="img/clients/client-7.png">
-                <img alt="" src="img/clients/client-8.png">
+                <img alt="" src="<?= Helpers::baseURL() ?>src/view/assets/img/clients/client-1.png">
+                <img alt="" src="<?= Helpers::baseURL() ?>src/view/assets/img/clients/client-2.png">
+                <img alt="" src="<?= Helpers::baseURL() ?>src/view/assets/img/clients/client-3.png">
+                <img alt="" src="<?= Helpers::baseURL() ?>src/view/assets/img/clients/client-4.png">
+                <img alt="" src="<?= Helpers::baseURL() ?>src/view/assets/img/clients/client-5.png">
+                <img alt="" src="<?= Helpers::baseURL() ?>src/view/assets/img/clients/client-6.png">
+                <img alt="" src="<?= Helpers::baseURL() ?>src/view/assets/img/clients/client-7.png">
+                <img alt="" src="<?= Helpers::baseURL() ?>src/view/assets/img/clients/client-8.png">
             </div>
 
         </div>

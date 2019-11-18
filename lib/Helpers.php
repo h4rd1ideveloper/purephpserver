@@ -21,8 +21,11 @@ class Helpers
     public static function baseURL(string $to = ''): string
     {
         $host = $_SERVER['HTTP_HOST'];
-        $redirectUrl = explode('/', str_replace('index', '', $_SERVER['REDIRECT_URL']));
-        return sprintf('//%s%s/%s/%s', $host, $redirectUrl[0], $redirectUrl[1], $to);
+        if (isset($_SERVER['REDIRECT_URL'])) {
+            $redirectUrl = explode('/', str_replace('index', '', isset($_SERVER['REDIRECT_URL']) ? $_SERVER['REDIRECT_URL'] : ''));
+            return sprintf('//%s%s/%s/%s', $host, $redirectUrl[0], $redirectUrl[1], $to);
+        }
+        return sprintf('//%s/%s/%s', $host, 'purephpserver', $to);
     }
 
     /**
@@ -59,13 +62,7 @@ class Helpers
      */
     public static function defines(): void
     {
-        define('PRODUCTION_DB_NAME', getenv('PRODUCTION_DB_NAME'));
-        define('PRODUCTION_DB_USER', getenv('PRODUCTION_DB_USER'));
-        define('PRODUCTION_DB_PASS', getenv('PRODUCTION_DB_PASS'));
-        define('PRODUCTION_DB_TYPE', getenv('PRODUCTION_DB_TYPE'));
-        define('PRODUCTION_DB_HOST', getenv('PRODUCTION_DB_HOST'));
-        define('ENEL_FIELDS', getenv('ENEL_FIELDS'));
-        define('ENEL_TABLE', getenv('ENEL_TABLE'));
+        define('PATH_ROOT', 'purephpserver');
         //Dev defines
     }
 

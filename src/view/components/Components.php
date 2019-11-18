@@ -30,14 +30,37 @@ public static function headerHTML(array $config)
         <meta name='viewport'
               content='width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0'/>
         <meta http-equiv='X-UA-Compatible' content='ie=edge'/>
-        <title><?= $title ?></title>
+        <meta content="" name="keywords">
+        <meta content="" name="description">
+
+        <!-- Favicons -->
+        <link href="<?= Helpers::baseURL() ?>src/view/assets/img/favicon.ico" rel="icon">
+        <link href="<?= Helpers::baseURL() ?>src/view/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+        <!-- Google Fonts -->
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,500,600,700,700i|Montserrat:300,400,500,600,700"
+              rel="stylesheet">
+
+        <!-- Bootstrap CSS File -->
         <link rel='stylesheet' href='<?= Helpers::baseURL() ?>src/view/assets/css/bootstrap.css'/>
         <script src="<?= Helpers::baseURL() ?>src/view/assets/js/jquery-3.4.1.min.js"></script>
         <script src='<?= Helpers::baseURL() ?>src/view/assets/js/popper.min.js'></script>
         <script src='<?= Helpers::baseURL() ?>src/view/assets/js/bootstrap.js'></script>
+
+        <!-- Libraries CSS Files -->
+        <link href="<?= Helpers::baseURL() ?>src/view/assets/js/lib/font-awesome/css/font-awesome.min.css"
+              rel="stylesheet">
+        <link href="<?= Helpers::baseURL() ?>src/view/assets/js/lib/animate/animate.min.css" rel="stylesheet">
+        <link href="<?= Helpers::baseURL() ?>src/view/assets/js/lib/ionicons/css/ionicons.min.css" rel="stylesheet">
+        <link href="<?= Helpers::baseURL() ?>src/view/assets/js/lib/owlcarousel/assets/owl.carousel.min.css"
+              rel="stylesheet">
+        <link href="<?= Helpers::baseURL() ?>src/view/assets/js/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
+
+        <!-- Main Stylesheet File -->
+        <link href="<?= Helpers::baseURL() ?>src/view/assets/css/style.css" rel="stylesheet">
+        <title><?= $title ?></title>
+
         <link rel='stylesheet' href='<?= Helpers::baseURL() ?>src/view/assets/css/index.css'/>
-        <link href='<?= Helpers::baseURL() ?>src/view/assets/fonts/fontawesome/css/all.min.css' rel='stylesheet'/>
-        <script src='<?= Helpers::baseURL() ?>src/view/assets/fonts/fontawesome/js/all.min.js'></script>
         <link href='<?= Helpers::baseURL() ?>src/view/assets/css/jquery.dataTables.min.css' rel='stylesheet'/>
         <script src='<?= Helpers::baseURL() ?>src/view/assets/js/jquery.dataTables.min.js'></script>
         <script src='<?= Helpers::baseURL() ?>src/view/assets/js/sweetalert2.min.js'></script>
@@ -56,6 +79,22 @@ public static function headerHTML(array $config)
     public static function footerHTML():Components
     {
     ?>
+    <!-- JavaScript Libraries -->
+    <script src="<?= Helpers::baseURL() ?>src/view/assets/js/lib/jquery/jquery-migrate.min.js"></script>
+    <script src="<?= Helpers::baseURL() ?>src/view/assets/js/lib/easing/easing.min.js"></script>
+    <script src="<?= Helpers::baseURL() ?>src/view/assets/js/lib/mobile-nav/mobile-nav.js"></script>
+    <script src="<?= Helpers::baseURL() ?>src/view/assets/js/lib/wow/wow.min.js"></script>
+    <script src="<?= Helpers::baseURL() ?>src/view/assets/js/lib/waypoints/waypoints.min.js"></script>
+    <script src="<?= Helpers::baseURL() ?>src/view/assets/js/lib/counterup/counterup.min.js"></script>
+    <script src="<?= Helpers::baseURL() ?>src/view/assets/js/lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="<?= Helpers::baseURL() ?>src/view/assets/js/lib/isotope/isotope.pkgd.min.js"></script>
+    <script src="<?= Helpers::baseURL() ?>src/view/assets/js/lib/lightbox/js/lightbox.min.js"></script>
+    <!-- Contact Form JavaScript File -->
+    <script src="<?= Helpers::baseURL() ?>src/view/assets/js/lib/contactform/contactform.js"></script>
+
+    <!-- Template Main Javascript File -->
+    <script src="<?= Helpers::baseURL() ?>src/view/assets/js/main.js"></script>
+    <script src="<?= Helpers::baseURL() ?>src/view/assets/js/translate.google.js"></script>
     <script>
         $("document").ready(function () {
             window.Toast = Swal.mixin({
