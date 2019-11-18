@@ -2,8 +2,6 @@
 
 use App\view\components\Components;
 
-$vars = isset($vars) && count($vars) ? $vars : false;
-
 Components
     ::headerHTML(['title' => 'Developer Web Page'])
 ?>

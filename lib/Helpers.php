@@ -4,6 +4,7 @@ namespace Lib;
 
 use Closure;
 use InvalidArgumentException;
+use Psr\Http\Message\HttpHelper;
 
 /**
  * Class Helpers
@@ -25,7 +26,11 @@ class Helpers
             $redirectUrl = explode('/', str_replace('index', '', isset($_SERVER['REDIRECT_URL']) ? $_SERVER['REDIRECT_URL'] : ''));
             return sprintf('//%s%s/%s/%s', $host, $redirectUrl[0], $redirectUrl[1], $to);
         }
-        return sprintf('//%s/%s/%s', $host, 'purephpserver', $to);
+        $env = HttpHelper::getEnvFrom('.env');
+        if ($env['path_root']) {
+            return sprintf('//%s/%s%s', $host, $env['path_root'], $to);
+        }
+        return sprintf('//%s/%s/%s', $host, '', $to);
     }
 
     /**
@@ -62,8 +67,7 @@ class Helpers
      */
     public static function defines(): void
     {
-        define('PATH_ROOT', 'purephpserver');
-        //Dev defines
+
     }
 
     /**

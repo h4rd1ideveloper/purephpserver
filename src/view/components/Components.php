@@ -305,4 +305,17 @@ public static function headerHTML(array $config)
         <?php endif;
         return new static();
     }
+
+    public static function handlerError(array $vars): Components
+    {
+        if (isset($vars['error']) && !!$vars['error']):?>
+            <script>
+                Toast.fire({
+                    type: 'error',
+                    title: 'Algo deu errado, contate o ADM do sistema'
+                });
+            </script>
+        <?php endif;
+        return new static();
+    }
 }

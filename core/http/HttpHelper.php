@@ -108,7 +108,7 @@ class HttpHelper extends Helpers
 
     /**
      * @param $pathEnv
-     * @return array|bool|string
+     * @return array|bool
      * @license MIT
      * @author Yan Santos Policarpo <policarpo@ice.ufjf.br>
      * @see Helpers::stringIsOk()
@@ -122,7 +122,7 @@ class HttpHelper extends Helpers
 
     /**
      * @param $pathEnv
-     * @return array|string
+     * @return array|bool
      */
     protected static function parseEnvFile($pathEnv)
     {
@@ -146,6 +146,7 @@ class HttpHelper extends Helpers
                 }
             );
         } catch (Exception $e) {
+            return false;
             return $e->getMessage() . PHP_EOL . $e->getLine() . PHP_EOL . $e->getTraceAsString() . PHP_EOL;
         }
     }
@@ -1003,7 +1004,7 @@ class HttpHelper extends Helpers
                 fclose($fp);
             }
             exit(
-                new Response(500, ['Content-Type' => 'application/json'], ['error' => true, 'message' => $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL . $e->getCode() . PHP_EOL . $e->getLine(), 'context' => [$string]])
+            new Response(500, ['Content-Type' => 'application/json'], ['error' => true, 'message' => $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL . $e->getCode() . PHP_EOL . $e->getLine(), 'context' => [$string]])
             );
         }
     }

@@ -3,7 +3,6 @@
 use App\view\components\Components;
 use Lib\Helpers;
 
-$vars = isset($vars) && count($vars) ? $vars : false;
 
 Components
     ::headerHTML(['title' => 'Developer Web Page'])
@@ -1061,15 +1060,9 @@ Components
     )
     ($ = window.jQuery, axios = window.axios, Swal = window.Swal)
 </script>
+
 <?php
-if (isset($vars['error']) && !!$vars['error']):?>
-    <script>
-        Toast.fire({
-            type: 'error',
-            title: 'Algo deu errado, contate o ADM do sistema'
-        });
-    </script>
-<?php endif; ?>
-<?php
-Components::footerHTML();
+Components
+    ::handlerError($vars ?? [])
+    ::footerHTML();
 ?>
