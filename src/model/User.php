@@ -11,19 +11,6 @@ use Exception;
 class User extends UserAbstraction
 {
     /**
-     * @param array $credentials
-     * @return User
-     */
-    public static function userFactory(array $credentials): User
-    {
-        try {
-            return new User($credentials);
-        } catch (Exception $e) {
-
-        }
-    }
-
-    /**
      * @var Dao|null
      */
     private $DB = null;
@@ -44,6 +31,28 @@ class User extends UserAbstraction
         $this->DB->connect();
     }
 
+    public function findOrFail(UserAbstraction $userAbstraction)
+    {
+        $user = self::findUser($userAbstraction);
+        if (count($user) === 0) {
+
+        }
+    }
+
+    /**
+     * @param UserAbstraction $user
+     * @return array
+     */
+    public function findUser(UserAbstraction $user): array
+    {
+        $this->DB->select(
+            'users',
+            '*',
+            null,
+            $user->getDatabaseSchemaFinder()
+        );
+        return $this->DB->getResult();
+    }
 
     /**
      * User constructor.
@@ -95,22 +104,6 @@ class User extends UserAbstraction
             'raw' => ['exist' => $this->DB->getResult(), 'send' => $user->getDatabaseSchemaRegistration()]
         ];
     }
-
-    /**
-     * @param UserAbstraction $user
-     * @return array
-     */
-    public function findUser(UserAbstraction $user)
-    {
-        $this->DB->select(
-            'users',
-            '*',
-            null,
-            $this->getDatabaseSchemaFinder()
-        );
-        return $this->DB->getResult();
-    }
-
 
     /**
      * @param integer|string $id

@@ -3,42 +3,33 @@ declare(strict_types=1);
 require_once __DIR__ . '/vendor/autoload.php';
 
 use App\controller\AppController;
+use App\middleware\Middleware;
+use Lib\Factory;
 use Psr\Http\Message\HttpHelper;
 use Psr\Http\Message\Request;
-use Psr\Http\Message\Response;
-
-$app = HttpHelper::AppFactory('.env');
-/**
- *  Views
- */
-$app->get('/', static function () {
-    //return new Response(200, ['Content-Type' => ['application/json']], ['error' => false, 'message' => 'ok']);
-    AppController::view('pages/index');
-});
-$app->get('/home', static function () {
-    AppController::dashboard(new Response());
-});
-$app->get('/login', static function () {
-    AppController::view('pages/Login');
-});
-$app->post('/user/login', static function (Request $request) {
-    AppController::apiLogin($request);
-});
-/**
- *  EndPoint
- */
-$app->post('/api/json/user/create', static function (Request $request): Response {
-    return AppController::apiSign($request);
-});
-$app->get('/api/json/user/login', static function (Request $request) {
-    return AppController::apiLogin($request);
-});
-/**
- * Resolver
- */
 
 try {
+    /**
+     * $app = Class Router
+     * @author Yan Santos Policar <policarpo@ice.ufjf.br>
+     * @version 1.1.0
+     * @see Closure
+     * @see die
+     * @see Request {@RequestInterface}
+     * @see Response {@ResponseInterface}
+     * @method get(string $string, Closure $param, ?Closure|array $closure = false)
+     * @method post(string $string, Closure $param, ?Closure|array $closure = false)
+     * @method patch(string $string, Closure $param, ?Closure|array $closure = false)
+     * @method put(string $string, Closure $param, ?Closure|array $closure = false)
+     * @method delete(string $string, Closure $param, ?Closure|array $closure = false)
+     * @method middleware(Closure|array $param)
+     */
+    $app = Factory::AppFactory('.env');
+    $app->get('/', (new AppController)::allAboutTheRequest());
+    $app->get('/dashboard', (new AppController)::dashboard());
+    $app->get('/login', (new AppController)::allAboutTheRequest());
     $app->run();
 } catch (Exception $e) {
-    $app->runException($e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL . $e->getCode() . PHP_EOL . $e->getLine());
+    $app->runException($e->getMessage() . $e->getTraceAsString() . $e->getCode() . $e->getLine());
+    exit;
 }

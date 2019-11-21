@@ -11,18 +11,22 @@ use Lib\Helpers;
  */
 class Components
 {
+    const buttonCollapse = '<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsedContent" aria-controls="collapsedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>';
+    /**
+     * @var string
+     */
+    private static $HTML_CONTENT;
 
     /**
      * @param array $config
      * @return Components
      */
-public static function headerHTML(array $config)
-{
-    $title = Helpers::orEmpty(
-        $config['title'],
-        false,
-        'Boletão'
-    ); ?>
+    public static function headerHTML(array $config): Components
+    {
+        self::$HTML_CONTENT = '';
+        $baseUrl = Helpers::baseURL();
+        self::$HTML_CONTENT .= sprintf(
+            "
     <!doctype html>
     <html lang='pt-br'>
     <head>
@@ -30,85 +34,76 @@ public static function headerHTML(array $config)
         <meta name='viewport'
               content='width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0'/>
         <meta http-equiv='X-UA-Compatible' content='ie=edge'/>
-        <meta content="" name="keywords">
-        <meta content="" name="description">
-
-        <!-- Favicons -->
-        <link href="<?= Helpers::baseURL() ?>src/view/assets/img/favicon.ico" rel="icon">
-        <link href="<?= Helpers::baseURL() ?>src/view/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
-
+        <meta content='' name='keywords'>
+        <meta content='' name='description'>
+        <link href='$baseUrl/src/view/assets/img/favicon.ico' rel='icon'>
+        <link href='$baseUrl/src/view/assets/img/apple-touch-icon.png' rel='apple-touch-icon'>
         <!-- Google Fonts -->
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,500,600,700,700i|Montserrat:300,400,500,600,700"
-              rel="stylesheet">
-
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,500,600,700,700i|Montserrat:300,400,500,600,700' rel='stylesheet'>
         <!-- Bootstrap CSS File -->
-        <link rel='stylesheet' href='<?= Helpers::baseURL() ?>src/view/assets/css/bootstrap.css'/>
-        <script src="<?= Helpers::baseURL() ?>src/view/assets/js/jquery-3.4.1.min.js"></script>
-        <script src='<?= Helpers::baseURL() ?>src/view/assets/js/popper.min.js'></script>
-        <script src='<?= Helpers::baseURL() ?>src/view/assets/js/bootstrap.js'></script>
-
+        <link rel='stylesheet' href='$baseUrl/src/view/assets/css/bootstrap.css'/>
+        <script src='$baseUrl/src/view/assets/js/jquery-3.4.1.min.js'></script>
+        <script src='$baseUrl/src/view/assets/js/popper.min.js'></script>
+        <script src='$baseUrl/src/view/assets/js/bootstrap.js'></script>
         <!-- Libraries CSS Files -->
-        <link href="<?= Helpers::baseURL() ?>src/view/assets/js/lib/font-awesome/css/font-awesome.min.css"
-              rel="stylesheet">
-        <link href="<?= Helpers::baseURL() ?>src/view/assets/js/lib/animate/animate.min.css" rel="stylesheet">
-        <link href="<?= Helpers::baseURL() ?>src/view/assets/js/lib/ionicons/css/ionicons.min.css" rel="stylesheet">
-        <link href="<?= Helpers::baseURL() ?>src/view/assets/js/lib/owlcarousel/assets/owl.carousel.min.css"
-              rel="stylesheet">
-        <link href="<?= Helpers::baseURL() ?>src/view/assets/js/lib/lightbox/css/lightbox.min.css" rel="stylesheet">
-
+        <link href='$baseUrl/src/view/assets/js/lib/font-awesome/css/font-awesome.min.css'
+              rel='stylesheet'>
+        <link href='$baseUrl/src/view/assets/js/lib/animate/animate.min.css' rel='stylesheet'>
+        <link href='$baseUrl/src/view/assets/js/lib/ionicons/css/ionicons.min.css' rel='stylesheet'>
+        <link href='$baseUrl/src/view/assets/js/lib/owlcarousel/assets/owl.carousel.min.css' rel='stylesheet'>
+        <link href='$baseUrl/src/view/assets/js/lib/lightbox/css/lightbox.min.css' rel='stylesheet'>
         <!-- Main Stylesheet File -->
-        <link href="<?= Helpers::baseURL() ?>src/view/assets/css/style.css" rel="stylesheet">
-        <title><?= $title ?></title>
-
-        <link rel='stylesheet' href='<?= Helpers::baseURL() ?>src/view/assets/css/index.css'/>
-        <link href='<?= Helpers::baseURL() ?>src/view/assets/css/jquery.dataTables.min.css' rel='stylesheet'/>
-        <script src='<?= Helpers::baseURL() ?>src/view/assets/js/jquery.dataTables.min.js'></script>
-        <script src='<?= Helpers::baseURL() ?>src/view/assets/js/sweetalert2.min.js'></script>
-        <link rel='stylesheet' href='<?= Helpers::baseURL() ?>src/view/assets/css/sweetalert2.min.css'/>
-        <script src='<?= Helpers::baseURL() ?>src/view/assets/js/axios.min.js'></script>
-        <script src='<?= Helpers::baseURL() ?>src/view/assets/js/moment-with-locales.js'></script>
+        <link href='$baseUrl/src/view/assets/css/style.css' rel='stylesheet'>
+        <title>%s</title>
+        <link rel='stylesheet' href='$baseUrl/src/view/assets/css/index.css'/>
+        <link href='$baseUrl/src/view/assets/css/jquery.dataTables.min.css' rel='stylesheet'/>
+        <script src='$baseUrl/src/view/assets/js/jquery.dataTables.min.js'></script>
+        <script src='$baseUrl/src/view/assets/js/sweetalert2.min.js'></script>
+        <link rel='stylesheet' href='$baseUrl/src/view/assets/css/sweetalert2.min.css'/>
+        <script src='$baseUrl/src/view/assets/js/axios.min.js'></script>
+        <script src='$baseUrl/src/view/assets/js/moment-with-locales.js'></script>
     </head>
-    <body>
-    <?php
-    return new static();
+    <body>", $config['title'] ?? 'SWS');
+        return new static();
     }
+
     /**
      * @TODO param array $config
-     * @return Components
+     * @return string
      */
-    public static function footerHTML():Components
+    public static function footerHTML(): string
     {
-    ?>
-    <!-- JavaScript Libraries -->
-    <script src="<?= Helpers::baseURL() ?>src/view/assets/js/lib/jquery/jquery-migrate.min.js"></script>
-    <script src="<?= Helpers::baseURL() ?>src/view/assets/js/lib/easing/easing.min.js"></script>
-    <script src="<?= Helpers::baseURL() ?>src/view/assets/js/lib/mobile-nav/mobile-nav.js"></script>
-    <script src="<?= Helpers::baseURL() ?>src/view/assets/js/lib/wow/wow.min.js"></script>
-    <script src="<?= Helpers::baseURL() ?>src/view/assets/js/lib/waypoints/waypoints.min.js"></script>
-    <script src="<?= Helpers::baseURL() ?>src/view/assets/js/lib/counterup/counterup.min.js"></script>
-    <script src="<?= Helpers::baseURL() ?>src/view/assets/js/lib/owlcarousel/owl.carousel.min.js"></script>
-    <script src="<?= Helpers::baseURL() ?>src/view/assets/js/lib/isotope/isotope.pkgd.min.js"></script>
-    <script src="<?= Helpers::baseURL() ?>src/view/assets/js/lib/lightbox/js/lightbox.min.js"></script>
-    <!-- Contact Form JavaScript File -->
-    <script src="<?= Helpers::baseURL() ?>src/view/assets/js/lib/contactform/contactform.js"></script>
+        $baseUrl = Helpers::baseURL();
+        return self::$HTML_CONTENT . "
+         <!-- JavaScript Libraries -->
+        <script src='$baseUrl/src/view/assets/js/lib/jquery/jquery-migrate.min.js'></script>
+        <script src='$baseUrl/src/view/assets/js/lib/easing/easing.min.js'></script>
+        <script src='$baseUrl/src/view/assets/js/lib/mobile-nav/mobile-nav.js'></script>
+        <script src='$baseUrl/src/view/assets/js/lib/wow/wow.min.js'></script>
+        <script src='$baseUrl/src/view/assets/js/lib/waypoints/waypoints.min.js'></script>
+        <script src='$baseUrl/src/view/assets/js/lib/counterup/counterup.min.js'></script>
+        <script src='$baseUrl/src/view/assets/js/lib/owlcarousel/owl.carousel.min.js'></script>
+        <script src='$baseUrl/src/view/assets/js/lib/isotope/isotope.pkgd.min.js'></script>
+        <script src='$baseUrl/src/view/assets/js/lib/lightbox/js/lightbox.min.js'></script>
+        <!-- Contact Form JavaScript File -->
+        <script src='$baseUrl/src/view/assets/js/lib/contactform/contactform.js'></script>
 
-    <!-- Template Main Javascript File -->
-    <script src="<?= Helpers::baseURL() ?>src/view/assets/js/main.js"></script>
-    <script src="<?= Helpers::baseURL() ?>src/view/assets/js/translate.google.js"></script>
-    <script>
-        $("document").ready(function () {
-            window.Toast = Swal.mixin({
-                toast: true,
-                position: "top-end",
-                showConfirmButton: false,
-                timer: 3000
+        <!-- Template Main Javascript File -->
+        <script src='$baseUrl/src/view/assets/js/main.js'></script>
+        <script src='$baseUrl/src/view/assets/js/translate.google.js'></script>
+        <script>
+            $('document').ready(function () {
+                window.Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
             });
-        });
-    </script>
-    </body>
-    </html>
-    <?php return new static();
-}
+        </script>
+        </body>
+        </html>";
+    }
 
     /**
      * @param array $data
@@ -143,57 +138,34 @@ public static function headerHTML(array $config)
     /**
      * @param array $infos
      * @param string $mode
+     * @return string
      */
-    public static function navbarHTML(array $infos, string $mode = 'dark')
+    public static function navigatorBar(array $infos, string $mode = 'dark'): string
     {
-        ?>
-        <nav class="navbar navbar-expand-md navbar-<?= $mode ?> bg-<?= $mode ?> mb-5">
-            <?
-            self::link($infos['page_href'] ?? '', $infos['page_title'] ?? ''); ?>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsedContent"
-                    aria-controls="collapsedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="collapsedContent"><?php
-                self
-                    ::navHTML($infos['page_href'] ?? '', $infos['page_title'] ?? '', $infos['nav_items'])
-                    ::searchHTML('...', 'Buscar', true);
-                ?>
-            </div>
-        </nav>
-        <?php
-    }
-
-    public static function link(string $target, string $text, $classes = false)
-    {
-        ?>
-        <a class="<?= ($classes ? $classes : 'navbar-brand') ?>"
-           href="<?= Helpers::baseURL($target) ?>"><?= $text ?></a>
-        <?php
-        return new static();
+        return '<nav class="navbar navbar-expand-md navbar-<?= $mode ?> bg-<?= $mode ?> mb-5">' .
+            self::link($infos['page_href'] ?? '', $infos['page_title'] ?? '') .
+            self::buttonCollapse . self::collapsedContent(
+                self::navHTML($infos['page_href'] ?? '', $infos['page_title'] ?? '', $infos['nav_items']) .
+                self::searchHTML('...', 'Buscar', true)
+            );
     }
 
     /**
-     * @param string $placeholder
-     * @param $buttonText
-     * @param bool $formWrap
-     * @return mixed
+     * @param string $target
+     * @param string $text
+     * @param string $classes
+     * @param string $props
+     * @return string
      */
-    public static function searchHTML(string $placeholder, $buttonText, bool $formWrap)
+    public static function link(string $target, string $text, $classes = '', string $props = ''): string
     {
-        if ($formWrap): ?>
-            <form class="form-inline my-2 my-lg-0">
-        <?php endif; ?>
-        <input class="form-control mr-sm-2" type="search" placeholder="<?= $placeholder ?>" aria-label="Search">
-        <?php if (Helpers::stringIsOk($buttonText)): ?>
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">
-            <?= $buttonText ?>
-        </button>
-    <?php endif; ?>
-        <?php if ($formWrap): ?>
-        </form>
-    <?php endif;
-        return new static();
+        $target = Helpers::baseURL($target);
+        return sprintf(/**@lang text */ "<a class='%s' href='%s' %s >%s</a>", $classes, $target, $props, $text);
+    }
+
+    public static function collapsedContent(string $content): string
+    {
+        return '<div class="collapse navbar-collapse" id="collapsedContent">' . $content . '</div></nav>';
     }
 
     /**
@@ -202,120 +174,127 @@ public static function headerHTML(array $config)
      * @param array $nav_items
      * @param array $nav_dropdown
      * @param array $nav_disabled
-     * @return Components
+     * @return string
      */
-    public static function navHTML(string $active_href, string $active_text, array $nav_items = [], array $nav_dropdown = [], array $nav_disabled = [])
+    public static function navHTML(string $active_href, string $active_text, array $nav_items = [], array $nav_dropdown = [], array $nav_disabled = []): string
     {
-        ?>
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-                <a class="nav-link" href="<?= Helpers::baseURL($active_href) ?>"><?= trim($active_text) ?>
-                    <span class="sr-only">(current)</span></a>
-            </li>
-            <?php
-            foreach ($nav_items as $label => $link):
-                ?>
-                <li class="nav-item">
-                    <a class="nav-link" href="<?= Helpers::baseURL($link) ?>"><?= $label ?></a>
-                </li>
-            <?php
-            endforeach;
-            foreach ($nav_dropdown as $content):?>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <?= $content['title'] ?>
-                    </a>
-                    <?php if (count($content['page_drop_links'])): ?>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <?php foreach ($content['page_drop_links'] as $label => $link): ?>
-                                <?php if ($link === 'D'): ?>
-                                    <div class="dropdown-divider"></div>
-                                <?php else: ?>
-                                    <a class="dropdown-item" href="<?= $link ?>"><?= $label ?></a>
-                                <?php endif; ?>
-                            <?php endforeach; ?>
-                        </div>
-                    <?php endif; ?>
-                </li>
-            <?php
-            endforeach;
-            ?>
-            <?php
-            foreach ($nav_disabled as $link):
-                ?>
-                <li class="nav-item">
-                    <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true"><?= $link ?></a>
-                </li>
-            <?php endforeach; ?>
-        </ul>
-        <?php
-        return new static();
+        $html = '<ul class="navbar-nav mr-auto"><li class="nav-item active">' .
+            self::link(
+                    Helpers::baseURL($active_href),
+                    trim($active_text) . '<span class="sr-only">(current)</span>',
+                    'nav-link'
+            ) .
+            '</li>';
+        foreach ($nav_items as $label => $link) {
+            $html .= sprintf(
+                '<li class="nav-item">%s</li>',
+                self::link(Helpers::baseURL($link), $label, 'nav-link')
+            );
+        }
+        foreach ($nav_dropdown as $content) {
+            $html .= '<li class="nav-item dropdown">' .
+                self::link(
+                    '#',
+                    $content['title'],
+                    'nav-link dropdown-toggle',
+                    'role="button"data-toggle="dropdown"aria-haspopup="true"aria-expanded="false"'
+                );
+            if (count($content['page_drop_links'])) {
+                $html .= '<div class="dropdown-menu" aria-labelledby="navbarDropdown">';
+                foreach ($content['page_drop_links'] as $label => $link) {
+                    $html .= ($link === 'D') ? '<div class="dropdown-divider"></div>' : self::link($link, $label, 'dropdown-item');
+                }
+                $html .= '</div>';
+            }
+            $html .= '</li>';
+        }
+        foreach ($nav_disabled as $link) {
+            $html .= '<li class="nav-item">' .
+                self::link('#', $link, 'nav-link disabled', 'tabindex="-1" aria-disabled="true"') .
+                '</li>';
+        }
+        $html .= '</ul>';
+        return $html;
+    }
+
+    /**
+     * @param string $placeholder
+     * @param $buttonText
+     * @param bool $formWrap
+     * @return string
+     */
+    public
+    static function searchHTML(string $placeholder, $buttonText, bool $formWrap): string
+    {
+        $html = '';
+        if ($formWrap) {
+            $html .= '<form class="form-inline my-2 my-lg-0" >';
+        }
+        $html .= "<input class='form-control mr-sm-2' type='search' placeholder='$placeholder' aria-label='Search'>";
+        if (Helpers::stringIsOk($buttonText)) {
+            $html .= "<button class='btn btn-outline-success my-2 my-sm-0' type='submit'>$buttonText</button>";
+        }
+        if ($formWrap) {
+            $html .= '</form>';
+        }
+        return $html;
     }
 
     /**
      * @param $text
      * @param string $size
+     * @return string
      */
-    public static function centredTitle($text, $size = 'h3')
+    public
+    static function centredTitle(string $text, string $size = 'h3'): string
     {
-        echo sprintf('
-            <div class="row my-5">
-                <div class="col-12">
-                    <h1 class="%s text-center text-black-50">%s </h1>
+        return "<div class='row my-5'>
+                <div class='col-12'>
+                    <h1 class='$size text-center text-black-50'>$text</h1>
                 </div>
-            </div>
-        ', $size, $text);
+            </div>";
     }
 
     /**
      * @param $text
      * @param string $text_class
+     * @return string
      */
-    public static function leftTitle($text, $text_class = '')
+    public
+    static function leftTitle(string $text, string $text_class = ''): string
     {
-        if ($text_class === '') {
-            echo sprintf('
-            <div class="row my-5">
-                <div class="col-12">
-                    <h1 class="h3 text-black-50 ">%s </h1>
+        return $text_class === '' ?
+            "<div class='row my-5'>
+                <div class='col-12'>
+                    <h1 class='h3 text-black-50'>$text</h1>
                 </div>
-            </div>
-        ', $text);
-        } else {
-            echo sprintf('
-            <div class="row my-5">
-                <div class="col-12">
-                    <h1 class="%s">%s </h1>
+            </div>" :
+            "<div class='row my-5'>
+                <div class='col-12'>
+                    <h1 class='$text_class'>$text</h1>
                 </div>
-            </div>
-        ', $text_class, $text);
-        }
+        </div>";
+
     }
 
-    public static function captureError(bool $error): Components
+    public
+    static function handlerError(array $vars): string
     {
-        if (isset($error) && !!$error):?>
-            <script>
+        return (isset($vars['error']) && !!$vars['error']) ?
+            "<script>
                 Toast.fire({
                     type: 'error',
                     title: 'Algo deu errado, contate o ADM do sistema'
                 });
-            </script>
-        <?php endif;
-        return new static();
+            </script>" : "";
+
     }
 
-    public static function handlerError(array $vars): Components
+    public
+    static function content(string $content, array $context = []): Components
     {
-        if (isset($vars['error']) && !!$vars['error']):?>
-            <script>
-                Toast.fire({
-                    type: 'error',
-                    title: 'Algo deu errado, contate o ADM do sistema'
-                });
-            </script>
-        <?php endif;
+
+        self::$HTML_CONTENT .= $content;
         return new static();
     }
 }

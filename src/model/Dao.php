@@ -56,18 +56,16 @@ class Dao extends QueryBuilder
      */
     private $numResults = false;
     /**
-     * @var array|object|bool
+     * @var array
      */
     private $result = false;
 
     /**
-     * Construtor
-     * __construct e seus parametretros *opcionais
      *
-     * @param string $db_user Usuario
-     * @param string $db_pass Senha
-     * @param string $db_name Nome
-     * @param string $db_type Tipo
+     * @param string $db_user Username
+     * @param string $db_pass Password
+     * @param string $db_name Collection Name
+     * @param string $db_type Type
      * @param string $db_path Path
      * @param string $db_host Host
      * @throws Exception
@@ -226,10 +224,10 @@ class Dao extends QueryBuilder
     }
 
     /**
-     * Resultado da query
+     * Query result
      * select ou insert??'';
      *
-     * @return array|bool
+     * @return array
      */
     public function getResult()
     {
@@ -237,9 +235,7 @@ class Dao extends QueryBuilder
     }
 
     /**
-     * Numero de Linhas
-     * Afetadas pela Query Ou nº Resultados
-     *
+     * Number of lines by query affected
      * @return int
      */
     public function getNumResults(): int

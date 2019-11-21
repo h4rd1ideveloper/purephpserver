@@ -289,6 +289,9 @@ class UserAbstraction extends Crypt
         return $this;
     }
 
+    /**
+     * @return array
+     */
     protected function getDatabaseSchemaFinder()
     {
         return [

@@ -3,15 +3,13 @@
 
 namespace Psr\Http\Message;
 
+use App\view\components\Components;
 use Closure;
 use Exception;
 use InvalidArgumentException;
 use Iterator;
 use Lib\Helpers;
-use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
 use RuntimeException;
-use Server\Router;
 
 /**
  * Class HttpHelper
@@ -20,6 +18,7 @@ use Server\Router;
 class HttpHelper extends Helpers
 {
     const JSON_H = ['Content-Type' => 'application/json'];
+    const HTML5_h = ['Content-Type' => 'text/html'];
 
     /**
      * Create a new stream based on the input type.
@@ -81,20 +80,6 @@ class HttpHelper extends Helpers
     }
 
     /**
-     * @param int $status
-     * @param array $headers
-     * @param null $body
-     * @param string $version
-     * @param null $reason
-     * @return Response
-     * @throws Exception
-     */
-    public static function responseFactory($status = 200, $headers = array(), $body = null, $version = '1.1', $reason = null)
-    {
-        return new Response($status, $headers, $body, $version, $reason);
-    }
-
-    /**
      * @param $BASE_ULR
      * @param $REQUEST_URI
      * @param bool $flag
@@ -128,7 +113,7 @@ class HttpHelper extends Helpers
     {
 
         try {
-            $envAsString = Request::createCachingStreamOfLazyOpenStream($pathEnv, 'r+')->getContents();
+            $envAsString = self::fileAsString($pathEnv);
             //exit(print_r(explode(PHP_EOL, trim($envAsString))));
             return self::MagicMap(
                 explode(PHP_EOL, trim($envAsString)),
@@ -147,7 +132,30 @@ class HttpHelper extends Helpers
             );
         } catch (Exception $e) {
             return false;
-            return $e->getMessage() . PHP_EOL . $e->getLine() . PHP_EOL . $e->getTraceAsString() . PHP_EOL;
+            //return $e->getMessage() . PHP_EOL . $e->getLine() . PHP_EOL . $e->getTraceAsString() . PHP_EOL;
+        }
+    }
+
+    public static function fileAsString(string $pathEnv, bool $ob = false, array $context = []): string
+    {
+        if ($ob) {
+            ob_start();
+            !file_exists(sprintf("%s/../../src/view/$pathEnv.php", __DIR__)) &&
+            die(
+            print_r(
+                [
+                    sprintf('[%s]', sprintf("%s/../../src/view/$pathEnv.php", __DIR__)),
+                    "view {$pathEnv} not found!", __DIR__
+                ]
+            )
+            );
+            include_once(sprintf("%s/../../src/view/$pathEnv.php", __DIR__));
+            return ob_get_clean() ?? '';
+        }
+        try {
+            return self::createCachingStreamOfLazyOpenStream($pathEnv, 'r+')->getContents();
+        } catch (Exception $e) {
+            return '-1';
         }
     }
 
@@ -160,6 +168,11 @@ class HttpHelper extends Helpers
     public static function createCachingStreamOfLazyOpenStream($filename, $mode)
     {
         return new CachingStream(new LazyOpenStream($filename, $mode));
+    }
+
+    public static function Sender(string $path, array $context = []): string
+    {
+        return Components::headerHTML(['title' => 'Dashboard'])::content(self::fileAsString($path, true, $context))::footerHTML();
     }
 
     /**
@@ -500,6 +513,24 @@ class HttpHelper extends Helpers
         }
 
         return $result;
+    }
+
+    /**
+     * allAboutTheRequest
+     * @Description All about content revice from request user
+     * @param Request $req
+     * @return string
+     * @throws Exception
+     */
+    public static function allAboutTheRequest(Request $req)
+    {
+        return $req::toJson(
+            [
+                'body' => $req->getParsedBodyContent(),
+                'params' => $req->getQueryParams(),
+                'parsedBody' => $req->getParsedBody(),
+            ]
+        );
     }
 
     /**
@@ -965,7 +996,7 @@ class HttpHelper extends Helpers
 
     /**
      * @param Request $request
-     * @return array|string
+     * @return array
      */
     public static function getBodyByMethod(Request $request)
     {
@@ -983,29 +1014,9 @@ class HttpHelper extends Helpers
                 try {
                     return $request->getParsedBodyContent();
                 } catch (Exception $e) {
-                    return $e->getMessage() . $e->getTraceAsString();
+                    return [];
                 }
             }
-        }
-    }
-
-    public static function AppFactory(string $string): Router
-    {
-        try {
-            return new Router($string);
-        } catch (Exception $e) {
-            try {
-                $logger = new Logger('AppFactory');
-                $logger->pushHandler(new StreamHandler('HttpHelper_AppFactory.log', Logger::WARNING));
-                $logger->critical($e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL . $e->getCode() . PHP_EOL . $e->getLine(), [$string]);
-            } catch (Exception $exception) {
-                $fp = HttpHelper::try_fopen('DB_CONNECTION.log', 'wb');
-                fwrite($fp, sprintf('%s', $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL . $e->getCode() . PHP_EOL . $e->getLine()));
-                fclose($fp);
-            }
-            exit(
-            new Response(500, ['Content-Type' => 'application/json'], ['error' => true, 'message' => $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL . $e->getCode() . PHP_EOL . $e->getLine(), 'context' => [$string]])
-            );
         }
     }
 

@@ -150,14 +150,19 @@ class Helpers
 
     /**
      * Init Headers
+     * @param array $cors
      */
-    public static function cors(): void
+    public static function cors(array $cors = [
+        'Access-Control-Allow-Origin' => '*',
+        'Access-Control-Allow-Headers' => '*',
+        'Access-Control-Allow-Methods' => ' GET, POST, PATCH, PUT, DELETE, OPTIONS',
+        'Accept' => 'application/json, application/x-www-form-urlencoded, multipart/form-data, application/xhtml+xml, application/xml;q=0.9, multipart/*, text/plain, text/html,  image/webp, */*;q=0.8',
+        'Accept-Encoding' => 'compress, gzip'
+    ]): void
     {
-        header("Access-Control-Allow-Origin: *");
-        header("Access-Control-Allow-Headers: *");
-        header("Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS");
-        header("Accept: application/json, application/x-www-form-urlencoded, multipart/form-data, application/xhtml+xml, application/xml;q=0.9, multipart/*, text/plain, text/html,  image/webp, */*;q=0.8");
-        header("Accept-Encoding: compress, gzip");
+        foreach ($cors as $key => $value) {
+            self::setHeader("$key: $value");
+        }
     }
 
     /**
@@ -174,7 +179,7 @@ class Helpers
      */
     public static function jsonToArray(string $data): array
     {
-        return json_decode($data, true);
+        return json_decode($data, true) ?? [];
     }
 
     /**
@@ -356,5 +361,15 @@ class Helpers
             $returned[$closureKey($value, $key)] = $callbackValue($value, $key);
         }
         return $returned;
+    }
+
+    /**
+     * @param $test
+     * @param int $length
+     * @return bool
+     */
+    public static function isArrayAndHasKeys($test, int $length = 1): bool
+    {
+        return is_array($test) && count($test) > $length;
     }
 }

@@ -2,11 +2,12 @@
 
 namespace Server;
 
+use App\middleware\Middleware;
 use Closure;
 use Exception;
 use InvalidArgumentException;
+use Lib\Factory;
 use Lib\Helpers;
-use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Psr\Http\Message\HttpHelper;
 use Psr\Http\Message\Request;
@@ -26,7 +27,7 @@ use Psr\Http\Message\Response;
  * @method patch(string $string, Closure $param, ?Closure|array $closure = false)
  * @method put(string $string, Closure $param, ?Closure|array $closure = false)
  * @method delete(string $string, Closure $param, ?Closure|array $closure = false)
- * @method middleware(Closure|array $param)
+ * @method add(Closure|array $param)
  */
 class Router
 {
@@ -39,6 +40,10 @@ class Router
      */
     private static $BASE_ULR;
     /**
+     * @var Middleware|null
+     */
+    private $middleware = null;
+    /**
      * @var array
      */
     private $routes = array();
@@ -46,10 +51,9 @@ class Router
      * @var array
      */
     private $INITIAL_STATE = array(
-        "path_root" => '/somepath',
+        "path_root" => '',
         "show_errors" => true,
-        "cors" => true,
-        "production_defines" => true
+        "cors" => true
     );
     /**
      * @var string
@@ -66,10 +70,6 @@ class Router
     /**
      * @var array
      */
-    private $middlewares = array();
-    /**
-     * @var array
-     */
     private $currentCallReference = null;
 
     /**
@@ -83,6 +83,7 @@ class Router
         $this->method = self::methodFromGlobal();
         $this->route = self::routeFromGlobal();
         $this->request = HttpHelper::requestFromGlobalsFactory($this->method, self::versionFromGlobal());
+        $this->middleware = new Middleware();
     }
 
     /**
@@ -94,7 +95,6 @@ class Router
             self::$BASE_ULR = $this->INITIAL_STATE["path_root"];
             $this->INITIAL_STATE["show_errors"] === true && Helpers::showErrors();
             $this->INITIAL_STATE["cors"] === true && Helpers::cors();
-            $this->INITIAL_STATE["production_defines"] === true && Helpers::defines();
         } elseif (is_array($config)) {
             isset($config["path_root"]) && is_string($config["path_root"]) &&
             self::$BASE_ULR = $config["path_root"];
@@ -102,8 +102,6 @@ class Router
             Helpers::showErrors();
             isset($config["cors"]) && $config["cors"] === true &&
             Helpers::cors();
-            isset($config["cors"]) && $config["cors"] === true &&
-            Helpers::defines();
         } elseif (is_string($config)) {
             $envs = HttpHelper::getEnvFrom($config);
             self::$BASE_ULR = HttpHelper::stringIsOk($envs['path_root']) ? $envs['path_root'] : self::$BASE_ULR;
@@ -111,8 +109,6 @@ class Router
             Helpers::showErrors();
             isset($envs['cors']) && $envs['cors'] === true &&
             Helpers::cors();
-            isset($envs['production_defines']) && $envs['production_defines'] === true &&
-            Helpers::defines();
             if (isset($envs['DB_type'], $envs['DB_HOST'], $envs['DB_USER'], $envs['DB_PASS'], $envs['DB_NAME'])) {
                 define("DB_type", $envs['DB_type']);
                 define("DB_HOST", $envs['DB_HOST']);
@@ -121,7 +117,6 @@ class Router
                 define("DB_NAME", $envs['DB_NAME']);
             }
         } else {
-            Helpers::defines();
             Helpers::cors();
             Helpers::showErrors();
         }
@@ -154,6 +149,23 @@ class Router
     }
 
     /**
+     * @param string $message
+     * @throws Exception
+     */
+    public function runException(string $message): void
+    {
+        try {
+            $logger = new Logger('Runner');
+            $logger->pushHandler(Factory::StreamHandlerFactory('Router_run.log', Logger::WARNING));
+            $logger->critical('Fail to execute run Router ->' . $message, $this());
+            echo $message;
+            HttpHelper::setHeader("HTTP/1.0 500 Internal Server Error");
+        } catch (Exception $e) {
+            HttpHelper::setHeader("HTTP/1.0 500 Internal Server Error [$message]");
+        }
+    }
+
+    /**
      * @param string $method
      * @param array $args
      * @return boolean
@@ -164,19 +176,23 @@ class Router
         if (!$this->validate($method)) {
             return false;
         }
-        if ($method === 'middleware') {
+
+        if ($method === 'add') {
             $actionMiddleware = $args[0];
             if (is_array($actionMiddleware)) {
-                $this->addMiddlewares($actionMiddleware);
+                $this->addAnyMiddleware($actionMiddleware);
             } elseif (is_callable($actionMiddleware)) {
                 if (
                     $this->currentCallReference !== null &&
                     isset($this->currentCallReference[0], $this->currentCallReference[1])
                 ) {
+
                     $ref_method = $this->currentCallReference[0];
                     $ref_route = $this->currentCallReference[1];
                     $this->setMiddleware($actionMiddleware, (string)$ref_method, (string)$ref_route);
+
                 } else {
+
                     $this->setMiddleware($actionMiddleware);
                 }
             } else {
@@ -190,10 +206,10 @@ class Router
                 if ($middleware !== null && is_callable($middleware)) {
                     $this->setMiddleware($middleware, $method, $route);
                 } elseif (is_array($middleware)) {
-                    $this->addMiddlewares($middleware);
+                    $this->addAnyMiddleware($middleware);
                 }
                 $this->routes[$method][$route] = $action;
-                $this->currentCallReference = array($method, $route);
+                $this->currentCallReference = [$method, $route];
             } else {
                 return false;
             }
@@ -208,13 +224,13 @@ class Router
      */
     private function validate($method)
     {
-        return in_array($method, array('get', 'post', 'patch', 'put', 'delete', 'middleware'));
+        return in_array($method, array('get', 'post', 'patch', 'put', 'delete', 'add'));
     }
 
     /**
      * @param array $actionMiddleware
      */
-    private function addMiddlewares(array $actionMiddleware)
+    private function addAnyMiddleware(array $actionMiddleware)
     {
         foreach ($actionMiddleware as $middlewareFunction) {
             if (!is_callable($middlewareFunction)) {
@@ -242,20 +258,21 @@ class Router
      * @param bool $route
      * @return void
      */
-    public function setMiddleware(Closure $middleware, $method = false, $route = false)
+    public function setMiddleware(Closure $middleware, $method = false, $route = false): void
     {
         if (($method !== false && $route !== false) && (!Helpers::stringIsOk($method) || !Helpers::stringIsOk($route))) {
             throw new InvalidArgumentException(sprintf(
                 '$key must be a valid string [ok:%s-%s, ok:%s-%s] ',
                 $method, $route, !Helpers::stringIsOk($method), !Helpers::stringIsOk($route)
             ));
-        }
 
+        }
         if ($method !== false && $route !== false) {
             $key = sprintf("%s%s", $method, $route);
-            $this->middlewares[$key][] = $middleware;
+            $this->middleware::addClosure($middleware, $key);
         } else {
-            $this->middlewares['global'][] = $middleware;
+
+            $this->middleware::addClosure($middleware);
         }
     }
 
@@ -274,100 +291,54 @@ class Router
      */
     public function run()
     {
+        $this->validateMethodOrFail();
+        $route = $this->validateRouteOrFail();
+        self::$params = HttpHelper::getBodyByMethod($this->request);
+        //$finalThis->routes[$finalThis->method][$route]($finalThis->request)
+        die($this->middleware::executeMiddleware($route, $this->request, $this->routes[$this->method][$route]));
+    }
+
+    /**
+     *
+     */
+    private function validateMethodOrFail()
+    {
+        try {
+            !isset($this->routes[$this->method]) &&
+            die(new Response(
+                405,
+                ['Content-Type' => 'application/json'],
+                ['405 Method not allowed', $this->method, $this->route]
+            ));
+        } catch (Exception $e) {
+            die(function () {
+                HttpHelper::setHeader('HTTP/1.0 405 Method Not Allowed');
+                return 'Method Not Allowed';
+            });
+        }
+    }
+
+    /**
+     * @return string
+     */
+    private function validateRouteOrFail(): string
+    {
         $alternativeRoute = substr($this->route, 0, (strlen($this->route) - 1));
-
-        !isset($this->routes[$this->method]) &&
-        die(
-        new Response(405, ['Content-Type' => 'application/json'], ['405 Method not allowed', $this->method, $this->route])
-        );
-
-        !isset($this->routes[$this->method][$this->route]) &&
-        !isset($this->routes[$this->method][$alternativeRoute]) &&
-        die(
-        new Response(404, ['Content-Type' => 'application/json'], ['404 Error', $this->method, $this->route, $alternativeRoute])
-        );
-
-        $route = isset($this->routes[$this->method][$this->route]) ? $this->route : $alternativeRoute;
-
-        self::$params = $this->getParams($this->method);
-
-        $finalThis = $this->executeMiddleware($this->method, $route);
-
-        die($finalThis->routes[$finalThis->method][$route]($finalThis->request));
-    }
-
-    /**
-     *  Only to GET POST
-     * @param string $method
-     * @return mixed
-     */
-    private function getParams($method)
-    {
-        return strtolower($method) == 'get' ? $_GET : $_POST;
-    }
-
-    /**
-     * @param $method
-     * @param $route
-     * @return Router
-     */
-    private function executeMiddleware($method, $route)
-    {
-        $size = count($this->getMiddlewares());
-        if ($size > 0) {
-            $newThis = clone $this;
-            $global = $this->getMiddlewares();
-            $global = isset($global['global']) ? $global['global'] : array();
-            $callables = $this->getMiddlewareFrom($method, $route);
-            $callables = array_merge(
-                isset($callables) && count($callables) && is_array($callables) ? $callables : array(),
-                isset($global) && count($global) && is_array($global) ? $global : array()
-            );
-            foreach ($callables as $callable) {
-                $callable(
-                    $this->getRequest(),
-                    function (Request $request) use ($newThis) {
-                        $newThis->setRequest($request);
-                    }
-                );
-            }
-            return $newThis;
+        try {
+            !isset($this->routes[$this->method][$this->route]) &&
+            !isset($this->routes[$this->method][$alternativeRoute]) &&
+            die(new Response(
+                404,
+                ['Content-Type' => 'application/json'],
+                ['404 Error', $this->method, $this->route, $alternativeRoute]
+            ));
+        } catch (Exception $e) {
+            die(function () {
+                HttpHelper::setHeader('HTTP/1.0 404  Request Route Not Found');
+                return 'Route Not Found';
+            });
         }
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getMiddlewares()
-    {
-        return $this->middlewares;
-    }
-
-    /**
-     * @param $method
-     * @param $route
-     * @return array|InvalidArgumentException
-     */
-    private function getMiddlewareFrom($method, $route)
-    {
-        if (!Helpers::stringIsOk($method) || !Helpers::stringIsOk($route)) {
-            return new InvalidArgumentException('invalid $method.$route offset');
-        }
-        $key = sprintf("%s%s", $method, $route);
-        return $this->getMiddleware($key);
-    }
-
-    /**
-     * @param $index
-     * @return array
-     */
-    public function getMiddleware($index)
-    {
-        if (!Helpers::stringIsOk($index)) {
-            throw new InvalidArgumentException('invalid $index offset');
-        }
-        return isset($this->middlewares[$index]) ? $this->middlewares[$index] : array();
+        return isset($this->routes[$this->method][$this->route]) ? $this->route : $alternativeRoute;
     }
 
     /**
@@ -379,25 +350,10 @@ class Router
     }
 
     /**
-     * @param Request $request
-     */
-    public function setRequest($request)
-    {
-        $this->request = $request;
-    }
-
-    /**
      * @return array
      */
     public function __invoke()
     {
         return get_object_vars($this);
-    }
-
-    public function runException(string $message): void
-    {
-        $logger = new Logger('Runner');
-        $logger->pushHandler(new StreamHandler('Router_run.log', Logger::WARNING));
-        $logger->critical('Fail to execute run Router ->' . $message, $this());
     }
 }

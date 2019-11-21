@@ -1,6 +1,6 @@
 # Simple php http server 
 
-[![N|Solid](https://cldup.com/dTxpPi9lDf.thumb.png)](https://www.linkedin.com/in/yanpolicarpo)
+[![N|Solid](https://policarpoyan.firebaseapp.com/img/apple-touch-icon.png)](https://www.linkedin.com/in/yanpolicarpo)
 
 [![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
 

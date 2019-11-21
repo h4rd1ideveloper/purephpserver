@@ -32,7 +32,6 @@
     "ext-pdo": "*",
     "ext-json": "*",
     "ext-mysqli": "*",
-    "ext-simplexml": "*",
     "psr/log": "^1.1",
     "monolog/monolog": "^2.0"
   },

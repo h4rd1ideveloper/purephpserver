@@ -3,9 +3,11 @@
 namespace App\controller;
 
 use App\Abstraction\UserAbstraction;
-use App\model\AjaxResolver;
 use App\model\User;
+use App\view\components\Components;
+use Closure;
 use Exception;
+use Lib\Factory;
 use Lib\Helpers;
 use Psr\Http\Message\HttpHelper;
 use Psr\Http\Message\Request;
@@ -28,6 +30,7 @@ final class AppController extends Controller
      */
     public function __construct()
     {
+
         self::$credentials = [
             'host' => DB_HOST,
             'user' => DB_USER,
@@ -36,106 +39,72 @@ final class AppController extends Controller
         ];
     }
 
-    /**
-     * @param Response $res
-     * @return void
-     */
-    public static function index(Response $res)
-    {
-        if (isset($_SESSION['user']) && !empty($_SESSION['user'])) {
-            $user = User::userFactory();
-            $login = explode('#|#', $_SESSION['user'])[0];
-            $pass = explode('#|#', $_SESSION['user'])[1];
-            $user = $user->findUser($login, $pass);
-            if (count($user)) {
-                $res->send(
-                    [
-                        'error' => false,
-                        'user' => $user
-                    ],
-                    'pages/Home'
-                );
-            }
-        } else {
-            self::redirect('login');
-        }
-    }
-
 
     /**
      * allAboutTheRequest
      * @Description All about content revice from request user
-     * @param Request $req
-     * @return string
+     * @return Closure
+     */
+    final public static function allAboutTheRequest(): Closure
+    {
+        return static function (Request $request): Response {
+            return new Response(200, HttpHelper::HTML5_h, $request->getBody()->getContents());
+        };
+    }
+
+    /**
+     * @return Closure
+     */
+    public static function dashboard(): Closure
+    {
+        return static function (Request $request): Response {
+
+            $Factory = new Factory(Factory::errorFactory('dashboard'));
+            $User = $Factory::userFactory(self::$credentials);
+            $body = $request::getBodyByMethod($request);
+            return Helpers::isArrayAndHasKeys($body) || (is_array($body) && isset($body['login'], $body['pass'])) ?
+                Factory
+                    ::responseFactory(
+                        302,
+                        HttpHelper::HTML5_h,
+                        Components::headerHTML(['title' => 'Dashboard'])
+                            ::content(
+                                HttpHelper::fileAsString(
+                                    'pages/index',
+                                    true,
+                                    $User->findUser($Factory::UserAbstractionFactory($body))
+                                )
+                            )
+                            ::footerHTML()
+                    )
+                :
+                Factory::responseFactory(
+                    301,
+                    HttpHelper::JSON_H,
+                    ['error' => true, 'message' => 'missing credentials']
+                );
+        };
+    }
+
+
+    /**
+     * @param Request $request
+     * @return Response
      * @throws Exception
      */
-    public static function allAboutTheRequest(Request $req)
-    {
-        return $req::toJson(
-            [
-                'body' => $req->getParsedBodyContent(),
-                'params' => $req->getQueryParams(),
-                'parsedBody' => $req->getParsedBody(),
-            ]
-        );
-    }
-
-    /**
-     * @param Response $response
-     */
-    public static function dashboard(Response $response)
-    {
-        $login = explode('#|#', $_SESSION['user'])[0];
-        $pass = explode('#|#', $_SESSION['user'])[1];
-        $user = User::userFactory(self::$credentials)->findUser($login, $pass);
-        $response->send(
-            [
-                'error' => false,
-                'user' => $user
-            ],
-            'pages/Home'
-        );
-    }
-
-    /**
-     * @return string
-     */
-    public static function apiUsers()
-    {
-        return Helpers::toJson((new AjaxResolver(true))::getAllUsers());
-    }
-
-    /**
-     * @param Request $request
-     * @return string
-     */
-    public static function apiUser(Request $request)
-    {
-        $id = isset($request->getQueryParams()['id']) ? $request->getQueryParams()['id'] : '';
-        $user = (new AjaxResolver(true))::getUserById($id);
-        $user = count($user) ? $user : ['error' => false, 'message' => "User not fount by id $id"];
-        return Helpers::toJson(Helpers::stringIsOk($id) ? $user : ['error' => true, 'message' => 'missing id parameter', 'raw' => [$id, $request->getQueryParams()]]);
-    }
-
-    /**
-     * @param Request $request
-     * @return array
-     */
-    public static function apiLogin(Request $request)
+    public static function login(Request $request): Response
     {
         $body = HttpHelper::getBodyByMethod($request);
+        $user = Factory::userFactory(self::$credentials)->findUser(new UserAbstraction($body['login'], $body['pass']));
         if (
-            Helpers::stringIsOk($body['login']) &&
-            Helpers::stringIsOk($body['pass']) &&
-            count(
-                User::userFactory(self::$credentials)->findUser(new UserAbstraction($body['login'], $body['pass']))
-            )
+        count($user)
         ) {
             session_start();
-            $_SESSION['user'] = ($body['login'] . '#|#' . $body['pass']);
-            self::redirect(Helpers::baseURL('home'));
+            ['login' => $login, 'pass' => $pass, '_id' => $_id] = $user;
+            $_SESSION['user'] = "$login#|#$pass";
+            self::redirect(Helpers::baseURL("dashboard?_id=$_id"));
         }
-        return ['error' => true, 'message' => 'Missing parameters login and password', 'raw' => $body];
+        return Factory::responseFactory(301, HttpHelper::HTML5_h, ['error' => true, 'message' => 'Missing parameters login and password', 'raw' => $body]);
     }
 
     /**

@@ -1,11 +1,5 @@
 <?php
-
-use App\view\components\Components;
 use Lib\Helpers;
-
-
-Components
-    ::headerHTML(['title' => 'Developer Web Page'])
 ?>
 
 <div id="ts"></div>
@@ -1060,9 +1054,3 @@ Components
     )
     ($ = window.jQuery, axios = window.axios, Swal = window.Swal)
 </script>
-
-<?php
-Components
-    ::handlerError($vars ?? [])
-    ::footerHTML();
-?>
