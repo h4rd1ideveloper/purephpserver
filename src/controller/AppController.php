@@ -48,7 +48,7 @@ final class AppController extends Controller
     final public static function allAboutTheRequest(): Closure
     {
         return static function (Request $request): Response {
-            return new Response(200, HttpHelper::HTML5_h, $request->getBody()->getContents());
+            return new Response(200, HttpHelper::HTML5_h, []);
         };
     }
 
@@ -88,12 +88,11 @@ final class AppController extends Controller
 
 
     /**
-     * @param Request $request
-     * @return Response
-     * @throws Exception
+     * @return Closure
      */
-    public static function login(Request $request): Response
+    public static function login(): Closure
     {
+        /*
         $body = HttpHelper::getBodyByMethod($request);
         $user = Factory::userFactory(self::$credentials)->findUser(new UserAbstraction($body['login'], $body['pass']));
         if (
@@ -103,8 +102,16 @@ final class AppController extends Controller
             ['login' => $login, 'pass' => $pass, '_id' => $_id] = $user;
             $_SESSION['user'] = "$login#|#$pass";
             self::redirect(Helpers::baseURL("dashboard?_id=$_id"));
-        }
-        return Factory::responseFactory(301, HttpHelper::HTML5_h, ['error' => true, 'message' => 'Missing parameters login and password', 'raw' => $body]);
+        }*/
+        return static function (Request $request): Response {
+            return Factory::responseFactory(
+                200,
+                HttpHelper::HTML5_h,
+                Components::headerHTML(['title' => 'Login'])
+                    ::content(HttpHelper::fileAsString('pages/login', true))
+                    ::footerHTML()
+            );
+        };
     }
 
     /**

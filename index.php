@@ -27,7 +27,7 @@ try {
     $app = Factory::AppFactory('.env');
     $app->get('/', (new AppController)::allAboutTheRequest());
     $app->get('/dashboard', (new AppController)::dashboard());
-    $app->get('/login', (new AppController)::allAboutTheRequest());
+    $app->get('/login', (new AppController)::login());
     $app->run();
 } catch (Exception $e) {
     $app->runException($e->getMessage() . $e->getTraceAsString() . $e->getCode() . $e->getLine());
