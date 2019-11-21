@@ -1,8 +1,6 @@
 # Simple php http server 
 
-[![N|Solid](https://cldup.com/dTxpPi9lDf.thumb.png)](https://www.linkedin.com/in/yanpolicarpo)
-
-[![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
+[![](https://policarpoyan.firebaseapp.com/img/apple-touch-icon.png)](https://www.linkedin.com/in/yanpolicarpo)
 
 Pure PHP Server is a microframework for management of request and response, server-side.
 
@@ -40,13 +38,12 @@ $ composer dump-autoload
 ```
 Remember to create an .env file with the example below.
 ```sh
-  path_root           = 
+  path_root           = pathToRootProject/
   show_erros          = true
   cors                = true
-  production_defines  = true
-  DB_type             =
+  DB_type             = 
   DB_HOST             = 
-  DB_USER             =  
+  DB_USER             = 
   DB_PASS             =
   DB_NAME             = 
 ```
