@@ -128,6 +128,17 @@
             0: {items: 2}, 768: {items: 4}, 900: {items: 6}
         }
     });
+    /**
+     * Background
+     * */
+    VANTA.NET({
+        el: "body",
+        color: 0xffffff,
+        backgroundColor: 0x41b1ff,
+        points: 20.00,
+        maxDistance: 24.00,
+        spacing: 18.00
+    })
 
 })($ = window.$ || window.jQuery);
 

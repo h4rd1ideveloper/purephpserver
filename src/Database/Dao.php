@@ -3,11 +3,9 @@
 namespace App\model;
 
 use Exception;
-use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
+use Lib\Factory;
 use PDO;
 use PDOException;
-use Psr\Http\Message\HttpHelper;
 
 /**
  * Class Dao
@@ -72,14 +70,7 @@ class Dao extends QueryBuilder
      */
     public function __construct(string $db_host, string $db_user, string $db_pass, string $db_name, string $db_type = 'mysql', string $db_path = null)
     {
-        try {
-            $this->logger = new Logger('name');
-            $this->logger->pushHandler(new StreamHandler('DB_CONNECTION.log', Logger::WARNING));
-        } catch (Exception $exception) {
-            $fp = HttpHelper::try_fopen('DB_CONNECTION.log', 'wb');
-            fwrite($fp, sprintf('%s\n%s\n%s\n%s\n', $exception->getMessage(), $exception->getTraceAsString(), $exception->getLine(), $exception->getCode()));
-            fclose($fp);
-        }
+        $this->logger = Factory::errorFactory('Dao');
         $this->_db_host = $db_host;
         $this->_db_user = $db_user;
         $this->_db_pass = $db_pass;
@@ -218,7 +209,7 @@ class Dao extends QueryBuilder
             }
             return true;
         } catch (PDOException $e) {
-            $this->logger->critical($e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL . $e->getCode() . PHP_EOL . $e->getLine(), [$this->_db, $table, $columns, $join, $where, $group, $order, $limit, $bind]);
+            $this->logger->register(400, $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL . $e->getCode() . PHP_EOL . $e->getLine(), [$this->_db, $table, $columns, $join, $where, $group, $order, $limit, $bind]);
             return false;
         }
     }
@@ -261,7 +252,7 @@ class Dao extends QueryBuilder
             try {
                 return $this->_db->prepare($q)->execute();
             } catch (PDOException $e) {
-                $this->logger->critical($e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL . $e->getCode() . PHP_EOL . $e->getLine(), [$q, $table, $value, $where]);
+                $this->logger->register(500, $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL . $e->getCode() . PHP_EOL . $e->getLine(), [$q, $table, $value, $where]);
                 return false;
             }
         }
@@ -294,7 +285,7 @@ class Dao extends QueryBuilder
             }
             return true;
         } catch (PDOException $e) {
-            $this->logger->critical(
+            $this->logger->register(400,
                 $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL . $e->getCode() . PHP_EOL . $e->getLine(),
                 [
                     $this->_db,
@@ -323,7 +314,7 @@ class Dao extends QueryBuilder
         try {
             return $this->_db->prepare($insert)->execute();
         } catch (PDOException $e) {
-            $this->logger->critical($e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL . $e->getCode() . PHP_EOL . $e->getLine(), [$insert, $table, $fieldsAndValues]);
+            $this->logger->register(500, $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL . $e->getCode() . PHP_EOL . $e->getLine(), [$insert, $table, $fieldsAndValues]);
             return false;
         }
     }
@@ -349,7 +340,7 @@ class Dao extends QueryBuilder
         try {
             return $this->_db->prepare($deleteQ)->execute();
         } catch (PDOException $e) {
-            $this->logger->critical(
+            $this->logger->register(400,
                 $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL . $e->getCode() . PHP_EOL . $e->getLine(),
                 [
                     $deleteQ,

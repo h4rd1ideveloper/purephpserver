@@ -62,8 +62,10 @@ class Components
         <link rel='stylesheet' href='$baseUrl/src/view/assets/css/sweetalert2.min.css'/>
         <script src='$baseUrl/src/view/assets/js/axios.min.js'></script>
         <script src='$baseUrl/src/view/assets/js/moment-with-locales.js'></script>
+        <script src='%ssrc/view/assets/js/lib/background/three.r92.min.js'></script>
+        <script src='%ssrc/view/assets/js/lib/background/vanta.net.min.js'></script>
     </head>
-    <body>", $config['title'] ?? 'SWS');
+    <body>", $config['title'] ?? 'SWS', $baseUrl, $baseUrl);
         return new static();
     }
 
@@ -180,9 +182,9 @@ class Components
     {
         $html = '<ul class="navbar-nav mr-auto"><li class="nav-item active">' .
             self::link(
-                    Helpers::baseURL($active_href),
-                    trim($active_text) . '<span class="sr-only">(current)</span>',
-                    'nav-link'
+                Helpers::baseURL($active_href),
+                trim($active_text) . '<span class="sr-only">(current)</span>',
+                'nav-link'
             ) .
             '</li>';
         foreach ($nav_items as $label => $link) {
