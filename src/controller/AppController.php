@@ -9,6 +9,7 @@ use Closure;
 use Exception;
 use Lib\Factory;
 use Lib\Helpers;
+use Lib\Token;
 use Psr\Http\Message\HttpHelper;
 use Psr\Http\Message\Request;
 use Psr\Http\Message\Response;
@@ -39,6 +40,28 @@ final class AppController extends Controller
         ];
     }
 
+    /**
+     * allAboutTheRequest
+     * @Description All about content revice from request user
+     * @return Closure
+     */
+    final public static function token(): Closure
+    {
+        return static function (Request $request): Response {
+            $token = Token::encode(['id' => '1'], 'policarpo');
+            [$headb64, $bodyb64, $cryptob64] = explode('.',$token);
+            return new Response(
+                200,
+                HttpHelper::JSON_H,
+                [
+                    'token' => $token,
+                    'decode' => Token::decodePiece($bodyb64),
+                    'header' => Token::decodePiece($headb64),
+                    $cryptob64
+                ]
+            );
+        };
+    }
 
     /**
      * allAboutTheRequest
@@ -89,20 +112,20 @@ final class AppController extends Controller
 
     /**
      * @return Closure
+     * @throws Exception
      */
     public static function login(): Closure
     {
-        /*
-        $body = HttpHelper::getBodyByMethod($request);
-        $user = Factory::userFactory(self::$credentials)->findUser(new UserAbstraction($body['login'], $body['pass']));
+        $body = $_SESSION;
         if (
-        count($user)
+        Token::isValidToKey($body, '')
         ) {
-            session_start();
+            //session_start();
+            //$user = Factory::userFactory(self::$credentials)->findUser(new UserAbstraction($body['login'], $body['pass']));
+            $user = Token::decode($body, '');
             ['login' => $login, 'pass' => $pass, '_id' => $_id] = $user;
-            $_SESSION['user'] = "$login#|#$pass";
             self::redirect(Helpers::baseURL("dashboard?_id=$_id"));
-        }*/
+        }
         return static function (Request $request): Response {
             return Factory::responseFactory(
                 200,

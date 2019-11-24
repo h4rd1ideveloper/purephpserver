@@ -4,8 +4,8 @@
 namespace App\middleware;
 
 use App\controller\AppController;
-use Firebase\JWT\JWT;
 use Lib\Helpers;
+use Lib\Token;
 use Psr\Http\Message\Request;
 
 class Middleware
@@ -13,7 +13,9 @@ class Middleware
     public static function authenticate(): callable
     {
         return static function (Request $request): Request {
-            if (Helpers::stringIsOk($_SESSION['user']) ) {
+            $token = str_replace('Bearer', '', $request->getHeaderLine('Authorization'));
+            if (Helpers::stringIsOk($token) && Token::isValidToKey($token, '')) {
+            $token = Token::decode($token,'');
 
             } else {
                 AppController::redirect('login');

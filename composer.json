@@ -1,5 +1,5 @@
 {
-  "name": "rbm_20/not_much",
+  "name": "h4rd1ideveloper/fullstack-boilerplate",
   "license": "MIT",
   "authors": [
     {
@@ -7,7 +7,7 @@
       "email": "policarpo@ice.ufjf.br"
     }
   ],
-  "description": "PSR-SERVER and GOOD PRACTICES",
+  "description": "boilerplate",
   "scripts": {
     "start-dev": "php -S localhost:8080 -t ./",
     "test": "phpunit --no-configuration src/__TEST__ --teamcity"

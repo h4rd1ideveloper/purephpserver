@@ -24,9 +24,9 @@ try {
      * @method middleware(Closure|array $param)
      */
     $app = Factory::AppFactory('.env');
-    $app->get('/', (new AppController)::allAboutTheRequest(), Middleware::authenticate());
+    $app->get('/', (new AppController)::token());
     $app->get('/dashboard', (new AppController)::dashboard());
-    $app->get('/login', (new AppController)::login());
+    //$app->get('/login', (new AppController)::login());
     $app->run();
 } catch (Exception $e) {
     $app->runException($e->getMessage() . $e->getTraceAsString() . $e->getCode() . $e->getLine());

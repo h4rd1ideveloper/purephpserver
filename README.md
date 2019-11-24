@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-composer require firebase/php-jwt
-=======
 # Simple php http server 
 
 [![](https://policarpoyan.firebaseapp.com/img/apple-touch-icon.png)](https://www.linkedin.com/in/yanpolicarpo)
@@ -65,5 +62,3 @@ License
 ----
 
 MIT
-
->>>>>>> 9df1bbc7008e70c22cfbc29d20a46a3a5bc3268d
