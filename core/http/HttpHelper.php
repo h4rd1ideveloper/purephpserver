@@ -17,7 +17,13 @@ use RuntimeException;
  */
 class HttpHelper extends Helpers
 {
+    /**
+     *
+     */
     const JSON_H = ['Content-Type' => 'application/json'];
+    /**
+     *
+     */
     const HTML5_h = ['Content-Type' => 'text/html'];
 
     /**
@@ -136,6 +142,12 @@ class HttpHelper extends Helpers
         }
     }
 
+    /**
+     * @param string $pathEnv
+     * @param bool $ob
+     * @param array $context
+     * @return string
+     */
     public static function fileAsString(string $pathEnv, bool $ob = false, array $context = []): string
     {
         if ($ob) {
@@ -170,34 +182,54 @@ class HttpHelper extends Helpers
         return new CachingStream(new LazyOpenStream($filename, $mode));
     }
 
+    /**
+     * @param string $path
+     * @param array $context
+     * @return string
+     */
     public static function Sender(string $path, array $context = []): string
     {
         return Components::headerHTML(['title' => 'Dashboard'])::content(self::fileAsString($path, true, $context))::footerHTML();
     }
 
+
     /**
-     * @param $method
-     * @param $version
+     * @param string|null $route
+     * @param string|null $method
+     * @param string|null $version
      * @return Request
      * @throws Exception
      */
-    public static function requestFromGlobalsFactory($method, $version)
+    public static function requestFromGlobalsFactory(?string $route, ?string $method = null, ?string $version = null)
     {
-        if (!is_string($method) || !is_string($version)) {
-            throw new InvalidArgumentException("Parameters must be a string");
-        }
         $request = new Request(
-            $method,
-            self::getUriFromGlobals(),
+            $method ?? self::methodFromGlobal(),
+            $route ?? self::getUriFromGlobals(),
             self::getHeaderList(),
-            new CachingStream(new LazyOpenStream('php://input', 'r+')),
-            $version
+            HttpHelper::createCachingStreamOfLazyOpenStream('php://input', 'r+'),
+            $version ?? self::versionFromGlobal()
         );
         return $request
             ->withCookieParams($_COOKIE)
             ->withQueryParams($_GET)
             ->withParsedBody($_POST)
             ->withUploadedFiles($request::normalizeFiles($_FILES));
+    }
+
+    /**
+     * @return mixed|string
+     */
+    private static function versionFromGlobal()
+    {
+        return isset($_SERVER['SERVER_PROTOCOL']) ? str_replace('HTTP/', '', $_SERVER['SERVER_PROTOCOL']) : '1.1';
+    }
+
+    /**
+     * @return string
+     */
+    private static function methodFromGlobal()
+    {
+        return isset($_SERVER['REQUEST_METHOD']) && Helpers::stringIsOk($_SERVER['REQUEST_METHOD']) ? strtolower($_SERVER['REQUEST_METHOD']) : 'get';
     }
 
     /**

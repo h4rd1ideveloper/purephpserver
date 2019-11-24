@@ -48,7 +48,7 @@ final class AppController extends Controller
     final public static function allAboutTheRequest(): Closure
     {
         return static function (Request $request): Response {
-            return new Response(200, HttpHelper::HTML5_h, []);
+            return new Response(200, HttpHelper::HTML5_h, HttpHelper::allAboutTheRequest($request));
         };
     }
 

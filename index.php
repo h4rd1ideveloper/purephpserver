@@ -5,7 +5,6 @@ require_once __DIR__ . '/vendor/autoload.php';
 use App\controller\AppController;
 use App\middleware\Middleware;
 use Lib\Factory;
-use Psr\Http\Message\HttpHelper;
 use Psr\Http\Message\Request;
 
 try {
@@ -25,7 +24,7 @@ try {
      * @method middleware(Closure|array $param)
      */
     $app = Factory::AppFactory('.env');
-    $app->get('/', (new AppController)::allAboutTheRequest());
+    $app->get('/', (new AppController)::allAboutTheRequest(), Middleware::authenticate());
     $app->get('/dashboard', (new AppController)::dashboard());
     $app->get('/login', (new AppController)::login());
     $app->run();
