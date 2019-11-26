@@ -39,7 +39,7 @@ class Components
         <link href='$baseUrl/src/view/assets/img/favicon.ico' rel='icon'>
         <link href='$baseUrl/src/view/assets/img/apple-touch-icon.png' rel='apple-touch-icon'>
         <!-- Google Fonts -->
-        <link href='https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,500,600,700,700i|Montserrat:300,400,500,600,700' rel='stylesheet'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans+Anton:300,300i,400,400i,500,600,700,700i|Roboto+Mono+Montserrat:100,300,400,500,600,700' rel='stylesheet'>
         <!-- Bootstrap CSS File -->
         <link rel='stylesheet' href='$baseUrl/src/view/assets/css/bootstrap.css'/>
         <script src='$baseUrl/src/view/assets/js/jquery-3.4.1.min.js'></script>
