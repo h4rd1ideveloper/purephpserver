@@ -1,6 +1,6 @@
 <?php
 
-namespace App\model;
+namespace App\Database\Bridge;
 
 use Lib\Helpers;
 use PDO;
@@ -21,7 +21,7 @@ abstract class QueryBuilder
         }
         $q = sprintf(
         /** @lang text */
-            'UPDATE %s SET ',
+            'UPDATE %s SET',
             $table
         );
 
@@ -36,7 +36,7 @@ abstract class QueryBuilder
         }
         $q =
             /** @lang text */
-            self::keyAndValue($q . ' WHERE ', $where, 'and', true);
+            self::keyAndValue($q . 'WHERE', $where, 'and', true);
         return $q;
     }
 
@@ -49,7 +49,7 @@ abstract class QueryBuilder
      * @param bool $bind
      * @return array|string;
      */
-    protected static function keyAndValue(string $q, array $keyAndValue, string $delimiter = 'and', bool $quote = false, bool $bind = false): array
+    protected static function keyAndValue(string $q, array $keyAndValue, string $delimiter = 'and', bool $quote = false, bool $bind = false)
     {
         $i = 0;
         if ($bind === false) {
@@ -83,25 +83,25 @@ abstract class QueryBuilder
      * @param null|string $order string
      * @param null|string $limit string
      * @param $bind bool
-     * @return bool|PDOStatement
+     * @return bool|PDOStatement|string
      */
-    public static function querySelect(PDO $PDO, string $table, string $columns = "*", $join = null, $where = null, string $group = null, string $order = null, string $limit = null, bool $bind = false): PDOStatement
+    public static function querySelect(?PDO $PDO, string $table, string $columns = "*", $join = null, $where = null, string $group = null, string $order = null, string $limit = null, bool $bind = false)
     {
         if (!$table) {
             return false;
         }
         $q = sprintf(
         /** @lang text */
-            "SELECT %s FROM %s ",
+            "SELECT %s FROM %s",
             $columns,
             $table
         );
         if ($join !== null) {
             if (!is_array($join)) {
-                $q .= $join;
+                $q .= " $join";
             } else {
                 foreach ($join as $currentJoin) {
-                    $q .= $currentJoin . " ";
+                    $q .= " $currentJoin";
                 }
             }
         }
@@ -120,13 +120,16 @@ abstract class QueryBuilder
             }
         }
         if ($group != null) {
-            $q .= sprintf(" GROUP BY %s ", $group);
+            $q .= sprintf(" GROUP BY %s", $group);
         }
         if ($order != null) {
-            $q .= sprintf(" ORDER BY %s ", $order);
+            $q .= sprintf(" ORDER BY %s", $order);
         }
         if ($limit != null) {
-            $q .= sprintf(" limit %s ", $limit);
+            $q .= sprintf(" limit %s", $limit);
+        }
+        if ($PDO === null) {
+            return $q;
         }
         $sql = $PDO->prepare($q);
         if (isset($params) && count($params)) {
@@ -171,8 +174,8 @@ abstract class QueryBuilder
         $lasIndex = (count($fieldsAndValues) - 1);
         foreach ($fieldsAndValues as $field => $value) {
             if ($lasIndex !== $i++) {
-                $fields .= sprintf(' %s, ', $field);
-                $values .= Helpers::stringIsOk($value) && Helpers::isMySQLFunction($value) ? sprintf(' %s, ', $value) : sprintf(" '%s', ", $value);
+                $fields .= sprintf(' %s,', $field);
+                $values .= Helpers::stringIsOk($value) && Helpers::isMySQLFunction($value) ? sprintf(' %s,', $value) : sprintf(" '%s',", $value);
             } else {
                 $fields .= sprintf(' %s ', $field);
                 $values .= Helpers::stringIsOk($value) && Helpers::isMySQLFunction($value) ? sprintf(' %s ', $value) : sprintf(" '%s' ", $value);

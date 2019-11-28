@@ -217,14 +217,6 @@ class HttpHelper extends Helpers
     }
 
     /**
-     * @return mixed|string
-     */
-    private static function versionFromGlobal()
-    {
-        return isset($_SERVER['SERVER_PROTOCOL']) ? str_replace('HTTP/', '', $_SERVER['SERVER_PROTOCOL']) : '1.1';
-    }
-
-    /**
      * @return string
      */
     private static function methodFromGlobal()
@@ -322,6 +314,14 @@ class HttpHelper extends Helpers
             }
         }
         return $headerList;
+    }
+
+    /**
+     * @return mixed|string
+     */
+    private static function versionFromGlobal()
+    {
+        return isset($_SERVER['SERVER_PROTOCOL']) ? str_replace('HTTP/', '', $_SERVER['SERVER_PROTOCOL']) : '1.1';
     }
 
     /**
@@ -1035,7 +1035,15 @@ class HttpHelper extends Helpers
         switch (strtolower($request->getMethod())) {
             case 'get':
             {
-                return $request->getQueryParams();
+                return Helpers::Reducer(
+                    $request->getQueryParams(), static function ($init, $v, $k) {
+                    if ($v) {
+                        $init[$k] = $v;
+                    } else {
+                        $init[] = $k;
+                    }
+                    return $init;
+                });
             }
             case 'post':
             {

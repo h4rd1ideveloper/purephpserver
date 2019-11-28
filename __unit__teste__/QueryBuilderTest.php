@@ -2,8 +2,9 @@
 
 namespace App\assets\lib;
 
+
+use App\Database\Bridge\QueryBuilder;
 use Exception;
-use PDO;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -17,7 +18,10 @@ class QueryBuilderTest extends TestCase
      */
     public function testQueryUpdate()
     {
-        self::assertEquals("UPDATE users SET  name = 'lucas'  , data = '{\"field\":\"value\"}'  WHERE  _id = '1' ", QueryBuilder::queryUpdate('users', array('name' => 'lucas', 'data' => '{"field":"value"}'), array('_id' => '1')));
+        self::assertEquals(
+            "UPDATE users SET username = 'lucas' WHERE id = '1' ",
+            QueryBuilder::queryUpdate('users', ['username' => 'lucas'], ['id' => '1'])
+        );
     }
 
     /**
@@ -25,19 +29,22 @@ class QueryBuilderTest extends TestCase
      */
     public function testQuerySelect()
     {
-        $_db = new Dao('localhost', 'root', '', 'app');
-        $_db->connect();
-        $sql = QueryBuilder::querySelect($_db->getDB(), 'users u', '*', 'inner join chat c on c.from_user_id = u._id', "u.name is not null ", 'u.name DESC', '3');
-        $sql->execute();
-        $json = Helpers::toJson($sql->fetchAll(PDO::FETCH_ASSOC));
-        self::assertEquals('', $json);
+        self::assertEquals(
+            "SELECT * FROM users",
+            QueryBuilder::querySelect(null, 'users')
+        );
     }
 
     /**
      *
+     * @throws Exception
      */
     public function testQueryInsert()
     {
-
+        self::assertEquals(
+            "INSERT INTO users ( username, password ) VALUES ( 'yan', '123' )",
+            QueryBuilder::queryInsert('users', ['username' => 'yan', 'password' => 123])
+        );
     }
+
 }

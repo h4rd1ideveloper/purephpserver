@@ -2,11 +2,9 @@
 
 namespace Psr\Http\Message;
 
-use Lib\Helpers;
-use Psr\Http\Message\Response as Response;
 use Exception;
 use PHPUnit\Framework\TestCase;
-use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\Response as Response;
 
 /**
  * Class ResponseTest
@@ -24,6 +22,7 @@ class ResponseTest extends TestCase
      * @param null $name
      * @param array $data
      * @param string $dataName
+     * @throws Exception
      */
     public function __construct($name = null, array $data = array(), $dataName = '')
     {

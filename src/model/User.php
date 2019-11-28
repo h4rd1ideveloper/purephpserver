@@ -3,68 +3,31 @@
 namespace App\model;
 
 use App\Abstraction\UserAbstraction;
-use Exception;
+use Cake\Database\Query;
+use Cake\Datasource\ConnectionManager;
 
 /**
  * Class User
  */
-class User extends UserAbstraction
+class User
 {
     /**
-     * @var Dao|null
+     * @var Query|null
      */
     private $DB = null;
 
     /**
      * User constructor.
-     * @param array $credentials
-     * @throws Exception
      */
-    public function __construct(array $credentials)
+    public function __construct()
     {
-        $this->DB = new Dao(
-            $credentials['host'],
-            $credentials['user'],
-            $credentials['pass'],
-            $credentials['name']
-        );
-        $this->DB->connect();
+        ConnectionManager::setConfig('default', ['url' => 'mysql://root:@localhost/app_dev']);
+        $this->DB = ConnectionManager::get('default')->newQuery();
     }
 
-    public function findOrFail(UserAbstraction $userAbstraction)
-    {
-        $user = self::findUser($userAbstraction);
-        if (count($user) === 0) {
-
-        }
-    }
-
-    /**
-     * @param UserAbstraction $user
-     * @return array
-     */
-    public function findUser(UserAbstraction $user): array
-    {
-        $this->DB->select(
-            'users',
-            '*',
-            null,
-            $user->getDatabaseSchemaFinder()
-        );
-        return $this->DB->getResult();
-    }
-
-    /**
-     * User constructor.
-     * old session_start();
-     * session_regenerate_id();
-     * if(!isset($_SESSION['users']))
-     * $_SESSION['users'] = array();
-     */
 
     public function __destruct()
     {
-        $this->DB->disconnect();
         unset($this->DB);
     }
 
@@ -76,16 +39,17 @@ class User extends UserAbstraction
      */
     public function listAll(?string $orderBy = null, ?string $limit = null): array
     {
-        $this->DB->select(
-            'users',
-            '*',
-            null,
-            null,
-            null,
-            $orderBy,
-            $limit
-        );
-        return $this->DB->getResult();
+        $q = $this->DB
+            ->select('*')
+            ->from('users');
+        if ($orderBy) {
+            $q->order($orderBy);
+        }
+        if ($limit) {
+            $q->limit($limit);
+        }
+        return $q->execute()
+            ->fetchAll();
     }
 
     /**
@@ -94,15 +58,41 @@ class User extends UserAbstraction
      */
     public function createUser(UserAbstraction $user): array
     {
-        if (!count($this->findUser($user))) {
-            $this->DB->insert('users', $user->getDatabaseSchemaRegistration());
-            return ['error' => false, 'message' => 'User created', 'raw' => $user->getDatabaseSchemaRegistration()];
+        if ($this->existUser($user)) {
+            return [
+                'error' => true,
+                'message' => 'There is already a user with the same credentials.',
+                'raw' => $this->findUser($user)
+            ];
         }
-        return [
-            'error' => true,
-            'message' => 'There is already a user with the same credentials.',
-            'raw' => ['exist' => $this->DB->getResult(), 'send' => $user->getDatabaseSchemaRegistration()]
-        ];
+        $this->DB->insert($user->getDatabaseSchemaRegistration())->into('users')->execute();
+        return ['error' => false, 'message' => 'User created', 'raw' => $user->getDatabaseSchemaRegistration()];
+    }
+
+    public function existUser(UserAbstraction $user): bool
+    {
+        return (bool)
+            $this->DB
+                ->select('id')
+                ->from('users')
+                ->where($user->schemaFinder())
+                ->limit(1)
+                ->execute()
+                ->count() > 0;
+    }
+
+    /**
+     * @param UserAbstraction $user
+     * @return array
+     */
+    public function findUser(UserAbstraction $user): array
+    {
+        return $this->DB
+            ->select('*')
+            ->from('users')
+            ->where($user->schemaFinder())
+            ->execute()
+            ->fetchAll();
     }
 
     /**

@@ -3,13 +3,13 @@
 namespace Server;
 
 use Exception;
+use Illuminate\Database\Capsule\Manager as Capsule;
 use Lib\Factory;
 use Lib\Helpers;
 use Monolog\Logger;
 use Psr\Http\Message\HttpHelper;
 use Psr\Http\Message\Request;
 use Psr\Http\Message\Response;
-
 
 /**
  * Class Router
@@ -76,6 +76,18 @@ class Router
         $this->request = HttpHelper::requestFromGlobalsFactory(self::routeFromGlobal());
         $this->method = strtolower($this->request->getMethod());
         $this->route = $this->request->getUri()->getPath();
+        $capsule = new Capsule;
+        $capsule->addConnection([
+            'driver' => 'mysql',
+            'host' => 'localhost',
+            'database' => 'app_dev',
+            'username' => 'root',
+            'password' => '',
+            'charset' => 'utf8',
+            'prefix' => ''
+        ]);
+        // Setup the Eloquent ORM…
+        $capsule->bootEloquent();
     }
 
     /**
@@ -113,6 +125,7 @@ class Router
             Helpers::showErrors();
         }
     }
+
     /**
      * @return mixed|string
      */

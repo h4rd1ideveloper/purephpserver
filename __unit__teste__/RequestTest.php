@@ -2,8 +2,8 @@
 
 namespace Psr\Http\Message;
 
-use Lib\Helpers;
 use Exception;
+use Lib\Helpers;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -17,7 +17,10 @@ class RequestTest extends TestCase
     public function __construct($name = null, array $data = [], $dataName = '')
     {
         parent::__construct($name, $data, $dataName);
-        $this->req = HttpHelper::requestFromGlobalsFactory('GET','1.1'); // new Request('GET', new Uri('/'), array('Content-Type' => 'text/html'), HttpHelper::stream_for(''));
+        try {
+            $this->req = HttpHelper::requestFromGlobalsFactory('GET', '1.1');
+        } catch (Exception $e) {
+        }
     }
 
     /**
@@ -190,7 +193,7 @@ class RequestTest extends TestCase
     public function testWithoutHeader()
     {
         $tempRequest = $this->req->withHeader('Content-Type', 'text/html');
-        self::assertEquals(/**@lang JSON*/'{"Host":["localhost"]}', $tempRequest::toJson($tempRequest->withoutHeader("Content-Type")->getHeaders()));
+        self::assertEquals(/**@lang JSON */ '{"Host":["localhost"]}', $tempRequest::toJson($tempRequest->withoutHeader("Content-Type")->getHeaders()));
     }
 
     /**
@@ -250,7 +253,7 @@ class RequestTest extends TestCase
      */
     public function testGetHeaders()
     {
-        $tempRequest = $this->req->withHeader('Content-Type','text/html');
+        $tempRequest = $this->req->withHeader('Content-Type', 'text/html');
         self::assertArrayHasKey("Content-Type", $tempRequest->getHeaders());
     }
 
@@ -260,7 +263,7 @@ class RequestTest extends TestCase
      */
     public function testWithAddedHeader()
     {
-        $tempRequest = $this->req->withHeader('Content-Type','text/html')->withAddedHeader("Content-Type", "application/json");
+        $tempRequest = $this->req->withHeader('Content-Type', 'text/html')->withAddedHeader("Content-Type", "application/json");
         self::assertEquals('text/html, application/json', $tempRequest->getHeaderLine("Content-Type"));
     }
 

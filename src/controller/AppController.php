@@ -2,6 +2,7 @@
 
 namespace App\controller;
 
+use App\Abstraction\Token\Token;
 use App\Abstraction\UserAbstraction;
 use App\model\User;
 use App\view\components\Components;
@@ -9,7 +10,6 @@ use Closure;
 use Exception;
 use Lib\Factory;
 use Lib\Helpers;
-use Lib\Token;
 use Psr\Http\Message\HttpHelper;
 use Psr\Http\Message\Request;
 use Psr\Http\Message\Response;
@@ -21,35 +21,17 @@ use Psr\Http\Message\ResponseInterface;
  */
 final class AppController extends Controller
 {
-    /**
-     * @var array|null
-     */
-    public static $credentials = null;
-
-    /**
-     * AppController constructor.
-     */
-    public function __construct()
-    {
-
-        self::$credentials = [
-            'host' => DB_HOST,
-            'user' => DB_USER,
-            'pass' => DB_PASS,
-            'name' => DB_NAME
-        ];
-    }
 
     /**
      * allAboutTheRequest
      * @Description All about content revice from request user
      * @return Closure
      */
-    final public static function token(): Closure
+    public static function token(): Closure
     {
         return static function (Request $request): Response {
             $token = Token::encode(['id' => '1'], 'policarpo');
-            [$headb64, $bodyb64, $cryptob64] = explode('.',$token);
+            [$headb64, $bodyb64, $cryptob64] = explode('.', $token);
             return new Response(
                 200,
                 HttpHelper::JSON_H,
@@ -63,27 +45,16 @@ final class AppController extends Controller
         };
     }
 
-    /**
-     * allAboutTheRequest
-     * @Description All about content revice from request user
-     * @return Closure
-     */
-    final public static function allAboutTheRequest(): Closure
-    {
-        return static function (Request $request): Response {
-            return new Response(200, HttpHelper::HTML5_h, HttpHelper::allAboutTheRequest($request));
-        };
-    }
 
     /**
-     * @return Closure
+     * @return callable
      */
-    public static function dashboard(): Closure
+    public static function dashboard(): callable
     {
         return static function (Request $request): Response {
 
             $Factory = new Factory(Factory::errorFactory('dashboard'));
-            $User = $Factory::userFactory(self::$credentials);
+            $User = $Factory::userFactory();
             $body = $request::getBodyByMethod($request);
             return Helpers::isArrayAndHasKeys($body) || (is_array($body) && isset($body['login'], $body['pass'])) ?
                 Factory
@@ -111,22 +82,19 @@ final class AppController extends Controller
 
 
     /**
+     * @param Request $request
      * @return Closure
-     * @throws Exception
      */
     public static function login(): Closure
     {
-        $body = $_SESSION;
-        if (
-        Token::isValidToKey($body, '')
-        ) {
-            //session_start();
-            //$user = Factory::userFactory(self::$credentials)->findUser(new UserAbstraction($body['login'], $body['pass']));
-            $user = Token::decode($body, '');
-            ['login' => $login, 'pass' => $pass, '_id' => $_id] = $user;
-            self::redirect(Helpers::baseURL("dashboard?_id=$_id"));
-        }
         return static function (Request $request): Response {
+            $body = HttpHelper::getBodyByMethod($request);
+            if (isset($body, $body['username'], $body['password'])) {
+                [$userSchema, $userModel] = [new UserAbstraction($body['username'], $body['password']), new User()];
+                $d = $userModel->existUser($userSchema) ?
+                    (new User())->findUser(new UserAbstraction($body['username'], $body['password']))['password'] :
+                    [];
+            }
             return Factory::responseFactory(
                 200,
                 HttpHelper::HTML5_h,
@@ -153,7 +121,7 @@ final class AppController extends Controller
             $user = new User(self::$credentials);
             $result = $user->createUser(
                 (new UserAbstraction($body['login'], $body['pass']))
-                    ->setName($body['name'])
+                    ->setFirstName($body['name'])
                     ->setMeta($body['meta'])
             );
             return new Response(

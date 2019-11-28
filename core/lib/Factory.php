@@ -5,12 +5,10 @@ namespace Lib;
 
 
 use App\Abstraction\UserAbstraction;
-use App\model\Dao;
+use App\Database\Bridge\Dao;
 use App\model\User;
 use Exception;
 use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
-use Psr\Http\Message\HttpHelper;
 use Psr\Http\Message\Response;
 use Server\Router;
 
@@ -34,6 +32,38 @@ class Factory extends Helpers
         self::$Error = $errorHandler;
     }
 
+    public static function aliasFakerFactory()
+    {
+        return \Faker\Factory::create('pt_BR');
+    }
+
+    /**
+     * @param array $credentials
+     * @return User
+     * @throws Exception
+     */
+    public static function userFactory(): User
+    {
+        return new User();
+    }
+
+    /**
+     * @param string $string
+     * @return Router
+     * @throws Exception
+     */
+    public static function AppFactory(string $string): Router
+    {
+        try {
+            return new Router($string);
+        } catch (Exception $e) {
+            self::$Error->register(self::$Error::CRITICAL, $e->getMessage() . $e->getTraceAsString() . $e->getCode() . $e->getLine(), [$string]);
+            exit(
+            self::responseFactory(500, ['Content-Type' => 'application/json'], ['error' => true, 'message' => $e->getMessage() . $e->getTraceAsString() . $e->getCode() . $e->getLine()])
+            );
+        }
+    }
+
     /**
      * @param int $status
      * @param array $headers
@@ -48,45 +78,7 @@ class Factory extends Helpers
         try {
             return new Response($status, $headers, $body, $version, $reason);
         } catch (Exception $e) {
-
-        }
-    }
-
-    /**
-     * @param array $credentials
-     * @return User
-     * @throws Exception
-     */
-    public static function userFactory(array $credentials): User
-    {
-        if (!self::isArrayAndHasKeys($credentials, 3)) {
-            self::$Error->register();
-        }
-        return new User($credentials);
-    }
-
-    /**
-     * @param string $string
-     * @return Router
-     * @throws Exception
-     */
-    public static function AppFactory(string $string): Router
-    {
-        try {
-            return new Router($string);
-        } catch (Exception $e) {
-            try {
-                $logger = new Logger('AppFactory');
-                $logger->pushHandler(self::StreamHandlerFactory('HttpHelper_AppFactory.log', Logger::WARNING));
-                $logger->critical($e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL . $e->getCode() . PHP_EOL . $e->getLine(), [$string]);
-            } catch (Exception $exception) {
-                $fp = HttpHelper::try_fopen('DB_CONNECTION.log', 'wb');
-                fwrite($fp, sprintf('%s', $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL . $e->getCode() . PHP_EOL . $e->getLine()));
-                fclose($fp);
-            }
-            exit(
-            new Response(500, ['Content-Type' => 'application/json'], ['error' => true, 'message' => $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL . $e->getCode() . PHP_EOL . $e->getLine(), 'context' => [$string]])
-            );
+            self::$Error->register(self::$Error::CRITICAL, 'Fail to create Response', [$status, $headers, $body, $version, $reason]);
         }
     }
 
@@ -100,7 +92,7 @@ class Factory extends Helpers
         try {
             return new StreamHandler($filename, $level);
         } catch (Exception $e) {
-
+            self::$Error->register(self::$Error::CRITICAL, $e->getMessage() . $e->getTraceAsString() . $e->getCode() . $e->getLine(), [$filename, $level]);
         }
     }
 

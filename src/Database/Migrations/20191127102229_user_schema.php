@@ -2,7 +2,7 @@
 
 use Phinx\Migration\AbstractMigration;
 
-class InitialState extends AbstractMigration
+class UserSchema extends AbstractMigration
 {
     /**
      * Change Method.
@@ -31,18 +31,22 @@ class InitialState extends AbstractMigration
      */
     public function change()
     {
-        // create the table
-        if ($this->table('users')->exists()) {
-            $this->table('users')->drop()->save();
-            $this->table('users')
-                ->addColumn('user_id', 'integer')
-                ->addColumn('created', 'datetime')
-                ->create();
-        } else {
-            $this->table('users')
-                ->addColumn('user_id', 'integer')
-                ->addColumn('created', 'datetime')
-                ->create();
+        $users = $this->table('users');
+        if ($users->exists()) {
+            $users->drop()->save();
         }
+        $users
+            ->addColumn('username', 'string', ['limit' => 20])
+            ->addColumn('password', 'string', ['limit' => 400])
+            ->addColumn('_decrypt_pass', 'string', ['limit' => 20])
+            ->addColumn('email', 'string', ['limit' => 100])
+            ->addColumn('first_name', 'string', ['limit' => 30])
+            ->addColumn('last_name', 'string', ['limit' => 30])
+            ->addColumn('tel', 'string', ['limit' => 15])
+            ->addTimestamps()
+            ->addColumn('active_at', 'timestamp', ['null' => true, 'timezone' => true])
+            ->addIndex(['username', 'email'], ['unique' => true])
+            ->save();
     }
+
 }

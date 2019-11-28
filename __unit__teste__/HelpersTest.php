@@ -3,6 +3,7 @@
 namespace App\assets\lib;
 
 use Exception;
+use Lib\Helpers;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -85,26 +86,6 @@ class HelpersTest extends TestCase
     }
 
     /**
-     * @throws Exception
-     * @see Helpers::defines();
-     * define("DB_type", "mysql");
-     * define("DB_HOST", "localhost");
-     * define("DB_USER", "root");
-     * define("DB_PASS", "");
-     * define("DB_NAME", "crefazscm_webscm");
-     * @see define('key', 'value');
-     */
-    public function testDefines()
-    {
-        Helpers::defines();
-        self::assertEquals("localhost", DB_HOST);
-        self::assertEquals("root", DB_USER);
-        self::assertEquals("", DB_PASS);
-        self::assertEquals("crefazscm_webscm", DB_NAME);
-
-    }
-
-    /**
      *
      * @throws Exception
      */
@@ -158,29 +139,14 @@ class HelpersTest extends TestCase
      */
     public function testMap()
     {
-        self::assertEquals('[[1,"yan","urlToPicture"],[123,[1.55,99,100]],55]', Helpers::toJson(Helpers::Map(
-            array(
-                "profile" => array("id" => 1, "name" => "yan", "picture" => "urlToPicture"),
-                "account" => array(
-                    "uc" => 123, "hidden" => array(1.55, 99, 100)
-                ),
-                55
-            ),
-            function ($value, $key) {
-                return !is_array($value) ?
-                    $value
-                    : Helpers::Map(
-                        $value,
-                        function ($val, $k) {
-                            return !is_array($val) ?
-                                $val
-                                : Helpers::Map($val, function ($V, $K) {
-                                    return !is_array($V) ?
-                                        $V :
-                                        Helpers::toJson($V);
-                                });
-                        });
-            })));
+        self::assertEquals(
+            '<p>Hello</p>',
+            Helpers::Map(['Hello', 'Word'], static function ($value) {
+                return "<p>$value</p>";
+            })
+            [0]
+        );
+
     }
 
     /**
@@ -189,15 +155,15 @@ class HelpersTest extends TestCase
      */
     public function testEntries()
     {
-        $arr = array(
-            "profile" => array("id" => 1, "name" => "yan", "picture" => "urlToPicture"),
-            "account" => array(
-                "uc" => 123, "hidden" => array(1.55, 99, 100)
-            ),
+        $arr = [
+            "profile" => ["id" => 1, "name" => "yan", "picture" => "urlToPicture"],
+            "account" => [
+                "uc" => 123, "hidden" => [1.55, 99, 100]
+            ],
             "_UMD" => 55,
             19,
             22
-        );
+        ];
         $keysAndValues = Helpers::Entries($arr);
         $keys = Helpers::objectKeys($arr);
         for ($i = 0; $i < count($keysAndValues); $i++) {

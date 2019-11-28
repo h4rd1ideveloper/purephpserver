@@ -3,37 +3,36 @@
 
 namespace App\Abstraction;
 
-
-use Lib\Crypt;
 use Lib\Helpers;
 
 /**
  * Class UserAbstraction
  * @package App\Abstraction
  */
-class UserAbstraction extends Crypt
+class UserAbstraction
 {
 
     /**
      * @var string
      */
-    private $id = null;
+    private $first_name = null;
+
     /**
      * @var string
      */
-    private $name = null;
+    private $last_name = null;
     /**
      * @var string
      */
-    private $login = null;
+    private $username = null;
     /**
      * @var string
      */
-    private $pass = null;
+    private $password = null;
     /**
      * @var string
      */
-    private $decryptPass = null;
+    private $_decrypt_pass = null;
     /**
      * @var string
      */
@@ -42,30 +41,35 @@ class UserAbstraction extends Crypt
      * @var string
      */
     private $tel = null;
-    /**
-     * @var string
-     */
-    private $phone = null;
-    /**
-     * @var string
-     */
-    private $meta = null;
-    /**
-     * @var string
-     */
-    private $date = null;
 
     /**
      * UserAbstraction constructor.
-     * @param string $login
-     * @param string $pass
+     * @param string $username
+     * @param string $password
      */
-    public function __construct(?string $login, ?string $pass)
+    public function __construct(?string $username = null, ?string $password = null)
     {
-        $this->login = $login;
-        $this->pass = $pass;
+        $this->username = $username;
+        $this->password = $password;
     }
 
+    /**
+     * @return string
+     */
+    public function getLastName(): string
+    {
+        return $this->last_name;
+    }
+
+    /**
+     * @param string $last_name
+     * @return UserAbstraction
+     */
+    public function setLastName(string $last_name): UserAbstraction
+    {
+        $this->last_name = $last_name;
+        return $this;
+    }
 
     /**
      * @param string $hash
@@ -73,7 +77,7 @@ class UserAbstraction extends Crypt
      */
     public function checkCryptPass(string $hash): bool
     {
-        return self::check($this->getDecryptPass(), $hash);
+        return password_verify($this->getDecryptPass(), $hash);
     }
 
     /**
@@ -81,16 +85,16 @@ class UserAbstraction extends Crypt
      */
     public function getDecryptPass(): string
     {
-        return $this->decryptPass;
+        return $this->_decrypt_pass;
     }
 
     /**
-     * @param string $decryptPass
+     * @param string $_decrypt_pass
      * @return UserAbstraction
      */
-    public function setDecryptPass(string $decryptPass): UserAbstraction
+    public function setDecryptPass(string $_decrypt_pass): UserAbstraction
     {
-        $this->decryptPass = $decryptPass;
+        $this->_decrypt_pass = $_decrypt_pass;
         return $this;
     }
 
@@ -100,24 +104,24 @@ class UserAbstraction extends Crypt
      */
     public function checkDecryptPass(string $decryptPass): bool
     {
-        return self::check($decryptPass, $this->getPass());
+        return password_verify($decryptPass, $this->getPassword());
     }
 
     /**
      * @return string
      */
-    public function getPass(): string
+    public function getPassword(): string
     {
-        return $this->pass;
+        return $this->password;
     }
 
     /**
-     * @param string $pass
+     * @param string $password
      * @return UserAbstraction
      */
-    public function setPass(string $pass): UserAbstraction
+    public function setPassword(string $password): UserAbstraction
     {
-        $this->pass = self::hash($pass);
+        $this->password = password_hash($password, PASSWORD_DEFAULT);
         return $this;
     }
 
@@ -129,25 +133,15 @@ class UserAbstraction extends Crypt
      */
     public function __toString()
     {
-        return Helpers::toJson(get_object_vars($this));
+        return Helpers::toJson($this->_data());
     }
 
-    /**
-     * @return string
-     */
-    public function getId(): string
+    private function _data()
     {
-        return $this->id;
-    }
-
-    /**
-     * @param string $id
-     * @return UserAbstraction
-     */
-    public function setId(string $id): UserAbstraction
-    {
-        $this->id = $id;
-        return $this;
+        return Helpers::Filter(
+            get_object_vars($this), static function ($v): bool {
+            return $v !== null;
+        });
     }
 
     /**
@@ -187,116 +181,56 @@ class UserAbstraction extends Crypt
     }
 
     /**
-     * @return string
-     */
-    public function getPhone(): string
-    {
-        return $this->phone;
-    }
-
-    /**
-     * @param string $phone
-     * @return UserAbstraction
-     */
-    public function setPhone(string $phone): UserAbstraction
-    {
-        $this->phone = $phone;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getMeta(): string
-    {
-        return $this->meta;
-    }
-
-    /**
-     * @param string $meta
-     * @return UserAbstraction
-     */
-    public function setMeta(string $meta): UserAbstraction
-    {
-        $this->meta = $meta;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDate(): string
-    {
-        return $this->date;
-    }
-
-    /**
-     * @param string $date
-     * @return UserAbstraction
-     */
-    public function setDate(string $date): UserAbstraction
-    {
-        $this->date = $date;
-        return $this;
-    }
-
-    /**
      * @return array
      */
     public function getDatabaseSchemaRegistration(): array
     {
-        return [
-            'login' => $this->getLogin(),
-            'name' => $this->getName(),
-            'pass' => Crypt::hash($this->getPass())
-
-        ];
+        return $this->_data();
     }
 
     /**
      * @return string
      */
-    public function getLogin(): string
+    public function getFirstName(): string
     {
-        return $this->login;
+        return $this->first_name;
     }
 
     /**
-     * @param string $login
+     * @param string $first_name
      * @return UserAbstraction
      */
-    public function setLogin(string $login): UserAbstraction
+    public function setFirstName(string $first_name): UserAbstraction
     {
-        $this->login = $login;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * @param string $name
-     * @return UserAbstraction
-     */
-    public function setName(string $name): UserAbstraction
-    {
-        $this->name = $name;
+        $this->first_name = $first_name;
         return $this;
     }
 
     /**
      * @return array
      */
-    protected function getDatabaseSchemaFinder()
+    public function schemaFinder()
     {
         return [
-            'login' => $this->getLogin(),
-            'pass' => $this->getPass()
+            'username' => self::getUsername()
         ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getUsername(): string
+    {
+        return $this->username;
+    }
+
+    /**
+     * @param string $username
+     * @return UserAbstraction
+     */
+    public function setUsername(string $username): UserAbstraction
+    {
+        $this->username = $username;
+        return $this;
     }
 }

@@ -14,6 +14,21 @@ use Psr\Http\Message\HttpHelper;
  */
 class Helpers
 {
+    /**
+     * @param array $array
+     * @param callable $fn
+     * @return array
+     */
+    public static function Filter(array $array, callable $fn): array
+    {
+        $data = [];
+        foreach ($array as $key => $value) {
+            if ((bool)$fn($value, $key) === true) {
+                $data[$key] = $value;
+            }
+        }
+        return $data;
+    }
 
     /**
      * @param string $to
@@ -287,9 +302,9 @@ class Helpers
      * @param $array
      * @param $callback
      * @param mixed $initialValue
-     * @return int
+     * @return mixed
      */
-    public static function Reducer(array $array, Closure $callback, $initialValue = array()): int
+    public static function Reducer(array $array, Closure $callback, $initialValue = [])
     {
         foreach ($array as $key => $value) {
             $initialValue = $callback($initialValue, $value, $key);

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\model;
+namespace App\Database\Bridge;
 
 use Exception;
 use Lib\Factory;

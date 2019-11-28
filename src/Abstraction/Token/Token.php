@@ -1,46 +1,59 @@
 <?php
 
-use \Firebase\JWT\JWT;
-define('KEY', 'root');
-class Token  extends JWT
+
+namespace App\Abstraction\Token;
+
+
+use Firebase\JWT\JWT;
+
+class Token extends JWT
 {
-    public function __construct()
+    public static function decodePiece(string $headb64)
     {
-        
+        return self::jsonDecode(self::urlsafeB64Decode($headb64));
+    }
+
+    public static function isValidByKey(string $token, $key, string $alg = 'SHA256'): bool
+    {
+        $token = explode('.', $token);
+        if (count($token) === 3) {
+            [$headb64, $bodyb64, $cryptob64] = $token;
+            $sig = self::urlsafeB64Decode($cryptob64);
+            $hash = hash_hmac($alg, "$headb64.$bodyb64", $key, true);
+            if (function_exists('hash_equals')) {
+                return hash_equals($sig, $hash);
+            }
+            $len = min(self::safeStrlen($sig), static::safeStrlen($hash));
+            $status = 0;
+            for ($i = 0; $i < $len; $i++) {
+                $status |= ord($sig[$i]) ^ ord($hash[$i]);
+            }
+            $status |= (static::safeStrlen($sig) ^ static::safeStrlen($hash));
+            return ($status === 0);
+        }
+        return false;
+    }
+
+    /**
+     * Get the number of bytes in cryptographic strings.
+     *
+     * @param string
+     *
+     * @return int
+     */
+    private static function safeStrlen($str)
+    {
+        if (function_exists('mb_strlen')) {
+            return mb_strlen($str, '8bit');
+        }
+        return strlen($str);
     }
 }
-$key = KEY;
+
+$key = 'KEY';
 $payload = array(
     "iss" => "http://example.org",
     "aud" => "http://example.com",
     "iat" => 1356999524,
     "nbf" => 1357000000
 );
-
-/**
- * IMPORTANT:
- * You must specify supported algorithms for your application. See
- * https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-40
- * for a list of spec-compliant algorithms.
- */
-$jwt = JWT::encode($payload, $key);
-$decoded = JWT::decode($jwt, $key, array('HS256'));
-
-print_r($decoded);
-
-/*
- NOTE: This will now be an object instead of an associative array. To get
- an associative array, you will need to cast it as such:
-*/
-
-$decoded_array = (array) $decoded;
-
-/**
- * You can add a leeway to account for when there is a clock skew times between
- * the signing and verifying servers. It is recommended that this leeway should
- * not be bigger than a few minutes.
- *
- * Source: http://self-issued.info/docs/draft-ietf-oauth-json-web-token.html#nbfDef
- */
-JWT::$leeway = 60; // $leeway in seconds
-$decoded = JWT::decode($jwt, $key, array('HS256'));
