@@ -1046,7 +1046,7 @@ Components
     ($ = window.jQuery, axios = window.axios, Swal = window.Swal)
 </script>
 <?php
-if (isset($vars['error']) && !!$vars['error']):?>
+if (isset($vars, $vars['error']) && !!$vars['error']):?>
     <script>
         Toast.fire({
             type: 'error',

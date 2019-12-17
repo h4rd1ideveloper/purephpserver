@@ -5,6 +5,7 @@ namespace App\model;
 use App\Abstraction\UserAbstraction;
 use Cake\Database\Query;
 use Cake\Datasource\ConnectionManager;
+use Exception;
 
 /**
  * Class User
@@ -20,12 +21,15 @@ class User
      * User constructor.
      */
     public function __construct()
-    {
+    {//'mysql://user:pass@localhost/database?'
         ConnectionManager::setConfig('default', ['url' => 'mysql://root:@localhost/app_dev']);
         $this->DB = ConnectionManager::get('default')->newQuery();
     }
 
 
+    /**
+     *
+     */
     public function __destruct()
     {
         unset($this->DB);
@@ -40,10 +44,10 @@ class User
     public function listAll(?string $orderBy = null, ?string $limit = null): array
     {
         $q = $this->DB
-            ->select('*')
-            ->from('users');
+            ->select('listAll.*', true)
+            ->from('users as listAll', true);
         if ($orderBy) {
-            $q->order($orderBy);
+            $q->order("listAll.$orderBy", true);
         }
         if ($limit) {
             $q->limit($limit);
@@ -58,24 +62,35 @@ class User
      */
     public function createUser(UserAbstraction $user): array
     {
-        if ($this->existUser($user)) {
+        try {
+            $insertQuery = $this->DB->into('users');
+            $insertQuery->insert(array_keys($user->getDatabaseSchemaRegistration()));
+            $insertQuery->clause('values');
+            $insertQuery->values($user->getDatabaseSchemaRegistration());
+            $insertQuery->execute();
+            return [
+                'error' => false,
+                'message' => 'User created'
+            ];
+        } catch (Exception $exception) {
             return [
                 'error' => true,
-                'message' => 'There is already a user with the same credentials.',
-                'raw' => $this->findUser($user)
+                'message' => 'Mysql Error [User  created or not], sorry ' . $exception->getTraceAsString()
             ];
         }
-        $this->DB->insert($user->getDatabaseSchemaRegistration())->into('users')->execute();
-        return ['error' => false, 'message' => 'User created', 'raw' => $user->getDatabaseSchemaRegistration()];
     }
 
+    /**
+     * @param UserAbstraction $user
+     * @return bool
+     */
     public function existUser(UserAbstraction $user): bool
     {
         return (bool)
             $this->DB
-                ->select('id')
-                ->from('users')
-                ->where($user->schemaFinder())
+                ->select('*', true)
+                ->from('users', true)
+                ->where($user->schemaFinder(), [], true)
                 ->limit(1)
                 ->execute()
                 ->count() > 0;
@@ -88,21 +103,22 @@ class User
     public function findUser(UserAbstraction $user): array
     {
         return $this->DB
-            ->select('*')
-            ->from('users')
-            ->where($user->schemaFinder())
+            ->select('*', true)
+            ->from('users', true)
+            ->where($user->schemaFinder(), [], true)
             ->execute()
-            ->fetchAll();
+            ->fetch();
+
     }
 
     /**
-     * @param integer|string $id
+     * @param UserAbstraction $user
      * @return array
      */
-    public function deleteUser($id)
+    public function deleteUser(UserAbstraction $user)
     {
-        if (count($this->findUserById($id))) {
-            $success = $this->DB->delete('users', ['_id' => $id]);
+        if ($id = $this->userId($user)) {
+            $success = $this->DB->delete()->from('user as deleteUser', true)->where(['deleteUser.id' => $id['id']], [], true)->execute()->fetch();
             return $success ?
                 ['error' => !$success, 'message' => "Usuario de id: $id, deletado"] :
                 ['error' => $success, 'message' => 'something is wrong'];
@@ -111,12 +127,17 @@ class User
     }
 
     /**
-     * @param string|int $id
-     * @return array
+     * @param UserAbstraction $user
+     * @return int|false
      */
-    public function findUserById($id)
+    public function userId(UserAbstraction $user)
     {
-        $this->DB->select('users', '*', null, ['_id' => $id]);
-        return $this->DB->getResult();
+        return $this->DB
+                ->select('id', true)
+                ->from('users', true)
+                ->where($user->schemaFinder(), [], true)
+                ->limit(1)
+                ->execute()
+                ->fetch()[0]['id'] ?? false;
     }
 }

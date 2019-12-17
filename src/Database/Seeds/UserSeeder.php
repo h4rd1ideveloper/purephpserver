@@ -23,7 +23,6 @@ class UserSeeder extends AbstractSeed
             $absUser = new UserAbstraction();
             $absUser->setUsername($faker->userName)
                 ->setPassword($faker->password)
-                ->setDecryptPass($faker->password)
                 ->setEmail($faker->email)
                 ->setFirstName($faker->firstName)
                 ->setLastName($faker->lastName);

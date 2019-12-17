@@ -11,6 +11,9 @@ use Lib\Helpers;
  */
 class Components
 {
+    /**
+     *
+     */
     const buttonCollapse = '<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsedContent" aria-controls="collapsedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>';
     /**
      * @var string
@@ -24,7 +27,9 @@ class Components
     public static function headerHTML(array $config): Components
     {
         self::$HTML_CONTENT = '';
+        //
         $baseUrl = Helpers::baseURL();
+        //$bootstrap = "<script src='$baseUrl/src/view/assets/js/bootstrap.js'></script>";
         self::$HTML_CONTENT .= sprintf(
             "
     <!doctype html>
@@ -36,18 +41,17 @@ class Components
         <meta http-equiv='X-UA-Compatible' content='ie=edge'/>
         <meta content='' name='keywords'>
         <meta content='' name='description'>
+        <link rel='manifest' href='$baseUrl/src/view/assets/site.webmanifest.json'>
         <link href='$baseUrl/src/view/assets/img/favicon.ico' rel='icon'>
         <link href='$baseUrl/src/view/assets/img/apple-touch-icon.png' rel='apple-touch-icon'>
         <!-- Google Fonts -->
-        <link href='https://fonts.googleapis.com/css?family=Open+Sans+Anton:300,300i,400,400i,500,600,700,700i|Roboto+Mono+Montserrat:100,300,400,500,600,700' rel='stylesheet'>
+        <link href='https://fonts.googleapis.com/css?family=Anton|Montserrat:300,400,700&display=swap&subset=latin-ext' rel='stylesheet'>
         <!-- Bootstrap CSS File -->
-        <link rel='stylesheet' href='$baseUrl/src/view/assets/css/bootstrap.css'/>
+       <link rel='stylesheet' href='//bootswatch.com/4/litera/bootstrap.min.css'/>
         <script src='$baseUrl/src/view/assets/js/jquery-3.4.1.min.js'></script>
         <script src='$baseUrl/src/view/assets/js/popper.min.js'></script>
-        <script src='$baseUrl/src/view/assets/js/bootstrap.js'></script>
         <!-- Libraries CSS Files -->
-        <link href='$baseUrl/src/view/assets/js/lib/font-awesome/css/font-awesome.min.css'
-              rel='stylesheet'>
+        <link href='https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' rel='stylesheet' integrity='sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN' crossorigin='anonymous'>
         <link href='$baseUrl/src/view/assets/js/lib/animate/animate.min.css' rel='stylesheet'>
         <link href='$baseUrl/src/view/assets/js/lib/ionicons/css/ionicons.min.css' rel='stylesheet'>
         <link href='$baseUrl/src/view/assets/js/lib/owlcarousel/assets/owl.carousel.min.css' rel='stylesheet'>
@@ -71,12 +75,14 @@ class Components
 
     /**
      * @TODO param array $config
+     * @param string $additionalScrips
      * @return string
      */
-    public static function footerHTML(): string
-    {
+    public static function footerHTML(string $additionalScrips = ''): string
+    {//<script src='$baseUrl/src/view/assets/js/translate.google.js'></script>
         $baseUrl = Helpers::baseURL();
-        return self::$HTML_CONTENT . "
+        return self::$HTML_CONTENT . <<<HTML
+
          <!-- JavaScript Libraries -->
         <script src='$baseUrl/src/view/assets/js/lib/jquery/jquery-migrate.min.js'></script>
         <script src='$baseUrl/src/view/assets/js/lib/easing/easing.min.js'></script>
@@ -89,10 +95,9 @@ class Components
         <script src='$baseUrl/src/view/assets/js/lib/lightbox/js/lightbox.min.js'></script>
         <!-- Contact Form JavaScript File -->
         <script src='$baseUrl/src/view/assets/js/lib/contactform/contactform.js'></script>
-
         <!-- Template Main Javascript File -->
         <script src='$baseUrl/src/view/assets/js/main.js'></script>
-        <script src='$baseUrl/src/view/assets/js/translate.google.js'></script>
+        $additionalScrips
         <script>
             $('document').ready(function () {
                 window.Toast = Swal.mixin({
@@ -104,7 +109,8 @@ class Components
             });
         </script>
         </body>
-        </html>";
+        </html>
+HTML;
     }
 
     /**
@@ -165,6 +171,10 @@ class Components
         return sprintf(/**@lang text */ "<a class='%s' href='%s' %s >%s</a>", $classes, $target, $props, $text);
     }
 
+    /**
+     * @param string $content
+     * @return string
+     */
     public static function collapsedContent(string $content): string
     {
         return '<div class="collapse navbar-collapse" id="collapsedContent">' . $content . '</div></nav>';
@@ -279,6 +289,10 @@ class Components
 
     }
 
+    /**
+     * @param array $vars
+     * @return string
+     */
     public
     static function handlerError(array $vars): string
     {
@@ -292,11 +306,42 @@ class Components
 
     }
 
-    public
-    static function content(string $content, array $context = []): Components
+    public static function content(string $content): Components
     {
 
         self::$HTML_CONTENT .= $content;
+        return new static();
+    }
+
+    /**
+     * @param string $name
+     * @param bool $required
+     * @param string|null $label
+     * @param string|null $labelHelper
+     * @param string|null $type
+     * @param string|null $placeholder
+     * @param string|null $class
+     * @param int|null $min
+     * @param int|null $max
+     * @return Components
+     */
+    public static function input(string $name, bool $required, ?string $label = '', ?string $labelHelper = '', ?string $type = 'text', ?string $placeholder = '', ?string $class = '', ?string $wrapClass = '', ?int $min = 4, ?int $max = 20)
+    {
+        $key = uniqid();
+        ?>
+        <div class="form-group <?= $wrapClass; ?>">
+            <label for="<?= $name; ?>"><?= $label; ?></label>
+            <input <?php if ($required): ?>required<?php endif; ?>
+                   maxlength="<?= $max; ?>" minlength="<?= $min; ?>"
+                   type="<?= $type; ?>"
+                   class="form-control <?= $class; ?>"
+                   name="<?= $name; ?>"
+                   aria-describedby="<?= $name; ?>HelpId_<?= $key; ?>"
+                   placeholder="<?= $placeholder; ?>"
+            />
+            <small id="<?= $name; ?>HelpId_<?= $key; ?>" class="form-text text-black-50"><?= $labelHelper; ?></small>
+        </div>
+        <?php
         return new static();
     }
 }

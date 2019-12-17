@@ -245,7 +245,7 @@ class Dao extends QueryBuilder
      */
     public function update(string $table, array $where, $value): bool
     {
-        if ($this->tableExists($table)) {
+        if (/*$this->tableExists($table)*/ $table) {
             $q = self::queryUpdate($table, $value, $where);
             $this->numResults = null;
             //exit($q);
@@ -257,49 +257,6 @@ class Dao extends QueryBuilder
             }
         }
         return false;
-    }
-
-    /**
-     * @param $table
-     * @return bool|string
-     */
-    private function tableExists(string $table): bool
-    {
-        $this->numResults = null;
-        try {
-            $sql = self::querySelect(
-                $this->_db,
-                'information_schema.tables',
-                'count( table_name) as ok',
-                null,
-                "table_schema = '$this->_db_name' and TABLE_NAME = '$table'",
-                null,
-                null,
-                '1'
-            );
-            $sql->execute();
-            $this->result = $sql->fetchAll(PDO::FETCH_OBJ);
-            $this->numResults = count($this->result);
-            if ($this->numResults === 0) {
-                $this->numResults = null;
-            }
-            return true;
-        } catch (PDOException $e) {
-            $this->logger->register(400,
-                $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL . $e->getCode() . PHP_EOL . $e->getLine(),
-                [
-                    $this->_db,
-                    'information_schema.tables',
-                    'count( table_name) as ok',
-                    null,
-                    "table_schema = '$this->_db_name' and TABLE_NAME = '$table'",
-                    null,
-                    null,
-                    '1'
-                ]
-            );
-            return false;
-        }
     }
 
     /**

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Abstraction;
 
 use Lib\Helpers;
@@ -54,24 +53,6 @@ class UserAbstraction
     }
 
     /**
-     * @return string
-     */
-    public function getLastName(): string
-    {
-        return $this->last_name;
-    }
-
-    /**
-     * @param string $last_name
-     * @return UserAbstraction
-     */
-    public function setLastName(string $last_name): UserAbstraction
-    {
-        $this->last_name = $last_name;
-        return $this;
-    }
-
-    /**
      * @param string $hash
      * @return bool
      */
@@ -86,16 +67,6 @@ class UserAbstraction
     public function getDecryptPass(): string
     {
         return $this->_decrypt_pass;
-    }
-
-    /**
-     * @param string $_decrypt_pass
-     * @return UserAbstraction
-     */
-    public function setDecryptPass(string $_decrypt_pass): UserAbstraction
-    {
-        $this->_decrypt_pass = $_decrypt_pass;
-        return $this;
     }
 
     /**
@@ -121,7 +92,18 @@ class UserAbstraction
      */
     public function setPassword(string $password): UserAbstraction
     {
+        $this->setDecryptPass($password);
         $this->password = password_hash($password, PASSWORD_DEFAULT);
+        return $this;
+    }
+
+    /**
+     * @param string $_decrypt_pass
+     * @return UserAbstraction
+     */
+    private function setDecryptPass(string $_decrypt_pass): UserAbstraction
+    {
+        $this->_decrypt_pass = $_decrypt_pass;
         return $this;
     }
 
@@ -145,6 +127,41 @@ class UserAbstraction
     }
 
     /**
+     * @param string $prefix
+     * @return array
+     */
+    public function getDatabaseSchemaRegistration(string $prefix = ''): array
+    {
+        return [
+            $prefix . 'username' => $this->getUsername(),
+            $prefix . 'password' => $this->getPassword(),
+            $prefix . '_decrypt_pass' => $this->getDecryptPass(),
+            $prefix . 'email' => $this->getEmail(),
+            $prefix . 'first_name' => $this->getFirstName(),
+            $prefix . 'last_name' => $this->getLastName(),
+            $prefix . 'tel' => $this->getTel()
+        ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getUsername(): string
+    {
+        return $this->username;
+    }
+
+    /**
+     * @param string $username
+     * @return UserAbstraction
+     */
+    public function setUsername(string $username): UserAbstraction
+    {
+        $this->username = $username;
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function getEmail(): string
@@ -159,6 +176,42 @@ class UserAbstraction
     public function setEmail(string $email): UserAbstraction
     {
         $this->email = $email;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFirstName(): string
+    {
+        return $this->first_name;
+    }
+
+    /**
+     * @param string $first_name
+     * @return UserAbstraction
+     */
+    public function setFirstName(string $first_name): UserAbstraction
+    {
+        $this->first_name = $first_name;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLastName(): string
+    {
+        return $this->last_name;
+    }
+
+    /**
+     * @param string $last_name
+     * @return UserAbstraction
+     */
+    public function setLastName(string $last_name): UserAbstraction
+    {
+        $this->last_name = $last_name;
         return $this;
     }
 
@@ -181,56 +234,13 @@ class UserAbstraction
     }
 
     /**
+     * @param string $prefix
      * @return array
      */
-    public function getDatabaseSchemaRegistration(): array
-    {
-        return $this->_data();
-    }
-
-    /**
-     * @return string
-     */
-    public function getFirstName(): string
-    {
-        return $this->first_name;
-    }
-
-    /**
-     * @param string $first_name
-     * @return UserAbstraction
-     */
-    public function setFirstName(string $first_name): UserAbstraction
-    {
-        $this->first_name = $first_name;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function schemaFinder()
+    public function schemaFinder(string $prefix = '')
     {
         return [
-            'username' => self::getUsername()
+            $prefix . "username" => $this->getUsername()
         ];
-    }
-
-    /**
-     * @return string
-     */
-    public function getUsername(): string
-    {
-        return $this->username;
-    }
-
-    /**
-     * @param string $username
-     * @return UserAbstraction
-     */
-    public function setUsername(string $username): UserAbstraction
-    {
-        $this->username = $username;
-        return $this;
     }
 }
