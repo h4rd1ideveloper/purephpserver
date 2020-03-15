@@ -1,0 +1,80 @@
+
+body {
+height: 100%;
+}
+
+span.draw-row {
+    width: 100% !important;
+    display: block !important;
+    background: #00000033 !important;
+    height: 1px !important;
+}
+
+.w-fix {
+    max-width: max-content !important;
+}
+
+.number_ready_only {
+    width: 45px !important;
+}
+
+.borderless,
+.borderless:hover,
+.borderless:focus {
+    border-block: none !important;
+    border-inline-style: none !important;
+    border: none transparent !important;
+}
+
+.dataTables_wrapper {
+    width: 100% !important;
+}
+
+#Authenticate {
+    margin-top: 25vh;
+}
+
+#logo {
+    max-height: max-content !important;
+    min-height: 40px !important;
+    height: 2rem !important;
+    width: 100%;
+    object-fit: contain;
+}
+
+.vanta-canvas {
+    position: fixed !important;
+    z-index: -1 !important;
+    min-width: 100vw !important;
+    min-height: 100vmax !important;
+}
+
+#Authenticate {
+    min-width: 340px;
+}
+
+@media screen and (max-width: 400px) {
+    #Authenticate {
+        margin: 0 !important;
+        min-height: 100vh !important;
+        min-width: 100vw !important;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background: whitesmoke;
+        background: #dee2e6 !important;
+    }
+
+    #Authenticate form {
+        min-height: max-content !important;
+        min-width: 100vw !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+}
+
+#Authenticate form * {
+    border-radius: 4px !important;
+}
