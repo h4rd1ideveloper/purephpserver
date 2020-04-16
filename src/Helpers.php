@@ -2,11 +2,11 @@
 
 namespace App;
 
+use Exception;
 use GuzzleHttp\Psr7\CachingStream;
 use GuzzleHttp\Psr7\LazyOpenStream;
 use InvalidArgumentException;
 use RuntimeException;
-use Exception;
 
 /**
  * Class Helpers
@@ -27,6 +27,21 @@ class Helpers
 
     /**
      * @param string $templateFileName
+     * @param array $context
+     * @param array $more
+     * @return string
+     * @throws Exception
+     */
+    public static function Sender(string $templateFileName, array $context = [], array $more = ['headerMore' => [], 'footerMore' => []]): string
+    {
+        return Components
+            ::headerHTML($more['headerMore'] ?? [])
+            ::content(self::fileAsString($templateFileName, true, $context))
+            ::footerHTML($more['footerMore'] ?? []);
+    }
+
+    /**
+     * @param string $templateFileName
      * @param bool $ob
      * @param array $context
      * @return string
@@ -34,9 +49,10 @@ class Helpers
      */
     public static function fileAsString(string $templateFileName, bool $ob = false, array $context = []): string
     {
+
         $pathToFile = sprintf("%s\pages\\$templateFileName.php", dirname(__FILE__));
         !file_exists($pathToFile) &&
-            die(print_r(["[$pathToFile]", "view {$templateFileName} not found!", dirname(__FILE__)]));
+        die(print_r(["[$pathToFile]", "view {$templateFileName} not found!", dirname(__FILE__)]));
         if ($ob) {
             ob_start();
             include_once($pathToFile);
@@ -54,16 +70,6 @@ class Helpers
     public static function createCachingStreamOfLazyOpenStream($filename, $mode)
     {
         return new CachingStream(new LazyOpenStream($filename, $mode));
-    }
-
-    /**
-     * @param string $templateFileName
-     * @param array $context
-     * @return string
-     */
-    public static function Sender(string $templateFileName, array $context = [], array $more = ['headerMore' => '', 'footerMore' => '']): string
-    {
-        return Components::headerHTML(['more' => $more['headerMore'] ?? ''])::content(self::fileAsString($templateFileName, true, $context))::footerHTML($more['footerMore']);
     }
 
     /**
@@ -99,6 +105,7 @@ class Helpers
         }
         return $handle;
     }
+
     /**
      * @param array $array
      * @param callable $fn
@@ -108,7 +115,7 @@ class Helpers
     {
         $data = [];
         foreach ($array as $key => $value) {
-            if ((bool) $fn($value, $key) === true) {
+            if ((bool)$fn($value, $key) === true) {
                 $data[$key] = $value;
             }
         }
@@ -126,7 +133,7 @@ class Helpers
             $redirectUrl = explode('/', str_replace('index', '', isset($_SERVER['REDIRECT_URL']) ? $_SERVER['REDIRECT_URL'] : ''));
             return sprintf('//%s%s/%s/%s', $host, $redirectUrl[0], $redirectUrl[1], $to);
         }
-        return sprintf('//%s/%s', $host, $to);
+        return sprintf('//%s/%s/%s', $host, sub_path, $to);
     }
 
     /**
@@ -144,9 +151,8 @@ class Helpers
      */
     public static function isMySQLFunction(string $string): bool
     {
-        return (bool) preg_match_all('/\(.*\)/', (string) $string);
+        return (bool)preg_match_all('/\(.*\)/', (string)$string);
     }
-
 
 
     /**
@@ -178,7 +184,7 @@ class Helpers
         $arr = [];
         foreach ($OBJ as $key => $valueNotUsedHer) {
             if ($noReapt) {
-                self::insertIfNotExist((string) $key, $arr);
+                self::insertIfNotExist((string)$key, $arr);
                 continue;
             }
             $arr[] = $key;
@@ -333,7 +339,7 @@ class Helpers
      */
     public static function containSubString(string $target, string $toSearch, int $offset = 0): bool
     {
-        return (bool) (strpos(strtoupper($target), strtoupper($toSearch), $offset) !== false);
+        return (bool)(strpos(strtoupper($target), strtoupper($toSearch), $offset) !== false);
     }
 
     /**
@@ -377,7 +383,7 @@ class Helpers
     public static function orEmpty(?string $test, bool $int = false, $default = false)
     {
         if ($int) {
-            $default = ($default === false) ? 0 : (int) $default;
+            $default = ($default === false) ? 0 : (int)$default;
         } elseif ($int === false) {
             $default = $int ? 0 : '';
         }
