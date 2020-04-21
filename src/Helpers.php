@@ -2,11 +2,14 @@
 
 namespace App;
 
-use GuzzleHttp\Psr7\CachingStream;
-use GuzzleHttp\Psr7\LazyOpenStream;
-use InvalidArgumentException;
-use RuntimeException;
 use Exception;
+use Illuminate\Database\Capsule\Manager as Capsule;
+use InvalidArgumentException;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
+use Psr\Http\Message\StreamInterface;
+use RuntimeException;
+use Slim\Psr7\Factory\StreamFactory;
 
 /**
  * Class Helpers
@@ -16,6 +19,7 @@ use Exception;
  */
 class Helpers
 {
+
     /**
      *
      */
@@ -26,44 +30,102 @@ class Helpers
     const HTML5_h = ['Content-Type' => 'text/html'];
 
     /**
+     * @param array|string[] $connectionConfig
+     * @return void
+     */
+    public static function setupIlluminateConnectionAsGlobal(array $connectionConfig = [
+        'driver' => 'mysql',
+        'host' => 'localhost',
+        'port' => '3306',
+        'database' => 'icardo_dev',
+        'username' => 'root',
+        'password' => '',
+        'charset' => 'utf8',
+        'collation' => 'utf8_unicode_ci',
+    ])
+    {
+        try {
+            $capsule = new Capsule;
+            $capsule->addConnection($connectionConfig);
+            $capsule->bootEloquent();
+            $capsule->setAsGlobal();
+            $capsule->schema();
+        } catch (Exception $e) {
+            $log = new Logger('setupIlluminateConnectionAsGlobal');
+            $log->pushHandler(new StreamHandler('./monolog.log', Logger::WARNING));
+            $log->error($e->getMessage() . " " . $e->getTraceAsString() . PHP_EOL);
+
+        }
+
+    }
+
+    /**
+     * @param string $templateFileName
+     * @param array $context
+     * @param array $more
+     * @return string
+     * @throws Exception
+     */
+    public static function Sender(string $templateFileName, array $context = [], array $more = ['headerMore' => [], 'footerMore' => []]): string
+    {
+        return Components
+            ::headerHTML($more['headerMore'] ?? [])
+            ::content(self::viewFileAsString($templateFileName, true, $context))
+            ::footerHTML($more['footerMore'] ?? []);
+    }
+
+    /**
      * @param string $templateFileName
      * @param bool $ob
      * @param array $context
      * @return string
      * @throws Exception
      */
-    public static function fileAsString(string $templateFileName, bool $ob = false, array $context = []): string
+    public static function viewFileAsString(string $templateFileName, bool $ob = false, array $context = []): string
     {
+
         $pathToFile = sprintf("%s\pages\\$templateFileName.php", dirname(__FILE__));
         !file_exists($pathToFile) &&
-            die(print_r(["[$pathToFile]", "view {$templateFileName} not found!", dirname(__FILE__)]));
+        die(print_r(["[$pathToFile]", "view {$templateFileName} not found!", dirname(__FILE__)]));
         if ($ob) {
             ob_start();
             include_once($pathToFile);
             return ob_get_clean() ?? '';
         }
-        return self::createCachingStreamOfLazyOpenStream($$pathToFile, 'r+')->getContents();
+        return self::createCachingStreamOfLazyOpenStream($pathToFile, 'r+')->getContents();
     }
 
     /**
      * @param $filename
-     * @param $mode
-     * @return CachingStream
-     * @throws Exception
+     * @param string $mode
+     * @return StreamInterface
      */
-    public static function createCachingStreamOfLazyOpenStream($filename, $mode)
+    public static function createCachingStreamOfLazyOpenStream($filename, $mode = 'r+')
     {
-        return new CachingStream(new LazyOpenStream($filename, $mode));
+        return (new StreamFactory)->createStreamFromFile($filename, $mode);
     }
 
     /**
-     * @param string $templateFileName
-     * @param array $context
-     * @return string
+     * @param string $filename
      */
-    public static function Sender(string $templateFileName, array $context = [], array $more = ['headerMore' => '', 'footerMore' => '']): string
+    public static function setEnvByFile(string $filename)
     {
-        return Components::headerHTML(['more' => $more['headerMore'] ?? ''])::content(self::fileAsString($templateFileName, true, $context))::footerHTML($more['footerMore']);
+        try {
+            $env = self::createCachingStreamOfLazyOpenStream($filename)->getContents();
+            foreach (explode(PHP_EOL, $env) as $row) {
+                $keyAndValue = explode('=', trim($row));
+                [$key, $value] = [$keyAndValue[0] ?? '', $keyAndValue[1] ?? ''];
+                if ($key !== '' && $value !== '') {
+                    [$key, $value] = [strtolower(trim($key)), strtolower(trim($value))];
+                    putenv("$key=$value");
+                    //echo "$key = $value </br>";
+                }
+            }
+        } catch (Exception $e) {
+            $log = new Logger('setEnvByFile');
+            $log->pushHandler(new StreamHandler('./monolog.log', Logger::WARNING));
+            $log->error($e->getMessage() . " " . $e->getTraceAsString() . PHP_EOL);
+        }
     }
 
     /**
@@ -99,6 +161,7 @@ class Helpers
         }
         return $handle;
     }
+
     /**
      * @param array $array
      * @param callable $fn
@@ -108,7 +171,7 @@ class Helpers
     {
         $data = [];
         foreach ($array as $key => $value) {
-            if ((bool) $fn($value, $key) === true) {
+            if ((bool)$fn($value, $key) === true) {
                 $data[$key] = $value;
             }
         }
@@ -126,7 +189,7 @@ class Helpers
             $redirectUrl = explode('/', str_replace('index', '', isset($_SERVER['REDIRECT_URL']) ? $_SERVER['REDIRECT_URL'] : ''));
             return sprintf('//%s%s/%s/%s', $host, $redirectUrl[0], $redirectUrl[1], $to);
         }
-        return sprintf('//%s/%s', $host, $to);
+        return sprintf('//%s/%s/%s', $host, getenv('root_path'), $to);
     }
 
     /**
@@ -144,9 +207,8 @@ class Helpers
      */
     public static function isMySQLFunction(string $string): bool
     {
-        return (bool) preg_match_all('/\(.*\)/', (string) $string);
+        return (bool)preg_match_all('/\(.*\)/', (string)$string);
     }
-
 
 
     /**
@@ -178,7 +240,7 @@ class Helpers
         $arr = [];
         foreach ($OBJ as $key => $valueNotUsedHer) {
             if ($noReapt) {
-                self::insertIfNotExist((string) $key, $arr);
+                self::insertIfNotExist((string)$key, $arr);
                 continue;
             }
             $arr[] = $key;
@@ -333,7 +395,7 @@ class Helpers
      */
     public static function containSubString(string $target, string $toSearch, int $offset = 0): bool
     {
-        return (bool) (strpos(strtoupper($target), strtoupper($toSearch), $offset) !== false);
+        return (bool)(strpos(strtoupper($target), strtoupper($toSearch), $offset) !== false);
     }
 
     /**
@@ -377,7 +439,7 @@ class Helpers
     public static function orEmpty(?string $test, bool $int = false, $default = false)
     {
         if ($int) {
-            $default = ($default === false) ? 0 : (int) $default;
+            $default = ($default === false) ? 0 : (int)$default;
         } elseif ($int === false) {
             $default = $int ? 0 : '';
         }

@@ -1,6 +1,6 @@
 
 body {
-height: 100%;
+    height: 100%;
 }
 
 span.draw-row {
@@ -62,7 +62,6 @@ span.draw-row {
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        background: whitesmoke;
         background: #dee2e6 !important;
     }
 
@@ -77,4 +76,8 @@ span.draw-row {
 
 #Authenticate form * {
     border-radius: 4px !important;
+}
+
+.vh-100 {
+    height: 100vh !important;
 }
