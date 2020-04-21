@@ -6,9 +6,9 @@ namespace App\controllers;
 
 use App\Helpers;
 use Exception;
-use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Psr7\Response;
 use Psr\Container\ContainerInterface;
+use Slim\Psr7\Request;
+use Slim\Psr7\Response;
 
 /**
  * Class UserController

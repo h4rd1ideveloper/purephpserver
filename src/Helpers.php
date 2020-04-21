@@ -3,10 +3,13 @@
 namespace App;
 
 use Exception;
-use GuzzleHttp\Psr7\CachingStream;
-use GuzzleHttp\Psr7\LazyOpenStream;
+use Illuminate\Database\Capsule\Manager as Capsule;
 use InvalidArgumentException;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
+use Psr\Http\Message\StreamInterface;
 use RuntimeException;
+use Slim\Psr7\Factory\StreamFactory;
 
 /**
  * Class Helpers
@@ -16,6 +19,7 @@ use RuntimeException;
  */
 class Helpers
 {
+
     /**
      *
      */
@@ -24,6 +28,36 @@ class Helpers
      *
      */
     const HTML5_h = ['Content-Type' => 'text/html'];
+
+    /**
+     * @param array|string[] $connectionConfig
+     * @return void
+     */
+    public static function setupIlluminateConnectionAsGlobal(array $connectionConfig = [
+        'driver' => 'mysql',
+        'host' => 'localhost',
+        'port' => '3306',
+        'database' => 'icardo_dev',
+        'username' => 'root',
+        'password' => '',
+        'charset' => 'utf8',
+        'collation' => 'utf8_unicode_ci',
+    ])
+    {
+        try {
+            $capsule = new Capsule;
+            $capsule->addConnection($connectionConfig);
+            $capsule->bootEloquent();
+            $capsule->setAsGlobal();
+            $capsule->schema();
+        } catch (Exception $e) {
+            $log = new Logger('setupIlluminateConnectionAsGlobal');
+            $log->pushHandler(new StreamHandler('./monolog.log', Logger::WARNING));
+            $log->error($e->getMessage() . " " . $e->getTraceAsString() . PHP_EOL);
+
+        }
+
+    }
 
     /**
      * @param string $templateFileName
@@ -36,7 +70,7 @@ class Helpers
     {
         return Components
             ::headerHTML($more['headerMore'] ?? [])
-            ::content(self::fileAsString($templateFileName, true, $context))
+            ::content(self::viewFileAsString($templateFileName, true, $context))
             ::footerHTML($more['footerMore'] ?? []);
     }
 
@@ -47,7 +81,7 @@ class Helpers
      * @return string
      * @throws Exception
      */
-    public static function fileAsString(string $templateFileName, bool $ob = false, array $context = []): string
+    public static function viewFileAsString(string $templateFileName, bool $ob = false, array $context = []): string
     {
 
         $pathToFile = sprintf("%s\pages\\$templateFileName.php", dirname(__FILE__));
@@ -58,18 +92,40 @@ class Helpers
             include_once($pathToFile);
             return ob_get_clean() ?? '';
         }
-        return self::createCachingStreamOfLazyOpenStream($$pathToFile, 'r+')->getContents();
+        return self::createCachingStreamOfLazyOpenStream($pathToFile, 'r+')->getContents();
     }
 
     /**
      * @param $filename
-     * @param $mode
-     * @return CachingStream
-     * @throws Exception
+     * @param string $mode
+     * @return StreamInterface
      */
-    public static function createCachingStreamOfLazyOpenStream($filename, $mode)
+    public static function createCachingStreamOfLazyOpenStream($filename, $mode = 'r+')
     {
-        return new CachingStream(new LazyOpenStream($filename, $mode));
+        return (new StreamFactory)->createStreamFromFile($filename, $mode);
+    }
+
+    /**
+     * @param string $filename
+     */
+    public static function setEnvByFile(string $filename)
+    {
+        try {
+            $env = self::createCachingStreamOfLazyOpenStream($filename)->getContents();
+            foreach (explode(PHP_EOL, $env) as $row) {
+                $keyAndValue = explode('=', trim($row));
+                [$key, $value] = [$keyAndValue[0] ?? '', $keyAndValue[1] ?? ''];
+                if ($key !== '' && $value !== '') {
+                    [$key, $value] = [strtolower(trim($key)), strtolower(trim($value))];
+                    putenv("$key=$value");
+                    //echo "$key = $value </br>";
+                }
+            }
+        } catch (Exception $e) {
+            $log = new Logger('setEnvByFile');
+            $log->pushHandler(new StreamHandler('./monolog.log', Logger::WARNING));
+            $log->error($e->getMessage() . " " . $e->getTraceAsString() . PHP_EOL);
+        }
     }
 
     /**
@@ -133,7 +189,7 @@ class Helpers
             $redirectUrl = explode('/', str_replace('index', '', isset($_SERVER['REDIRECT_URL']) ? $_SERVER['REDIRECT_URL'] : ''));
             return sprintf('//%s%s/%s/%s', $host, $redirectUrl[0], $redirectUrl[1], $to);
         }
-        return sprintf('//%s/%s/%s', $host, sub_path, $to);
+        return sprintf('//%s/%s/%s', $host, getenv('root_path'), $to);
     }
 
     /**

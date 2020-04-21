@@ -2,7 +2,7 @@
 
 use App\Helpers;
 
-$baseUrl = Helpers::baseURL()
+$baseUrl = Helpers::baseURL();
 ?>
 
 <div class="wrapper">

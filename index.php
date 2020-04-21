@@ -1,33 +1,49 @@
 <?php
 
 use App\handlers\ErrorHandler;
-use GuzzleHttp\Psr7\Response;
+use App\Helpers;
+use App\middleware\JsonBodyParserMiddleware;
+use App\middleware\TrailingMiddleware;
 use Slim\Exception\HttpMethodNotAllowedException;
 use Slim\Exception\HttpNotFoundException;
 use Slim\Factory\AppFactory;
+use Slim\Psr7\Response;
+use Slim\Routing\RouteCollectorProxy;
 
 require(dirname(__FILE__) . './vendor/autoload.php');
-require(dirname(__FILE__) . './src/constantes.php');
+
+Helpers::setEnvByFile('.env');
+Helpers::setupIlluminateConnectionAsGlobal();
 $app = AppFactory::create();
-$app->setBasePath('/' . sub_path);
-
+$app->setBasePath(getenv('root_path'));
 $app->addRoutingMiddleware();
-$errorMiddleware = $app->addErrorMiddleware(true, true, true);
-$errorMiddleware->setErrorHandler(
-    HttpNotFoundException::class,
-    ErrorHandler::notFound(new Response())
-);
-$errorMiddleware->setErrorHandler(
-    HttpMethodNotAllowedException::class,
-    ErrorHandler::notAllowedMethod(new Response())
-);
-$app->add(App\middleware\Middleware::trailing(new Response()));
-/**Views Routes */
-//$app->get('/', 'App\controllers\UserController::loginPage');
-$app->get('/', 'App\controllers\DashboardController::home_1');
+$app
+    ->addErrorMiddleware(
+        true,
+        true,
+        true
+    )
+    ->setErrorHandler(
+        HttpNotFoundException::class,
+        ErrorHandler::notFound(new Response())
+    )->setErrorHandler(
+        HttpMethodNotAllowedException::class,
+        ErrorHandler::notAllowedMethod(new Response())
+    );
+$app->add(new TrailingMiddleware);
+$app->add(new JsonBodyParserMiddleware);
 
-/**Api methods */
-$app->get('/users', 'App\controllers\UserControllerApi::listAll');
-$app->post('/login', 'App\controllers\UserControllerApi::login');
-/** Run app */
+
+$app->get('/', 'App\controllers\DashboardController::home_1');
+$app->get('/login', 'App\controllers\UserController::loginPage');
+
+$app->group('/api', function (RouteCollectorProxy $api) {
+    $api->group('/user', function (RouteCollectorProxy $user) {
+        $user->get('[/{skip:[0-9]+}[/{limit:[0-9]+}]]', 'App\controllers\UserControllerApi::listAll');
+    });
+    $api->group('/authentication', function (RouteCollectorProxy $authentication) {
+        $authentication->post('/login', 'App\controllers\UserControllerApi::login');
+        $authentication->post('/sign', 'App\controllers\UserControllerApi::login');
+    });
+});
 $app->run();
