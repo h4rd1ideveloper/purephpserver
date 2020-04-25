@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\lib;
 
 use Exception;
 use Illuminate\Database\Capsule\Manager as Capsule;
@@ -19,21 +19,40 @@ use Slim\Psr7\Factory\StreamFactory;
  */
 class Helpers
 {
-
     /**
      *
      */
-    const JSON_H = ['Content-Type' => 'application/json'];
+    const filters = [
+        'bool' => [FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE],
+        'email' => [FILTER_VALIDATE_EMAIL, FILTER_FLAG_EMAIL_UNICODE],
+        'float' => [FILTER_VALIDATE_FLOAT, FILTER_FLAG_ALLOW_THOUSAND],
+        'int' => [FILTER_VALIDATE_INT, [FILTER_FLAG_ALLOW_OCTAL, FILTER_FLAG_ALLOW_HEX]],
+        'ip' => [FILTER_VALIDATE_IP, [FILTER_FLAG_IPV4, FILTER_FLAG_IPV6, FILTER_FLAG_NO_PRIV_RANGE, FILTER_FLAG_NO_RES_RANGE]],
+        'domain' => [FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME],
+        'url' => [FILTER_VALIDATE_URL, [FILTER_FLAG_PATH_REQUIRED, FILTER_FLAG_QUERY_REQUIRED]],
+        'string' => [
+            FILTER_SANITIZE_STRING, [
+                FILTER_FLAG_STRIP_LOW, FILTER_FLAG_NO_ENCODE_QUOTES, FILTER_FLAG_STRIP_HIGH, FILTER_FLAG_ENCODE_LOW, FILTER_FLAG_ENCODE_HIGH, FILTER_FLAG_ENCODE_AMP
+            ]
+        ]
+    ];
+    /**
+     * @Description  $blackList  used to check if match more that 1 times
+     * @example "ALTER FIELDS" or "DROP TABLE" and other combinations
+     */
+    const blackList = [
+        "ALTER", "ANALYZE", "CREATE",
+        "DELETE", "DESCRIBE", "DROP", "EXISTS",
+        "FIELDS", "FLOAT", "GRANT", "INSERT",
+        "KILL", "PRIVILEGES", "PROCEDURE", "PURGE",
+        "REPLACE", "SELECT", "SET", "SHOW",
+        "TABLE", "TABLES", "TRUE", "UPDATE",
+        "VALUES", "XOR", "DATABASE"
+    ];
     /**
      *
      */
-    const HTML5_h = ['Content-Type' => 'text/html'];
-
-    /**
-     * @param array|string[] $connectionConfig
-     * @return void
-     */
-    public static function setupIlluminateConnectionAsGlobal(array $connectionConfig = [
+    const connectionConfig = [
         'driver' => 'mysql',
         'host' => 'localhost',
         'port' => '3306',
@@ -42,7 +61,13 @@ class Helpers
         'password' => '',
         'charset' => 'utf8',
         'collation' => 'utf8_unicode_ci',
-    ])
+    ];
+
+    /**
+     * @param array $connectionConfig
+     * @return Capsule|bool
+     */
+    public static function setupIlluminateConnectionAsGlobal(array $connectionConfig = self::connectionConfig)
     {
         try {
             $capsule = new Capsule;
@@ -50,13 +75,13 @@ class Helpers
             $capsule->bootEloquent();
             $capsule->setAsGlobal();
             $capsule->schema();
+            return $capsule;
         } catch (Exception $e) {
             $log = new Logger('setupIlluminateConnectionAsGlobal');
             $log->pushHandler(new StreamHandler('./monolog.log', Logger::WARNING));
             $log->error($e->getMessage() . " " . $e->getTraceAsString() . PHP_EOL);
-
         }
-
+        return false;
     }
 
     /**
@@ -80,11 +105,13 @@ class Helpers
      * @param array $context
      * @return string
      * @throws Exception
+     * @see Stream
+     * @see ob_start
      */
     public static function viewFileAsString(string $templateFileName, bool $ob = false, array $context = []): string
     {
 
-        $pathToFile = sprintf("%s\pages\\$templateFileName.php", dirname(__FILE__));
+        $pathToFile = sprintf("%s\..\pages\\$templateFileName.php", dirname(__FILE__));//Path to folder templates
         !file_exists($pathToFile) &&
         die(print_r(["[$pathToFile]", "view {$templateFileName} not found!", dirname(__FILE__)]));
         if ($ob) {
@@ -92,7 +119,7 @@ class Helpers
             include_once($pathToFile);
             return ob_get_clean() ?? '';
         }
-        return self::createCachingStreamOfLazyOpenStream($pathToFile, 'r+')->getContents();
+        return self::createStreamFromFile($pathToFile, 'r+')->getContents();
     }
 
     /**
@@ -100,7 +127,7 @@ class Helpers
      * @param string $mode
      * @return StreamInterface
      */
-    public static function createCachingStreamOfLazyOpenStream($filename, $mode = 'r+')
+    public static function createStreamFromFile($filename, $mode = 'r+')
     {
         return (new StreamFactory)->createStreamFromFile($filename, $mode);
     }
@@ -108,10 +135,10 @@ class Helpers
     /**
      * @param string $filename
      */
-    public static function setEnvByFile(string $filename)
+    public static function setEnvByFile(string $filename): void
     {
         try {
-            $env = self::createCachingStreamOfLazyOpenStream($filename)->getContents();
+            $env = self::createStreamFromFile($filename)->getContents();
             foreach (explode(PHP_EOL, $env) as $row) {
                 $keyAndValue = explode('=', trim($row));
                 [$key, $value] = [$keyAndValue[0] ?? '', $keyAndValue[1] ?? ''];
@@ -210,7 +237,6 @@ class Helpers
         return (bool)preg_match_all('/\(.*\)/', (string)$string);
     }
 
-
     /**
      * Format any Object or Array to JSON string
      * @param string|array|bool|int $toJson
@@ -232,14 +258,14 @@ class Helpers
     /**
      * Get Keys of the array
      * @param array $OBJ
-     * @param bool $noReapt
+     * @param bool $noRepeat
      * @return array
      */
-    public static function objectKeys(array $OBJ, bool $noReapt = true): array
+    public static function objectKeys(array $OBJ, bool $noRepeat = true): array
     {
         $arr = [];
         foreach ($OBJ as $key => $valueNotUsedHer) {
-            if ($noReapt) {
+            if ($noRepeat) {
                 self::insertIfNotExist((string)$key, $arr);
                 continue;
             }
@@ -280,11 +306,11 @@ class Helpers
      * @param $arr
      * @return array
      */
-    public static function getRowsById(array $ids, array $arr): array
+    public static function getRowsByKeys(array $ids, array $arr): array
     {
         $source = [];
         foreach ($ids as $id) {
-            isset($arr[$id]) && $source[$id] = $arr[$id];
+            if (isset($arr[$id])) $source[$id] = $arr[$id];
         }
         return $source;
     }
@@ -338,22 +364,8 @@ class Helpers
      */
     public static function isSQLInjection(string $value, string $type = 'string', $options = false): bool
     {
-        $filters = [
-            'bool' => [FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE],
-            'email' => [FILTER_VALIDATE_EMAIL, FILTER_FLAG_EMAIL_UNICODE],
-            'float' => [FILTER_VALIDATE_FLOAT, FILTER_FLAG_ALLOW_THOUSAND],
-            'int' => [FILTER_VALIDATE_INT, [FILTER_FLAG_ALLOW_OCTAL, FILTER_FLAG_ALLOW_HEX]],
-            'ip' => [FILTER_VALIDATE_IP, [FILTER_FLAG_IPV4, FILTER_FLAG_IPV6, FILTER_FLAG_NO_PRIV_RANGE, FILTER_FLAG_NO_RES_RANGE]],
-            'domain' => [FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME],
-            'url' => [FILTER_VALIDATE_URL, [FILTER_FLAG_PATH_REQUIRED, FILTER_FLAG_QUERY_REQUIRED]],
-            'string' => [
-                FILTER_SANITIZE_STRING, [
-                    FILTER_FLAG_STRIP_LOW, FILTER_FLAG_NO_ENCODE_QUOTES, FILTER_FLAG_STRIP_HIGH, FILTER_FLAG_ENCODE_LOW, FILTER_FLAG_ENCODE_HIGH, FILTER_FLAG_ENCODE_AMP
-                ]
-            ]
-        ];
-        $validate = $filters[$type][0];
-        $flag = $options ? $options : $filters[$type][1][0];
+        $validate = self::filters[$type][0];
+        $flag = $options ? $options : self::filters[$type][1][0];
         $checked = filter_var($value, $validate, $flag);
         if (strlen($value) !== strlen($checked)) {
             return true;
@@ -362,29 +374,13 @@ class Helpers
         if (strlen($value) !== strlen($checked)) {
             return true;
         }
-        /**
-         * @Description  $blackList  used to check if match more that 1 times
-         * @example "ALTER FIELDS" or "DROP TABLE" and other combinations
-         */
-        $blackList = [
-            "ALTER", "ANALYZE", "CREATE",
-            "DELETE", "DESCRIBE", "DROP", "EXISTS",
-            "FIELDS", "FLOAT", "GRANT", "INSERT",
-            "KILL", "PRIVILEGES", "PROCEDURE", "PURGE",
-            "REPLACE", "SELECT", "SET", "SHOW",
-            "TABLE", "TABLES", "TRUE", "UPDATE",
-            "VALUES", "XOR", "DATABASE"
-        ];
         $flag = [];
-        foreach ($blackList as $blackWord) {
+        foreach (self::blackList as $blackWord) {
             if (self::containSubString($value, $blackWord)) {
                 $flag[] = true;
             }
         }
-        if (count($flag) > 1 || preg_match("/d*s*=s*d*/", $value)) {
-            return true;
-        }
-        return false;
+        return (bool)(count($flag) > 1 || preg_match("/d*s*=s*d*/", $value));
     }
 
     /**
@@ -419,7 +415,7 @@ class Helpers
      */
     public static function ymdToDmy(string $strDate)
     {
-        self::orEmpty($strDate, false, '0000-00-00');
+        self::orEmpty($strDate, '0000-00-00');
         if (
             !self::isOnlyNumbers(substr($strDate, 0, 4)) ||
             !self::isOnlyNumbers(substr($strDate, 5, 2)) ||
@@ -432,25 +428,19 @@ class Helpers
 
     /**
      * @param string $test
-     * @param bool $int
-     * @param bool|int|string $default
+     * @param string|int $default
      * @return string|int
      */
-    public static function orEmpty(?string $test, bool $int = false, $default = false)
+    public static function orEmpty(?string $test, $default = 0)
     {
-        if ($int) {
-            $default = ($default === false) ? 0 : (int)$default;
-        } elseif ($int === false) {
-            $default = $int ? 0 : '';
-        }
-        return self::stringIsOk($test) ? $test : $default;
+        return self::isOk($test) ? $test : $default;
     }
 
     /**
-     * @param string|int $string
+     * @param string|int|double $string
      * @return bool
      */
-    public static function stringIsOk($string): bool
+    public static function isOk($string): bool
     {
         return isset($string) && !empty($string) && (is_string($string) || is_int($string) || is_double($string));
     }
@@ -470,22 +460,12 @@ class Helpers
      * @param callable $callbackValue
      * @return array
      */
-    public static function MagicMap(array $array, callable $closureKey, ?callable $callbackValue = null): array
+    public static function valueAndKeyMap(array $array, callable $closureKey, ?callable $callbackValue = null): array
     {
         $returned = [];
         foreach ($array as $key => $value) {
             $returned[$closureKey($value, $key) ?? $key] = $callbackValue === null ? $value : $callbackValue($value, $key);
         }
         return $returned;
-    }
-
-    /**
-     * @param $test
-     * @param int $length
-     * @return bool
-     */
-    public static function isArrayAndHasKeys($test, int $length = 1): bool
-    {
-        return is_array($test) && count($test) > $length;
     }
 }

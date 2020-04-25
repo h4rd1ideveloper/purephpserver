@@ -4,7 +4,7 @@
 namespace App\controllers;
 
 
-use App\Helpers;
+use App\lib\Helpers;
 use Exception;
 use Psr\Container\ContainerInterface;
 use Slim\Psr7\Request;
@@ -16,7 +16,7 @@ use Slim\Psr7\Response;
  */
 class UserController
 {
-    protected $container;
+    protected ContainerInterface $container;
 
     // constructor receives container instance
     public function __construct(ContainerInterface $container)
@@ -43,7 +43,6 @@ class UserController
                 });    
             </script>";
         try {
-            //$response->getBody()->write(Helpers::Sender("index", [], ['headerMore' => ['admlt' => true], 'footerMore' => ['admlt' => true]]));
             $response->getBody()->write(Helpers::Sender("Login", [], ['footerMore' => ['scripts' => $script]]));
         } catch (Exception $e) {
             $response->getBody()->write(sprintf("Internal server error%s %s", $e->getMessage(), $e->getTraceAsString()));

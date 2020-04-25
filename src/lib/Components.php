@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\lib;
 
 use InvalidArgumentException;
 
@@ -29,7 +29,8 @@ class Components
         $description = $config['description'] ?? '';
         $more = $config['more'] ?? '';
         $bodyClass = $config['bodyClass'] ?? '';
-        self::$HTML_CONTENT .= "
+        self::$HTML_CONTENT .= /**@lang text */
+            "
             <!doctype html>
             <html lang='pt-br'>
             <head>
@@ -44,6 +45,7 @@ class Components
             self::$HTML_CONTENT .= $config['admlt'];
         } else {
             self::$HTML_CONTENT .=
+                /**@lang text */
                 "
     
         <!-- Google Fonts -->
@@ -54,7 +56,8 @@ class Components
         <link rel='stylesheet' href='$baseUrl/src/pages/css/style.css'/>
        ";
         }
-        self::$HTML_CONTENT .= "
+        self::$HTML_CONTENT .= /**@lang text */
+            "
 
         $more
         <title>$title</title>
@@ -75,12 +78,12 @@ class Components
         $baseUrl = substr(Helpers::baseURL(), -1) !== '/' ? Helpers::baseURL() : substr(Helpers::baseURL(), 0, -1);
         $script = $more['scripts'] ?? '';
         if (isset($more['admlt']) && $more['admlt']) {
-            return self::$HTML_CONTENT . "
+            return self::$HTML_CONTENT . /**@lang text */ "
                 $script
             </body>
         </html>";
         }
-        return self::$HTML_CONTENT . "
+        return self::$HTML_CONTENT . /**@lang text */ "
             <!-- JavaScript Libraries -->
             <script src='//code.jquery.com/jquery-3.4.1.slim.min.js' integrity='sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n' crossorigin='anonymous'></script>
             <script src='//cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js' integrity='sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo' crossorigin='anonymous'></script>
@@ -106,6 +109,7 @@ class Components
      * @param string|null $type
      * @param string|null $placeholder
      * @param string|null $class
+     * @param string|null $wrapClass
      * @param int|null $min
      * @param int|null $max
      * @return Components
@@ -113,13 +117,17 @@ class Components
     public static function input(string $name, bool $required, ?string $label = '', ?string $labelHelper = '', ?string $type = 'text', ?string $placeholder = '', ?string $class = '', ?string $wrapClass = '', ?int $min = 4, ?int $max = 20)
     {
         $key = uniqid();
-?>
+        ?>
         <div class="form-group <?= $wrapClass; ?>">
-            <label for="<?= $name; ?>"><?= $label; ?></label>
-            <input <?php if ($required) : ?>required<?php endif; ?> maxlength="<?= $max; ?>" minlength="<?= $min; ?>" type="<?= $type; ?>" class="form-control <?= $class; ?>" name="<?= $name; ?>" aria-describedby="<?= $name; ?>HelpId_<?= $key; ?>" placeholder="<?= $placeholder; ?>" />
+            <label for="<?= $name; ?>"><?= $label; ?>
+                <input <?php if ($required) : ?>required<?php endif; ?> maxlength="<?= $max; ?>"
+                       minlength="<?= $min; ?>" type="<?= $type; ?>" class="form-control <?= $class; ?>"
+                       name="<?= $name; ?>" aria-describedby="<?= $name; ?>HelpId_<?= $key; ?>"
+                       placeholder="<?= $placeholder; ?>"/>
+            </label>
             <small id="<?= $name; ?>HelpId_<?= $key; ?>" class="form-text text-black-50"><?= $labelHelper; ?></small>
         </div>
-<?php
+        <?php
         return new static();
     }
 
@@ -135,21 +143,41 @@ class Components
         if (!isset($data['headers']) || !is_array($data['headers'])) {
             throw new InvalidArgumentException("Atributo headers é obrigatorio e deve ser um array de valores escalar");
         }
-        if (!isset($data['body']) || !is_array($data['body'])) {
-            throw new InvalidArgumentException("Atributo headers é obrigatorio e deve ser um array de valores escalar");
+        if (!isset($data['body']) || !is_array($data['body']) || !is_array($data['body'][0])) {
+            throw new InvalidArgumentException("Atributo body é obrigatorio e deve ser um array de array");
         }
         $html = '';
-        $html .= Helpers::Reducer($data['headers'], function ($initial, $currentValue) {
-            return $initial . "<th scope='col'>$currentValue</th>";
-        }, "<table id='$id' class='table table-hover'><thead><tr>") . '</tr></thead>';
-        $html .= Helpers::Reducer($data['body'], function ($initial, $currentValue) {
-            if (!is_array($currentValue)) {
-                throw new InvalidArgumentException("Atributo body é obrigatorio e deve ser um array de array valores escalar");
-            }
-            return $initial . Helpers::Reducer($currentValue, function ($init, $v) {
-                return $init . "<th class='text-black-50' scope='row'>$v</th>";
-            }, '<tr>') . '</tr>';
-        }, '<tbody>') . '</tbody></table>';
+        $html .= sprintf(
+        /**@lang text */ "%s</tr></thead>",
+            Helpers::Reducer(
+                $data['headers'],
+                fn($initial, $currentValue) => sprintf(
+                /**@lang text */ "%s<th scope='col'>%s</th>",
+                    $initial,
+                    $currentValue
+                ),
+                sprintf(/**@lang text */ "<table id='%s' class='table table-hover'><thead><tr>", $id)
+            )
+        );
+        $html .= sprintf(
+        /**@lang text */ "%s</tbody></table>",
+            Helpers::Reducer(
+                $data['body'],
+                fn($initial, $currentValue) => sprintf(
+                /**@lang text */ "%s%s</tr>",
+                    $initial,
+                    Helpers::Reducer(
+                        $currentValue,
+                        fn($init, $v) => sprintf(
+                        /**@lang text */ "%s<th class='text-black-50' scope='row'>%s</th>",
+                            $init,
+                            $v
+                        ),
+                        /**@lang text */ '<tr>')
+                ),
+                /**@lang text */ '<tbody>'
+            )
+        );
         echo $html;
     }
 }

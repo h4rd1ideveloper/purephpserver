@@ -3,7 +3,7 @@
 
 namespace App\controllers;
 
-use App\Helpers;
+use App\lib\Helpers;
 use App\model\User;
 use Psr\Container\ContainerInterface;
 use Slim\Psr7\Request;
@@ -18,7 +18,7 @@ class UserControllerApi
     /**
      * @var ContainerInterface
      */
-    protected $container;
+    protected ContainerInterface $container;
 
     // constructor receives container instance
 
@@ -38,7 +38,10 @@ class UserControllerApi
      */
     public function login(Request $request, Response $response): Response
     {
-        $response->withStatus(200)->withAddedHeader('content-type', 'text/html')->getBody()->write('login');
+        $response->withStatus(200)
+            ->withAddedHeader('content-type', 'text/html')
+            ->getBody()
+            ->write('login');
         return $response;
     }
 
@@ -54,7 +57,12 @@ class UserControllerApi
         $response
             ->withHeader('Content-Type', 'application/json')
             ->getBody()
-            ->write(Helpers::toJson($users->skip($args['skip'] ?? 0)->take($args['limit'] ?? 100)->get()));
+            ->write(
+                Helpers::toJson($users->skip($args['skip'] ?? 0)
+                    ->take($args['limit'] ?? 100)
+                    ->get()
+                )
+            );
         return $response;
     }
 }

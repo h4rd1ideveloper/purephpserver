@@ -1,6 +1,7 @@
 <?php
 
-use App\Helpers;
+
+use App\lib\Helpers;
 
 $baseUrl = Helpers::baseURL();
 ?>

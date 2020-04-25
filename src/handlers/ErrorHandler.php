@@ -4,7 +4,7 @@
 namespace App\handlers;
 
 
-use App\Helpers;
+use App\lib\Helpers;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Psr7\Response;
 use Throwable;

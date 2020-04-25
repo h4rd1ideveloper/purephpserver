@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App;
+namespace App\lib;
 
 
 use Firebase\JWT\JWT as JWT;
