@@ -1,22 +1,18 @@
 <?php
 
-use App\lib\Bcrypt;
-use Slim\Psr7\Factory\StreamFactory;
+use App\model\User;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
 use Slim\Routing\RouteCollectorProxy;
 
+
 $app->get('/', 'App\controllers\DashboardController::home_1');
+$app->get('/function', function (Request $request, Response $response) use ($container) {
+
+    return $response;
+});
 
 $app->get('/login', 'App\controllers\UserController::loginPage');
-
-$app->get('/functions', fn(Request $request, Response $response, array $args) => $response
-    ->withBody((new StreamFactory)
-        ->createStream(
-            strlen(Bcrypt::hashPassword('1596321758'))
-        )
-    )
-);
 
 $app->group('/api', function (RouteCollectorProxy $api) {
 

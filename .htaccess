@@ -3,4 +3,4 @@ RewriteBase /
 Options -Indexes +FollowSymLinks
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^ server/index.php [QSA,L]
+RewriteRule ^ purephpserver/index.php [QSA,L]

@@ -6,8 +6,11 @@ namespace App\controllers;
 use App\lib\Helpers;
 use App\model\User;
 use Psr\Container\ContainerInterface;
+use Psr\Http\Message\MessageInterface;
+use Slim\Psr7\Message;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
+
 
 /**
  * Class UserControllerApi
@@ -49,20 +52,13 @@ class UserControllerApi
      * @param Request $request
      * @param Response $response
      * @param $args
-     * @return Response
+     * @return MessageInterface|Message
      */
-    public function listAll(Request $request, Response $response, $args): Response
+    public function listAll(Request $request, Response $response, $args)
     {
-        $users = new User;
-        $response
-            ->withHeader('Content-Type', 'application/json')
-            ->getBody()
-            ->write(
-                Helpers::toJson($users->skip($args['skip'] ?? 0)
-                    ->take($args['limit'] ?? 100)
-                    ->get()
-                )
-            );
+        $users = (new User)->getUsersFields($args['skip'] ?? 0, $args['limit'] ?? 100);
+        $response = $response->withHeader('Content-Type', 'Application/json');
+        $response->getBody()->write(Helpers::toJson($users));
         return $response;
     }
 }

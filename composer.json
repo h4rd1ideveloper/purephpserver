@@ -20,7 +20,6 @@
     "monolog/monolog": "^2.0",
     "fzaninotto/faker": "^1.9",
     "slim/psr7": "^1.0",
-    "react/socket": "^1.4",
     "ext-openssl": "*",
     "php-di/php-di": "^6.1"
   },

@@ -64,6 +64,40 @@ class Helpers
     ];
 
     /**
+     * @param callable $map
+     * @param int $length
+     * @param null $ref
+     * @return array
+     */
+    public static function many(callable $map, int $length = 0, &$ref = null)
+    {
+        $arr = [];
+        if ($ref != null && is_array($ref)) {
+            for ($i = 0; $i < $length; $i++) {
+                var_dump($map());
+                self::insertIfNotExist($map(), $ref);
+            }
+        } else {
+            for ($i = 0; $i < $length; $i++) {
+                $arr[] = $map();
+            }
+            return $arr;
+        }
+    }
+
+    /**
+     * Insert a value if not exist in array only unique values is accept
+     * @param $value mixed
+     * @param $arr
+     */
+    public static function insertIfNotExist($value, array &$arr): void
+    {
+        if (!in_array($value, $arr)) {
+            $arr[] = $value;
+        }
+    }
+
+    /**
      * @param array $connectionConfig
      * @return Capsule|bool
      */
@@ -78,7 +112,7 @@ class Helpers
             return $capsule;
         } catch (Exception $e) {
             $log = new Logger('setupIlluminateConnectionAsGlobal');
-            $log->pushHandler(new StreamHandler('./monolog.log', Logger::WARNING));
+            $log->pushHandler(new StreamHandler('/monolog.log', Logger::WARNING));
             $log->error($e->getMessage() . " " . $e->getTraceAsString() . PHP_EOL);
         }
         return false;
@@ -111,7 +145,7 @@ class Helpers
     public static function viewFileAsString(string $templateFileName, bool $ob = false, array $context = []): string
     {
 
-        $pathToFile = sprintf("%s\..\pages\\$templateFileName.php", dirname(__FILE__));//Path to folder templates
+        $pathToFile = sprintf("%s/../pages/$templateFileName.php", dirname(__FILE__));//Path to folder templates
         !file_exists($pathToFile) &&
         die(print_r(["[$pathToFile]", "view {$templateFileName} not found!", dirname(__FILE__)]));
         if ($ob) {
@@ -150,8 +184,9 @@ class Helpers
             }
         } catch (Exception $e) {
             $log = new Logger('setEnvByFile');
-            $log->pushHandler(new StreamHandler('./monolog.log', Logger::WARNING));
-            $log->error($e->getMessage() . " " . $e->getTraceAsString() . PHP_EOL);
+            $log->pushHandler(new StreamHandler('/monolog.log', Logger::WARNING));
+            die(
+            var_dump($e->getMessage() . " " . $e->getTraceAsString() . PHP_EOL));
         }
     }
 
@@ -214,9 +249,11 @@ class Helpers
         $host = $_SERVER['HTTP_HOST'];
         if (isset($_SERVER['REDIRECT_URL'])) {
             $redirectUrl = explode('/', str_replace('index', '', isset($_SERVER['REDIRECT_URL']) ? $_SERVER['REDIRECT_URL'] : ''));
+
             return sprintf('//%s%s/%s/%s', $host, $redirectUrl[0], $redirectUrl[1], $to);
         }
-        return sprintf('//%s/%s/%s', $host, getenv('root_path'), $to);
+
+        return sprintf('//%s%s/%s', $host, '/purephpserver', $to);
     }
 
     /**
@@ -272,18 +309,6 @@ class Helpers
             $arr[] = $key;
         }
         return $arr;
-    }
-
-    /**
-     * Insert a value if not exist in array only unique values is accept
-     * @param $value mixed
-     * @param $arr
-     */
-    public static function insertIfNotExist($value, array &$arr): void
-    {
-        if (!in_array($value, $arr)) {
-            $arr[] = $value;
-        }
     }
 
     /**

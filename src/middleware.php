@@ -7,6 +7,7 @@ use Slim\Exception\HttpMethodNotAllowedException;
 use Slim\Exception\HttpNotFoundException;
 use Slim\Psr7\Response;
 
+
 $app->addRoutingMiddleware();
 $app->addErrorMiddleware(
     true,

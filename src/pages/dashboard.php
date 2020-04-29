@@ -172,7 +172,7 @@ $baseUrl = Helpers::baseURL();
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="./index.html" class="nav-link active">
+                                <a href="/index.html" class="nav-link active">
                                     <i class="far fa-circle nav-icon"></i>
                                     <p>Dashboard v1</p>
                                 </a>
@@ -1378,4 +1378,5 @@ $baseUrl = Helpers::baseURL();
 <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
 <script src='<?= $baseUrl; ?>src/pages/dist/js/pages/dashboard.js'></script>
 <!-- AdminLTE for demo purposes -->
+http://localhost//purephpserver/src/pages/dist/js/adminlte.js
 <script src='<?= $baseUrl; ?>src/pages/dist/js/demo.js'></script>

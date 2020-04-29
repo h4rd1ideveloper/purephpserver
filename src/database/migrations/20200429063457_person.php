@@ -1,11 +1,10 @@
 <?php
 
-use App\database\migrations\Migration;
+use Phinx\Migration\AbstractMigration;
 use Phinx\Util\Literal;
 
-class Rup extends Migration
+class Person extends AbstractMigration
 {
-
     public function change()
     {
         $users = $this->table('users', ['id' => false, 'primary_key' => ['user_id']]);
@@ -20,10 +19,8 @@ class Rup extends Migration
             ->addColumn('first_name', 'string', ['limit' => 30])
             ->addColumn('last_name', 'string', ['limit' => 30])
             ->addColumn('phone', 'string', ['limit' => strlen('(32) 9 98868-4312')])
-            ->addColumn('phone_2', 'string', ['limit' => strlen('(32) 3462-3107')])
-            ->addColumn('last_name', 'string', ['limit' => 30])
-            ->addColumn('last_name', 'string', ['limit' => 30])
-            ->addColumn('last_name', 'string', ['limit' => 30])
+            ->addColumn('phone_2', 'string', ['limit' => strlen('(32) 3462-3107'), 'null' => true])
+            ->addColumn('address', 'string', ['limit' => 200, 'null' => true])
             ->addTimestampsWithTimezone()
             ->addIndex(['username', 'email'], ['unique' => true])
             ->create();
