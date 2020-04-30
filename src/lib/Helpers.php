@@ -4,6 +4,7 @@ namespace App\lib;
 
 use Exception;
 use Illuminate\Database\Capsule\Manager as Capsule;
+use Illuminate\Database\Eloquent\Model;
 use InvalidArgumentException;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
@@ -225,22 +226,6 @@ class Helpers
     }
 
     /**
-     * @param array $array
-     * @param callable $fn
-     * @return array
-     */
-    public static function Filter(array $array, callable $fn): array
-    {
-        $data = [];
-        foreach ($array as $key => $value) {
-            if ((bool)$fn($value, $key) === true) {
-                $data[$key] = $value;
-            }
-        }
-        return $data;
-    }
-
-    /**
      * @param string $to
      * @return string
      */
@@ -363,6 +348,22 @@ class Helpers
             $returned[$key] = $callback($value, $key);
         }
         return $returned;
+    }
+
+    /**
+     * @param array $array
+     * @param callable $fn
+     * @return array
+     */
+    public static function Filter(array $array, callable $fn): array
+    {
+        $data = [];
+        foreach ($array as $key => $value) {
+            if ((bool)$fn($value, $key) === true) {
+                $data[$key] = $value;
+            }
+        }
+        return $data;
     }
 
     /**

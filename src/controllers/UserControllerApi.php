@@ -5,6 +5,7 @@ namespace App\controllers;
 
 use App\lib\Helpers;
 use App\model\User;
+use App\repositories\PersonRepository;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\MessageInterface;
 use Slim\Psr7\Message;
@@ -23,8 +24,6 @@ class UserControllerApi
      */
     protected ContainerInterface $container;
 
-    // constructor receives container instance
-
     /**
      * UserControllerApi constructor.
      * @param ContainerInterface $container
@@ -37,14 +36,19 @@ class UserControllerApi
     /**
      * @param Request $request
      * @param Response $response
-     * @return Response
+     * @return MessageInterface|Message|Response
      */
-    public function login(Request $request, Response $response): Response
+    public function login(Request $request, Response $response)
     {
-        $response->withStatus(200)
-            ->withAddedHeader('content-type', 'text/html')
-            ->getBody()
-            ->write('login');
+        $body = $request->getParsedBody();
+        if ($key = $body['user_key'] && $value = $body['user_value'] && $password = $body['password']) {
+            $password = password_hash($password, PASSWORD_DEFAULT);
+            $user = (new PersonRepository(new User))
+                ->setExcepted(['user_id'])
+                ->setRepo(User::where($key, $value)->get()->toArray());
+            $response = $response->withHeader('Content-Type', 'Application/json');
+            $response->getBody()->write(Helpers::toJson($user));
+        }
         return $response;
     }
 
@@ -56,7 +60,10 @@ class UserControllerApi
      */
     public function listAll(Request $request, Response $response, $args)
     {
-        $users = (new User)->getUsersFields($args['skip'] ?? 0, $args['limit'] ?? 100);
+        $users = (new PersonRepository(new User))
+            ->setExcepted(['user_id', 'password'])
+            ->pagination($args['skip'] ?? 0, $args['limit'] ?? 100)
+            ->getRepo();
         $response = $response->withHeader('Content-Type', 'Application/json');
         $response->getBody()->write(Helpers::toJson($users));
         return $response;
