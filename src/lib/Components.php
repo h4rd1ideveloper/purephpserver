@@ -14,7 +14,7 @@ class Components
     /**
      * @var string HTML Content
      */
-    private static $HTML_CONTENT;
+    private static string $HTML_CONTENT;
 
     /**
      * @param array $config

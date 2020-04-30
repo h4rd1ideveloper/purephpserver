@@ -4,7 +4,6 @@ namespace App\lib;
 
 use Exception;
 use Illuminate\Database\Capsule\Manager as Capsule;
-use Illuminate\Database\Eloquent\Model;
 use InvalidArgumentException;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
