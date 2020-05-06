@@ -150,17 +150,7 @@ class Helpers
         return isset($string) && !empty($string) && (is_string($string) || is_int($string) || is_double($string));
     }
 
-    /**
-     * @param string $templateFileName
-     * @param array $context
-     * @param array $more
-     * @return string
-     * @throws Exception
-     */
-    public static function Sender(string $templateFileName, ?array $context = []): string
-    {
-        return self::viewFileAsString($templateFileName, true, $context ?? []);
-    }
+
 
     /**
      * @param string $templateFileName

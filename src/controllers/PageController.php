@@ -3,7 +3,7 @@
 
 namespace App\controllers;
 
-use App\lib\Helpers;
+use App\lib\Components;
 use Exception;
 use Psr\Container\ContainerInterface;
 use Slim\Psr7\Request;
@@ -41,7 +41,7 @@ class PageController
     {
         try {
             $response->getBody()->write(
-                Helpers::Sender("dashboard")
+                Components::sender("dashboard")
             );
         } catch (Exception $e) {
             $response->getBody()->write(
@@ -64,7 +64,7 @@ class PageController
     public static function login(Request $request, Response $response, $args)
     {
         try {
-            $response->getBody()->write(Helpers::Sender("Login"));
+            $response->getBody()->write(Components::sender("Login"));
         } catch (Exception $e) {
             $response->getBody()->write(sprintf("Internal server error%s %s", $e->getMessage(), $e->getTraceAsString()));
         }
@@ -80,7 +80,7 @@ class PageController
     public static function sign(Request $request, Response $response, $args)
     {
         try {
-            $response->getBody()->write(Helpers::Sender("Login"));
+            $response->getBody()->write(Components::sender("Login"));
         } catch (Exception $e) {
             $response->getBody()->write(sprintf("Internal server error%s %s", $e->getMessage(), $e->getTraceAsString()));
         }

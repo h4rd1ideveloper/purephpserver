@@ -2,6 +2,7 @@
 
 namespace App\lib;
 
+use Exception;
 use InvalidArgumentException;
 
 /**
@@ -15,6 +16,17 @@ class Components
      * @var string HTML Content
      */
     private static string $HTML_CONTENT;
+
+    /**
+     * @param string $templateFileName
+     * @param array $context
+     * @return string
+     * @throws Exception
+     */
+    public static function Sender(string $templateFileName, ?array $context = []): string
+    {
+        return Helpers::viewFileAsString($templateFileName, true, $context ?? []);
+    }
 
     /**
      * @param array $config

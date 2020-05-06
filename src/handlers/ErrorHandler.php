@@ -4,7 +4,7 @@
 namespace App\handlers;
 
 
-use App\lib\Helpers;
+use App\lib\Components;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Psr7\Factory\StreamFactory;
 use Slim\Psr7\Response;
@@ -37,9 +37,8 @@ class ErrorHandler
     {
         return
             function (ServerRequestInterface $request, Throwable $exception, bool $displayErrorDetails) use ($response) {
-                $baseUrl = Helpers::baseURL();
                 $response->getBody()->write(
-                    Helpers::Sender("404")
+                    Components::Sender("404")
                 );
                 return $response->withStatus(404);
             };
