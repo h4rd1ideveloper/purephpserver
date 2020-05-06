@@ -1,10 +1,26 @@
 <?php
 
-
+use App\lib\Components;
 use App\lib\Helpers;
 
 $baseUrl = Helpers::baseURL();
 ?>
+<?= Components::headerHTML([
+    'title' => 'dashboard',
+    'stylesheet' => [
+        $baseUrl . "src/plugins/fontawesome-free/css/all.css",
+        "//code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css",
+        $baseUrl . "src/pages/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css",
+        $baseUrl . "src/pages/plugins/icheck-bootstrap/icheck-bootstrap.min.css",
+        $baseUrl . "src/pages/plugins/jqvmap/jqvmap.min.css",
+        $baseUrl . "src/pages/dist/css/adminlte.min.css",
+        $baseUrl . "src/pages/plugins/overlayScrollbars/css/OverlayScrollbars.min.css",
+        $baseUrl . "src/pages/plugins/daterangepicker/daterangepicker.css",
+        $baseUrl . "src/pages/plugins/summernote/summernote-bs4.css",
+        "//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700"
+    ],
+    'bodyClass' => 'hold-transition sidebar-mini layout-fixed'
+]); ?>
 
 <div class="wrapper">
     <!-- Navbar -->
@@ -1344,39 +1360,28 @@ $baseUrl = Helpers::baseURL();
     </aside>
     <!-- /.control-sidebar -->
 </div>
-<!-- ./wrapper -->
-<!-- jQuery -->
-<script src='<?= $baseUrl; ?>src/pages/plugins/jquery/jquery.min.js'></script>
-<!-- jQuery UI 1.11.4 -->
-<script src='<?= $baseUrl; ?>src/pages/plugins/jquery-ui/jquery-ui.min.js'></script>
-<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
+<?= Components::scripts([
+    $baseUrl . 'src/pages/plugins/jquery/jquery.min.js',
+    $baseUrl . 'src/pages/plugins/jquery-ui/jquery-ui.min.js',
+]); ?>
 <script>
     $.widget.bridge('uibutton', $.ui.button)
 </script>
-<!-- Bootstrap 4 -->
-<script src='<?= $baseUrl; ?>src/pages/plugins/bootstrap/js/bootstrap.bundle.min.js'></script>
-<!-- ChartJS -->
-<script src='<?= $baseUrl; ?>src/pages/plugins/chart.js/Chart.min.js'></script>
-<!-- Sparkline -->
-<script src='<?= $baseUrl; ?>src/pages/plugins/sparklines/sparkline.js'></script>
-<!-- JQVMap -->
-<script src='<?= $baseUrl; ?>src/pages/plugins/jqvmap/jquery.vmap.min.js'></script>
-<script src='<?= $baseUrl; ?>src/pages/plugins/jqvmap/maps/jquery.vmap.usa.js'></script>
-<!-- jQuery Knob Chart -->
-<script src='<?= $baseUrl; ?>src/pages/plugins/jquery-knob/jquery.knob.min.js'></script>
-<!-- daterangepicker -->
-<script src='<?= $baseUrl; ?>src/pages/plugins/moment/moment.min.js'></script>
-<script src='<?= $baseUrl; ?>src/pages/plugins/daterangepicker/daterangepicker.js'></script>
-<!-- Tempusdominus Bootstrap 4 -->
-<script src='<?= $baseUrl; ?>src/pages/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js'></script>
-<!-- Summernote -->
-<script src='<?= $baseUrl; ?>src/pages/plugins/summernote/summernote-bs4.min.js'></script>
-<!-- overlayScrollbars -->
-<script src='<?= $baseUrl; ?>src/pages/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js'></script>
-<!-- AdminLTE App -->
-<script src='<?= $baseUrl; ?>src/pages/dist/js/adminlte.js'></script>
-<!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-<script src='<?= $baseUrl; ?>src/pages/dist/js/pages/dashboard.js'></script>
-<!-- AdminLTE for demo purposes -->
-http://localhost//purephpserver/src/pages/dist/js/adminlte.js
-<script src='<?= $baseUrl; ?>src/pages/dist/js/demo.js'></script>
+<?= Components::scripts([
+    $baseUrl . 'src/pages/plugins/bootstrap/js/bootstrap.bundle.min.js',
+    $baseUrl . 'src/pages/plugins/chart.js/Chart.min.js',
+    $baseUrl . 'src/pages/plugins/sparklines/sparkline.js',
+    $baseUrl . 'src/pages/plugins/jqvmap/jquery.vmap.min.js',
+    $baseUrl . 'src/pages/plugins/jqvmap/maps/jquery.vmap.usa.js',
+    $baseUrl . 'src/pages/plugins/jquery-knob/jquery.knob.min.js',
+    $baseUrl . 'src/pages/plugins/moment/moment.min.js',
+    $baseUrl . 'src/pages/plugins/daterangepicker/daterangepicker.js',
+    $baseUrl . 'src/pages/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js',
+    $baseUrl . 'src/pages/plugins/summernote/summernote-bs4.min.js',
+    $baseUrl . 'src/pages/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js',
+    $baseUrl . 'src/pages/dist/js/adminlte.js',
+    $baseUrl . 'src/pages/dist/js/pages/dashboard.js',
+    $baseUrl . 'src/pages/dist/js/demo.js',
+]); ?>
+
+<?= Components::closeView(); ?>

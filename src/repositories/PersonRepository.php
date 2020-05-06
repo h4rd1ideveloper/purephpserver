@@ -13,7 +13,11 @@ use Illuminate\Database\Eloquent\Model;
  */
 class PersonRepository implements RepositoryInterface
 {
+    /**
+     *
+     */
     const error = [['error' => true]];
+
     /**
      * @var Model
      */
@@ -34,6 +38,7 @@ class PersonRepository implements RepositoryInterface
     public function __construct(Model $model)
     {
         $this->setInstance($model);
+
     }
 
     /**

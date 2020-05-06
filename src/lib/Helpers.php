@@ -2,6 +2,7 @@
 
 namespace App\lib;
 
+use App\handlers\ErrorHandler;
 use Exception;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use InvalidArgumentException;
@@ -119,18 +120,46 @@ class Helpers
     }
 
     /**
+     * @param array $payload
+     * @return string
+     * @throws Exception
+     */
+    public static function XfsToken(array $payload = []): string
+    {
+        if (getenv('key') === '' || !self::orEmpty(getenv('key')))
+            return Token::encode($payload, getenv('key'));
+        throw new Exception('Invalid XfsToken', 403, "getenv('key') === '' || !self::orEmpty(getenv('key'))");
+    }
+
+    /**
+     * @param null|string $test
+     * @param mixed $default
+     * @return mixed
+     */
+    public static function orEmpty(?string $test, $default = 0)
+    {
+        return self::isOk($test) ? $test : $default;
+    }
+
+    /**
+     * @param string|int|double $string
+     * @return bool
+     */
+    public static function isOk($string): bool
+    {
+        return isset($string) && !empty($string) && (is_string($string) || is_int($string) || is_double($string));
+    }
+
+    /**
      * @param string $templateFileName
      * @param array $context
      * @param array $more
      * @return string
      * @throws Exception
      */
-    public static function Sender(string $templateFileName, array $context = [], array $more = ['headerMore' => [], 'footerMore' => []]): string
+    public static function Sender(string $templateFileName, ?array $context, array $more = ['header' => [], 'footer' => []]): string
     {
-        return Components
-            ::headerHTML($more['headerMore'] ?? [])
-            ::content(self::viewFileAsString($templateFileName, true, $context))
-            ::footerHTML($more['footerMore'] ?? []);
+        return self::viewFileAsString($templateFileName, true, $context ?? []);
     }
 
     /**
@@ -145,7 +174,7 @@ class Helpers
     public static function viewFileAsString(string $templateFileName, bool $ob = false, array $context = []): string
     {
 
-        $pathToFile = sprintf("%s/../pages/$templateFileName.php", dirname(__FILE__));//Path to folder templates
+        $pathToFile = sprintf("%s/../pages/$templateFileName.php", dirname(__FILE__)); //Path to folder templates
         !file_exists($pathToFile) &&
         die(print_r(["[$pathToFile]", "view {$templateFileName} not found!", dirname(__FILE__)]));
         if ($ob) {
@@ -167,6 +196,31 @@ class Helpers
     }
 
     /**
+     * @param string $type
+     * @param array $array
+     * @return bool
+     */
+    public static function isArrayOf(string $type, array $array)
+    {
+        $ok = true;
+        foreach ($array as $row) {
+            switch ($type) {
+                case 'string' :
+                {
+                    $ok = is_string($row) ? $ok : false;
+                    break;
+                }
+                default :
+                {
+                    $ok = is_array($row) ? $ok : false;
+                    break;
+                }
+            }
+        }
+        return $ok;
+    }
+
+    /**
      * @param string $filename
      */
     public static function setEnvByFile(string $filename): void
@@ -179,14 +233,12 @@ class Helpers
                 if ($key !== '' && $value !== '') {
                     [$key, $value] = [strtolower(trim($key)), strtolower(trim($value))];
                     putenv("$key=$value");
-                    //echo "$key = $value </br>";
                 }
             }
         } catch (Exception $e) {
             $log = new Logger('setEnvByFile');
             $log->pushHandler(new StreamHandler('/monolog.log', Logger::WARNING));
-            die(
-            var_dump($e->getMessage() . " " . $e->getTraceAsString() . PHP_EOL));
+            die(ErrorHandler::missingEnvironments($e->getMessage() . PHP_EOL . $e->getTraceAsString()));
         }
     }
 
@@ -449,25 +501,6 @@ class Helpers
             throw new InvalidArgumentException('Parameter must be a valid datetime with format y-m-d');
         }
         return date('d/m/Y', strtotime($strDate));
-    }
-
-    /**
-     * @param string $test
-     * @param string|int $default
-     * @return string|int
-     */
-    public static function orEmpty(?string $test, $default = 0)
-    {
-        return self::isOk($test) ? $test : $default;
-    }
-
-    /**
-     * @param string|int|double $string
-     * @return bool
-     */
-    public static function isOk($string): bool
-    {
-        return isset($string) && !empty($string) && (is_string($string) || is_int($string) || is_double($string));
     }
 
     /**

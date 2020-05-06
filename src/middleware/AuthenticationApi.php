@@ -27,14 +27,10 @@ class AuthenticationApi implements MiddlewareInterface
                 get('key')
             )
         ) {
-            $uri = $request->getUri()->withPath("/");
-            if ($request->getMethod() == 'GET') {
-                return (new ResponseObject)
-                    ->withStatus(301)
-                    ->withHeader('Location', (string)$uri);
-            } else {
-                $request = $request->withUri($uri);
-            }
+            die(
+            (new ResponseObject)
+                ->withStatus(403)
+            );
         }
         return $handler->handle($request);
     }

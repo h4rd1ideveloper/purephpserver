@@ -1,11 +1,24 @@
 <?php
 
 
+use App\lib\Components;
 use App\lib\Helpers;
 
 $baseUrl = Helpers::baseURL();
 ?>
-
+<?= Components::headerHTML(
+    [
+        'stylesheet' =>
+            [
+                "$baseUrl/src/pages/plugins/fontawesome-free/css/all.min.css",
+                "https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css",
+                "$baseUrl/src/pages/dist/css/adminlte.min.css",
+                "https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700",
+                "$baseUrl/src/pages/css/style.css"
+            ],
+        'bodyClass' => 'vh-100 w-100 d-flex flex-direction-row justify-content-center align-items-center'
+    ]
+); ?>
 <div class="error-page">
     <h2 class="headline text-warning"> 404</h2>
     <div class="error-content">
