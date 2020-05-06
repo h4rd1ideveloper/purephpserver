@@ -39,24 +39,7 @@ class ErrorHandler
             function (ServerRequestInterface $request, Throwable $exception, bool $displayErrorDetails) use ($response) {
                 $baseUrl = Helpers::baseURL();
                 $response->getBody()->write(
-                    Helpers::Sender(
-                        "404",
-                        [],
-                        [
-                            'headerMore' => [
-                                'admlt' =>
-                                    [
-                                        "$baseUrl/src/pages/plugins/fontawesome-free/css/all.min.css",
-                                        "https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css",
-                                        "$baseUrl/src/pages/dist/css/adminlte.min.css",
-                                        "https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700",
-                                        "$baseUrl/src/pages/css/style.css"
-                                    ],
-                                'bodyClass' => 'vh-100 w-100 d-flex flex-direction-row justify-content-center align-items-center'
-                            ],
-                            'footerMore' => ['admlt' => true]
-                        ]
-                    )
+                    Helpers::Sender("404")
                 );
                 return $response->withStatus(404);
             };

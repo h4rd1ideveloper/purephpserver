@@ -157,7 +157,7 @@ class Helpers
      * @return string
      * @throws Exception
      */
-    public static function Sender(string $templateFileName, ?array $context, array $more = ['header' => [], 'footer' => []]): string
+    public static function Sender(string $templateFileName, ?array $context = []): string
     {
         return self::viewFileAsString($templateFileName, true, $context ?? []);
     }

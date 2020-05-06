@@ -39,33 +39,9 @@ class PageController
      */
     public static function home(Request $request, Response $response, $args)
     {
-        $baseUrl = Helpers::baseURL();
         try {
             $response->getBody()->write(
-                Helpers::Sender(
-                    "dashboard",
-                    null,
-                    [
-                        'header' => [
-                            'title' => 'dashboad',
-                            'keywords' => 'Dashboard ICARDO store ',
-                            'bodyClass' => 'hold-transition sidebar-mini layout-fixed',
-                            'stylesheet' => [
-                                "$baseUrl/src/pages/plugins/fontawesome-free/css/all.min.css",
-                                '//code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css',
-                                "$baseUrl/src/pages/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css",
-                                "$baseUrl/src/pages/plugins/icheck-bootstrap/icheck-bootstrap.min.css",
-                                "$baseUrl/src/pages/plugins/jqvmap/jqvmap.min.css",
-                                "$baseUrl/src/pages/dist/css/adminlte.min.css",
-                                "$baseUrl/src/pages/plugins/overlayScrollbars/css/OverlayScrollbars.min.css",
-                                "$baseUrl/src/pages/plugins/daterangepicker/daterangepicker.css",
-                                "$baseUrl/src/pages/plugins/summernote/summernote-bs4.css",
-                                '//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700'
-                            ]
-                        ],
-                        'footer' => ['admlt' => true]
-                    ]
-                )
+                Helpers::Sender("dashboard")
             );
         } catch (Exception $e) {
             $response->getBody()->write(
@@ -88,12 +64,7 @@ class PageController
     public static function login(Request $request, Response $response, $args)
     {
         try {
-            $response->getBody()->write(Helpers::Sender(
-                "Login",
-                [],
-                ['footer' => ['admlt' => true]]
-            )
-            );
+            $response->getBody()->write(Helpers::Sender("Login"));
         } catch (Exception $e) {
             $response->getBody()->write(sprintf("Internal server error%s %s", $e->getMessage(), $e->getTraceAsString()));
         }
@@ -109,12 +80,7 @@ class PageController
     public static function sign(Request $request, Response $response, $args)
     {
         try {
-            $response->getBody()->write(Helpers::Sender(
-                "Login",
-                [],
-                ['footer' => ['admlt' => true]]
-            )
-            );
+            $response->getBody()->write(Helpers::Sender("Login"));
         } catch (Exception $e) {
             $response->getBody()->write(sprintf("Internal server error%s %s", $e->getMessage(), $e->getTraceAsString()));
         }
