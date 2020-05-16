@@ -1,0 +1,136 @@
+* {
+  transition: all 0.2s linear;
+}
+
+#social_list {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  list-style: none;
+  align-items: center;
+  padding: 0;
+  margin: 0 !important;
+  height: 3rem;
+}
+#social_list .social_icon {
+  color: rgba(255, 255, 255, 0.3);
+  transition: all linear 0.2s;
+  cursor: pointer;
+}
+#social_list .social_icon:hover {
+  transform: scale(1.1);
+  color: whitesmoke;
+}
+
+#profile_header {
+  z-index: 10 !important;
+}
+
+#profile_body {
+  z-index: 20 !important;
+  margin-bottom: 0 !important;
+}
+
+#avatar {
+  object-fit: contain;
+  height: 240px;
+  border-radius: 30px;
+}
+
+#profile {
+  padding-top: 3rem;
+}
+
+#features {
+  height: 2rem;
+}
+
+#profile_header {
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+#profile_body {
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+#profile_header,
+#profile_body {
+  width: 80%;
+  padding: 3rem;
+}
+
+#social_list {
+  font-size: 2rem;
+  margin-bottom: 3rem;
+}
+
+@media screen and (max-width: 800px) {
+  #profile_header,
+#profile_body {
+    width: 100% !important;
+    margin: 0 auto 3rem auto;
+  }
+
+  #profile_body {
+    line-height: 2;
+  }
+
+  #profile {
+    padding: 0 !important;
+  }
+
+  #profile_header,
+#profile_body {
+    border-radius: 0 !important;
+  }
+
+  #avatar {
+    margin-top: 2.75rem;
+  }
+}
+@media screen and (min-width: 801px) {
+  #profile_header,
+#profile_body {
+    width: 80%;
+    margin: 0 auto !important;
+    padding: 3rem;
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175) !important;
+  }
+}
+@media screen and (min-width: 1200px) {
+  #profile {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 80vh;
+  }
+
+  #profile_header,
+#profile_body {
+    border-radius: 0 !important;
+  }
+
+  #profile_body {
+    transform: perspective(1000px) scale(1.1);
+  }
+}
+.bg_gradient {
+  background: linear-gradient(-45deg, #ee7752, #4582EC, #23a6d5, #23d5ab);
+  background-size: 400% 400%;
+  animation: gradient 15s ease-in-out infinite;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}

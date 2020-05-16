@@ -57,7 +57,7 @@ class Components
         if (isset($config['stylesheet']) && $config['stylesheet']) {
             self::$HTML_CONTENT .= Helpers::Reducer(
                 $config['stylesheet'],
-                fn($initialValue, $value, $key) => sprintf("%s<link rel='stylesheet' href='%s' >%s", $initialValue, $value, PHP_EOL),
+                fn ($initialValue, $value, $key) => sprintf("%s<link rel='stylesheet' href='%s' >%s", $initialValue, $value, PHP_EOL),
                 ''
             );
         }
@@ -79,18 +79,18 @@ class Components
      * @param array $more
      * @return string
      */
-    public static function scripts(array $more = []): string
+    public static function scripts(array $more = [], string $raw = ''): string
     {
-        return count($more) && Helpers::isArrayOf('string', $more) ? Helpers::Reducer(
-            $more,
-            fn($initialValue, $value, $key) => sprintf("%s<script type='text/javascript' src='%s'></script> %s", $initialValue, $value, PHP_EOL),
-            ''
-        ) : "
+        return "
             <script src='//code.jquery.com/jquery-3.4.1.slim.min.js' integrity='sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n' crossorigin='anonymous'></script>
             <script src='//cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js' integrity='sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo' crossorigin='anonymous'></script>
             <script src='//stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js' integrity='sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6' crossorigin='anonymous'></script>
             <script type='text/javascript' src='//cdn.datatables.net/v/bs4/dt-1.10.20/datatables.min.js'></script>
-      ";
+      " . Helpers::Reducer(
+            $more,
+            fn ($initialValue, $value, $key) => sprintf("%s<script type='text/javascript' src='%s'></script> %s", $initialValue, $value, PHP_EOL),
+            ''
+        ) . $raw;
     }
 
     public static function closeView()
@@ -114,17 +114,14 @@ class Components
     public static function input(string $name, bool $required, ?string $label = '', ?string $labelHelper = '', ?string $type = 'text', ?string $placeholder = '', ?string $class = '', ?string $wrapClass = '', ?int $min = 4, ?int $max = 20)
     {
         $key = uniqid();
-        ?>
+?>
         <div class="form-group <?= $wrapClass; ?>">
             <label for="<?= $name; ?>"><?= $label; ?>
-                <input <?php if ($required) : ?>required<?php endif; ?> maxlength="<?= $max; ?>"
-                       minlength="<?= $min; ?>" type="<?= $type; ?>" class="form-control <?= $class; ?>"
-                       name="<?= $name; ?>" aria-describedby="<?= $name; ?>HelpId_<?= $key; ?>"
-                       placeholder="<?= $placeholder; ?>"/>
+                <input <?php if ($required) : ?>required<?php endif; ?> maxlength="<?= $max; ?>" minlength="<?= $min; ?>" type="<?= $type; ?>" class="form-control <?= $class; ?>" name="<?= $name; ?>" aria-describedby="<?= $name; ?>HelpId_<?= $key; ?>" placeholder="<?= $placeholder; ?>" />
             </label>
             <small id="<?= $name; ?>HelpId_<?= $key; ?>" class="form-text text-secondary"><?= $labelHelper; ?></small>
         </div>
-        <?php
+<?php
         return new static();
     }
 
@@ -145,36 +142,36 @@ class Components
         }
         $html = '';
         $html .= sprintf(
-        /**@lang text */
+            /**@lang text */
             "%s</tr></thead>",
             Helpers::Reducer(
                 $data['headers'],
-                fn($initial, $currentValue) => sprintf(
-                /**@lang text */
+                fn ($initial, $currentValue) => sprintf(
+                    /**@lang text */
                     "%s<th scope='col'>%s</th>",
                     $initial,
                     $currentValue
                 ),
                 sprintf(
-                /**@lang text */
+                    /**@lang text */
                     "<table id='%s' class='table table-hover'><thead><tr>",
                     $id
                 )
             )
         );
         $html .= sprintf(
-        /**@lang text */
+            /**@lang text */
             "%s</tbody></table>",
             Helpers::Reducer(
                 $data['body'],
-                fn($initial, $currentValue) => sprintf(
-                /**@lang text */
+                fn ($initial, $currentValue) => sprintf(
+                    /**@lang text */
                     "%s%s</tr>",
                     $initial,
                     Helpers::Reducer(
                         $currentValue,
-                        fn($init, $v) => sprintf(
-                        /**@lang text */
+                        fn ($init, $v) => sprintf(
+                            /**@lang text */
                             "%s<th class='text-black-50' scope='row'>%s</th>",
                             $init,
                             $v

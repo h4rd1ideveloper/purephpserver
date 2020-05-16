@@ -7,6 +7,9 @@ use Slim\Routing\RouteCollectorProxy;
 
 $app->group('/', function (RouteCollectorProxy $views) {
     $views->get('',
+        'App\controllers\PageController::home'
+    );
+    $views->get('authentication',
         'App\controllers\PageController::loginAndSign'
     );
 });
