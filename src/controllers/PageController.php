@@ -30,6 +30,29 @@ class PageController
     {
         $this->container = $container;
     }
+    /**
+     * @param Request $request
+     * @param Response $response
+     * @param $args
+     * @return Response
+     */
+    public static function beta(Request $request, Response $response, $args)
+    {
+        try {
+            $response->getBody()->write(
+                Components::sender($args['view'])
+            );
+        } catch (Exception $e) {
+            $response->getBody()->write(
+                sprintf(
+                    "Internal server error%s %s",
+                    $e->getMessage(),
+                    $e->getTraceAsString()
+                )
+            );
+        }
+        return $response;
+    }
 
     /**
      * @param Request $request

@@ -90,3 +90,8 @@ span.draw-row {
 #profile{
 
 }
+#error{
+    position: absolute;
+    top: 40vh;
+    left: 20%;
+}

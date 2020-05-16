@@ -6,9 +6,13 @@ use Slim\Psr7\Response;
 use Slim\Routing\RouteCollectorProxy;
 
 $app->group('/', function (RouteCollectorProxy $views) {
+    $views->get('beta/{view}',
+        'App\controllers\PageController::beta'
+    );
     $views->get('',
         'App\controllers\PageController::home'
     );
+
     $views->get('authentication',
         'App\controllers\PageController::loginAndSign'
     );
