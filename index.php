@@ -10,12 +10,12 @@ require(dirname(__FILE__) . '/vendor/autoload.php');
 Helpers::setEnvByFile('.env');
 AppFactory::setContainer(new Container);
 $app = AppFactory::create();
-$app->setBasePath('/purephpserver');
+$app->setBasePath(getenv('path_root') ?? '/purephpserver');
 $container = $app->getContainer();
 
-require(dirname(__FILE__) . '/src/config.php');
-require(dirname(__FILE__) . '/src/dependencies.php');
-require(dirname(__FILE__) . '/src/middleware.php');
-require(dirname(__FILE__) . '/src/routes.php');
+require(dirname(__FILE__) . '/src/bootstrap/config.php');
+require(dirname(__FILE__) . '/src/bootstrap/dependencies.php');
+require(dirname(__FILE__) . '/src/bootstrap/middleware.php');
+require(dirname(__FILE__) . '/src/bootstrap/routes.php');
 
 $app->run();

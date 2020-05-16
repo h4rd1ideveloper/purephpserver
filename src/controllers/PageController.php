@@ -61,27 +61,12 @@ class PageController
      * @param $args
      * @return Response
      */
-    public static function login(Request $request, Response $response, $args)
+    public static function loginAndSign(Request $request, Response $response, $args)
     {
         try {
             $response->getBody()->write(Components::sender("Login"));
         } catch (Exception $e) {
-            $response->getBody()->write(sprintf("Internal server error%s %s", $e->getMessage(), $e->getTraceAsString()));
-        }
-        return $response;
-    }
-
-    /**
-     * @param Request $request
-     * @param Response $response
-     * @param $args
-     * @return Response
-     */
-    public static function sign(Request $request, Response $response, $args)
-    {
-        try {
-            $response->getBody()->write(Components::sender("Login"));
-        } catch (Exception $e) {
+            $response = $response->withStatus(500);
             $response->getBody()->write(sprintf("Internal server error%s %s", $e->getMessage(), $e->getTraceAsString()));
         }
         return $response;

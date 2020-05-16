@@ -19,7 +19,7 @@ $classResolver = fn(string $username): string => in_array($username, $target) ? 
             <div id="login" class="col-12 col-sm-10 col-md-8 col-lg-6 mx-auto bg-white p-5 shadow">
                 <fieldset class="mb-5">
                     <legend class="text-capitalize text-center mb-4">
-                        <h1>authentication</h1>
+                        <h1>authentication<?= substr(Helpers::baseURL(), -1) ?></h1>
                     </legend>
                     <div class="container-fluid p-0">
                         <div class="row">

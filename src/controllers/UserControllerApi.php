@@ -3,9 +3,9 @@
 
 namespace App\controllers;
 
+use App\database\repositories\PersonRepository;
 use App\lib\Helpers;
 use App\model\User;
-use App\repositories\PersonRepository;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\MessageInterface;
 use Slim\Psr7\Message;
@@ -51,6 +51,7 @@ class UserControllerApi
         }
         return $response;
     }
+
     /**
      * @param Request $request
      * @param Response $response

@@ -15,7 +15,6 @@
     "cakephp/collection": "^4.0",
     "robmorgan/phinx": "^0.12.0",
     "symfony/yaml": "^5.0",
-    "almasaeed2010/adminlte": "~3.0",
     "illuminate/database": "^7.6",
     "monolog/monolog": "^2.0",
     "fzaninotto/faker": "^1.9",
@@ -27,5 +26,9 @@
     "psr-4": {
       "App\\": "src/"
     }
+  },
+  "scripts": {
+    "migration-dev": "vendor/bin/phinx breakpoint -e development",
+    "seed-dev": "vendor/bin/phinx seed:run -e development"
   }
 }

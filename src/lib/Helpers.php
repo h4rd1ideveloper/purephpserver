@@ -70,14 +70,14 @@ class Helpers
      * @param null $ref
      * @return array
      */
-    public static function many(callable $map, int $length = 0, &$ref = null)
+    public static function many(callable $map, int $length = 0, &$ref = null): array
     {
         $arr = [];
         if ($ref != null && is_array($ref)) {
             for ($i = 0; $i < $length; $i++) {
-                var_dump($map());
                 self::insertIfNotExist($map(), $ref);
             }
+            return $ref;
         } else {
             for ($i = 0; $i < $length; $i++) {
                 $arr[] = $map();
@@ -149,7 +149,6 @@ class Helpers
     {
         return isset($string) && !empty($string) && (is_string($string) || is_int($string) || is_double($string));
     }
-
 
 
     /**

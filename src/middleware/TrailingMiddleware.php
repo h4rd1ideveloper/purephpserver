@@ -26,7 +26,7 @@ class TrailingMiddleware implements MiddlewareInterface
     {
         $uri = $request->getUri();
         $path = $uri->getPath();
-        if ($path != '/' && substr($path, -1) == '/' && substr(Helpers::baseURL(), -1) !== '/') {
+        if ($path != '/' && substr($path, -1) == '/' && substr(Helpers::baseURL(), -1) === '/') {
             while (substr($path, -1) == '/') $path = substr($path, 0, -1);
             $uri = $uri->withPath($path);
             if ($request->getMethod() == 'GET') {

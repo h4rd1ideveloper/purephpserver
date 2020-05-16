@@ -30,7 +30,8 @@ class UserSeeder extends AbstractSeed
                         'address' => $faker->address
                     ],
                     500
-                ))
+                )
+            )
             ->saveData();
     }
 }
