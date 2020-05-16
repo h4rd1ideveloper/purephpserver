@@ -18,7 +18,8 @@ $baseUrl = Helpers::baseURL();
                 $baseUrl . 'src/pages/css/home.css',
                 'https://bootswatch.com/4/litera/bootstrap.min.css'
             ],
-        'bodyClass' => 'vh-100 w-100 d-flex flex-direction-row justify-content-center align-items-center demo content'
+        'bodyClass' => 'vh-100 w-100 d-flex flex-direction-row justify-content-center align-items-center demo content',
+            'raw' => '<style>body{max-height: 100vh;overflow: hidden;}</style>'
     ]
 ); ?>
     <div id="large-header">
