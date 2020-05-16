@@ -17,30 +17,30 @@ use Throwable;
 class ErrorHandler
 {
     /**
-     * @param Response $response
      * @return callable
      */
-    public static function notAllowedMethod(Response $response): callable
+    public static function notAllowedMethod(): callable
     {
         return
-            function (ServerRequestInterface $request, Throwable $exception, bool $displayErrorDetails) use ($response) {
+            function (ServerRequestInterface $request, Throwable $exception, bool $displayErrorDetails) {
+                $response = (new Response)->withStatus(405);
                 $response->getBody()->write('405 NOT ALLOWED');
-                return $response->withStatus(405);
+                return $response;
             };
     }
 
     /**
-     * @param Response $response
      * @return callable
      */
-    public static function notFound(Response $response): callable
+    public static function notFound(): callable
     {
         return
-            function (ServerRequestInterface $request, Throwable $exception, bool $displayErrorDetails) use ($response) {
+            function (ServerRequestInterface $request, Throwable $exception, bool $displayErrorDetails) {
+                $response = (new Response)->withStatus(404);
                 $response->getBody()->write(
                     Components::Sender("404")
                 );
-                return $response->withStatus(404);
+                return $response;
             };
     }
 

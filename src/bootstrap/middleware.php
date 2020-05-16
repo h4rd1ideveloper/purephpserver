@@ -6,7 +6,6 @@ use App\middleware\JsonBodyParserMiddleware;
 use App\middleware\TrailingMiddleware;
 use Slim\Exception\HttpMethodNotAllowedException;
 use Slim\Exception\HttpNotFoundException;
-use Slim\Psr7\Response;
 
 
 $app->addRoutingMiddleware();
@@ -17,10 +16,10 @@ $app->addErrorMiddleware(
 )
     ->setErrorHandler(
         HttpNotFoundException::class,
-        ErrorHandler::notFound(new Response)
+        ErrorHandler::notFound()
     )->setErrorHandler(
         HttpMethodNotAllowedException::class,
-        ErrorHandler::notAllowedMethod(new Response)
+        ErrorHandler::notAllowedMethod()
     );
 $app->add(new TrailingMiddleware);
 $app->add(new JsonBodyParserMiddleware);
