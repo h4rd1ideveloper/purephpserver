@@ -3,6 +3,10 @@ body {
     height: 100%;
 }
 
+#login, #sign {
+    background: rgba(255, 255, 255, 0.31) !important
+}
+
 span.draw-row {
     width: 100% !important;
     display: block !important;
@@ -33,6 +37,7 @@ span.draw-row {
 #Authenticate {
     margin-top: 25vh;
     min-width: 340px;
+    background: url("//src/pages/img/background.svg");
 }
 
 #logo {

@@ -12,8 +12,13 @@ $classResolver = fn(string $username): string => in_array($username, $target) ? 
 ?>
 <?= Components::headerHTML([
     'title' => 'Login Page',
-    'stylesheet' => [$baseUrl . 'src/pages/css/style.css']
+    'stylesheet' => [
+        $baseUrl . 'src/pages/css/style.css',
+        $baseUrl . 'src/pages/css/background.svg.css',
+        'https://bootswatch.com/4/litera/bootstrap.min.css'
+    ]
 ]); ?>
+<?php require(dirname(__FILE__) . '/img/background.svg'); ?>
     <div id="Authenticate" class="container">
         <div class="row">
             <div id="login" class="col-12 col-sm-10 col-md-8 col-lg-6 mx-auto bg-white p-5 shadow">
@@ -56,7 +61,7 @@ $classResolver = fn(string $username): string => in_array($username, $target) ? 
                 <div class="d-flex flex-row align-items-center justify-content-between  mx-auto text-white-50">
                     <a class="btn  btn-block btn-primary m-0 mx-1 w-25">Login</a>
                     <a id="toSign" type="button" role="button"
-                       class="btn btn-link  btn-block btn-dark  m-0 mx-1  w-25">Sign</a>
+                       class="btn btn-link  btn-block btn-secondary m-0 mx-1  w-25">Sign</a>
                 </div>
             </div>
             <div id="sign" class="col-12 col-sm-10 col-md-8 col-lg-6 mx-auto bg-white p-5 shadow d-none">
@@ -146,7 +151,7 @@ $classResolver = fn(string $username): string => in_array($username, $target) ? 
                 </fieldset>
                 <div class="d-flex flex-row align-items-center justify-content-between mx-auto text-white-50 ">
                     <a class="btn btn-block btn-primary m-0 mx-1 w-25">Sign</a>
-                    <a id="toLogin" type="button" role="button" class="btn btn-dark btn-block m-0 mx-1 w-25">Login</a>
+                    <a id="toLogin" type="button" role="button" class="btn btn-link  btn-block btn-secondary m-0 mx-1 w-25">Login</a>
                 </div>
             </div>
         </div>

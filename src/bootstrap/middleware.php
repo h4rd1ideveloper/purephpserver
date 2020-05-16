@@ -21,5 +21,5 @@ $app->addErrorMiddleware(
         HttpMethodNotAllowedException::class,
         ErrorHandler::notAllowedMethod()
     );
-$app->add(new TrailingMiddleware);
+//$app->add(new TrailingMiddleware);
 $app->add(new JsonBodyParserMiddleware);

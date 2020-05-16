@@ -122,7 +122,7 @@ class Components
                        name="<?= $name; ?>" aria-describedby="<?= $name; ?>HelpId_<?= $key; ?>"
                        placeholder="<?= $placeholder; ?>"/>
             </label>
-            <small id="<?= $name; ?>HelpId_<?= $key; ?>" class="form-text text-black-50"><?= $labelHelper; ?></small>
+            <small id="<?= $name; ?>HelpId_<?= $key; ?>" class="form-text text-secondary"><?= $labelHelper; ?></small>
         </div>
         <?php
         return new static();
