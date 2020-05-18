@@ -5,7 +5,6 @@ namespace App\controllers;
 
 use App\lib\Components;
 use Exception;
-use Psr\Container\ContainerInterface;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
 
@@ -15,21 +14,8 @@ use Slim\Psr7\Response;
  */
 class PageController
 {
-    /**
-     * @var ContainerInterface
-     */
-    protected ContainerInterface $container;
+    use ControllerTrait;
 
-    // constructor receives container instance
-
-    /**
-     * PageController constructor.
-     * @param ContainerInterface $container
-     */
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
     /**
      * @param Request $request
      * @param Response $response

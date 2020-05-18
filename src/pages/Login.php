@@ -5,7 +5,7 @@ use App\lib\Components;
 use App\lib\Helpers;
 
 $baseUrl = Helpers::baseURL();
-['error' => $isError, 'fields' => $target] = (isset($context) && count($context) && isset($context['error']) && isset($context['fields'])) ? $context : ['error' => false, 'fields' => ['-1']];
+['error' => $isError, 'fields' => $target] = (isset($context) && isset($context['error']) && isset($context['fields'])) ? $context : ['error' => false, 'fields' => ['-1']];
 $classFeedBack = ($isError) ? 'is-invalid' : 'is-valid';
 $classResolver = fn(string $username): string => in_array($username, $target) ? $classFeedBack : 'border';
 

@@ -6,7 +6,6 @@ namespace App\controllers;
 use App\database\repositories\PersonRepository;
 use App\lib\Helpers;
 use App\model\User;
-use Psr\Container\ContainerInterface;
 use Psr\Http\Message\MessageInterface;
 use Slim\Psr7\Message;
 use Slim\Psr7\Request;
@@ -19,19 +18,7 @@ use Slim\Psr7\Response;
  */
 class UserControllerApi
 {
-    /**
-     * @var ContainerInterface
-     */
-    protected ContainerInterface $container;
-
-    /**
-     * UserControllerApi constructor.
-     * @param ContainerInterface $container
-     */
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
+    use ControllerTrait;
 
     /**
      * @param Request $request

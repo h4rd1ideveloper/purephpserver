@@ -2,7 +2,7 @@
 
 namespace App\lib;
 
-use App\handlers\ErrorHandler;
+use App\controllers\handlers\ErrorHandler;
 use Exception;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use InvalidArgumentException;
@@ -70,31 +70,14 @@ class Helpers
      * @param null $ref
      * @return array
      */
-    public static function many(callable $map, int $length = 0, &$ref = null): array
+    public static function forMany(callable $map, int $length = 0, ?array &$ref = null): void
     {
-        $arr = [];
-        if ($ref != null && is_array($ref)) {
-            for ($i = 0; $i < $length; $i++) {
-                self::insertIfNotExist($map(), $ref);
+        for ($i = 0; $i < $length; $i++) {
+            if ($ref) {
+                $ref[] = $map();
+            } else {
+                $map();
             }
-            return $ref;
-        } else {
-            for ($i = 0; $i < $length; $i++) {
-                $arr[] = $map();
-            }
-            return $arr;
-        }
-    }
-
-    /**
-     * Insert a value if not exist in array only unique values is accept
-     * @param $value mixed
-     * @param $arr
-     */
-    public static function insertIfNotExist($value, array &$arr): void
-    {
-        if (!in_array($value, $arr)) {
-            $arr[] = $value;
         }
     }
 
@@ -127,8 +110,8 @@ class Helpers
     public static function XfsToken(array $payload = []): string
     {
         if (getenv('key') === '' || !self::orEmpty(getenv('key')))
-            return Token::encode($payload, getenv('key'));
-        throw new Exception('Invalid XfsToken', 403, "getenv('key') === '' || !self::orEmpty(getenv('key'))");
+            return Token::encode($payload, getenv('key') ?? '');
+        throw new Exception('Invalid XfsToken', 403);
     }
 
     /**
@@ -150,29 +133,7 @@ class Helpers
         return isset($string) && !empty($string) && (is_string($string) || is_int($string) || is_double($string));
     }
 
-
-    /**
-     * @param string $templateFileName
-     * @param bool $ob
-     * @param array $context
-     * @return string
-     * @throws Exception
-     * @see Stream
-     * @see ob_start
-     */
-    public static function viewFileAsString(string $templateFileName, bool $ob = false, array $context = []): string
-    {
-
-        $pathToFile = sprintf("%s/../pages/$templateFileName.php", dirname(__FILE__)); //Path to folder templates
-        !file_exists($pathToFile) &&
-        die(print_r(["[$pathToFile]", "view {$templateFileName} not found!", dirname(__FILE__)]));
-        if ($ob) {
-            ob_start();
-            include_once($pathToFile);
-            return ob_get_clean() ?? '';
-        }
-        return self::createStreamFromFile($pathToFile, 'r+')->getContents();
-    }
+    
 
     /**
      * @param $filename
@@ -185,25 +146,23 @@ class Helpers
     }
 
     /**
-     * @param string $type
+     * @param string|null $type
      * @param array $array
      * @return bool
      */
-    public static function isArrayOf(string $type, array $array)
+    public static function isArrayOf(?string $type, array $array): bool
     {
         $ok = true;
         foreach ($array as $row) {
             switch ($type) {
-                case 'string' :
-                {
-                    $ok = is_string($row) ? $ok : false;
-                    break;
-                }
-                default :
-                {
-                    $ok = is_array($row) ? $ok : false;
-                    break;
-                }
+                case 'string': {
+                        $ok = is_string($row) ? $ok : false;
+                        break;
+                    }
+                default: {
+                        $ok = is_array($row) ? $ok : false;
+                        break;
+                    }
             }
         }
         return $ok;
@@ -274,11 +233,10 @@ class Helpers
         $host = $_SERVER['HTTP_HOST'];
         if (isset($_SERVER['REDIRECT_URL'])) {
             $redirectUrl = explode('/', str_replace('index', '', isset($_SERVER['REDIRECT_URL']) ? $_SERVER['REDIRECT_URL'] : ''));
-
             return sprintf('//%s%s/%s/%s', $host, $redirectUrl[0], $redirectUrl[1], $to);
         }
-
-        return sprintf('//%s%s/%s', $host, '/purephpserver', $to);
+        //echo "entrou2";
+        return sprintf('//%s%s/%s', $host, getenv('path_root') ?? '', $to);
     }
 
     /**
@@ -296,7 +254,7 @@ class Helpers
      */
     public static function isMySQLFunction(string $string): bool
     {
-        return (bool)preg_match_all('/\(.*\)/', (string)$string);
+        return (bool) preg_match_all('/\(.*\)/', (string) $string);
     }
 
     /**
@@ -328,12 +286,24 @@ class Helpers
         $arr = [];
         foreach ($OBJ as $key => $valueNotUsedHer) {
             if ($noRepeat) {
-                self::insertIfNotExist((string)$key, $arr);
+                self::insertIfNotExist((string) $key, $arr);
                 continue;
             }
             $arr[] = $key;
         }
         return $arr;
+    }
+
+    /**
+     * Insert a value if not exist in array only unique values is accept
+     * @param $value mixed
+     * @param $arr
+     */
+    public static function insertIfNotExist($value, array &$arr): void
+    {
+        if (!in_array($value, $arr)) {
+            $arr[] = $value;
+        }
     }
 
     /**
@@ -399,7 +369,7 @@ class Helpers
     {
         $data = [];
         foreach ($array as $key => $value) {
-            if ((bool)$fn($value, $key) === true) {
+            if ((bool) $fn($value, $key) === true) {
                 $data[$key] = $value;
             }
         }
@@ -446,7 +416,7 @@ class Helpers
                 $flag[] = true;
             }
         }
-        return (bool)(count($flag) > 1 || preg_match("/d*s*=s*d*/", $value));
+        return (bool) (count($flag) > 1 || preg_match("/d*s*=s*d*/", $value));
     }
 
     /**
@@ -457,7 +427,7 @@ class Helpers
      */
     public static function containSubString(string $target, string $toSearch, int $offset = 0): bool
     {
-        return (bool)(strpos(strtoupper($target), strtoupper($toSearch), $offset) !== false);
+        return (bool) (strpos(strtoupper($target), strtoupper($toSearch), $offset) !== false);
     }
 
     /**

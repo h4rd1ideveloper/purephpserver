@@ -1,5 +1,5 @@
 * {
-  transition: all 0.2s linear;
+  transition: all 0.3s linear;
 }
 
 #social_list {
@@ -15,7 +15,7 @@
 }
 #social_list .social_icon {
   color: rgba(255, 255, 255, 0.3);
-  transition: all linear 0.2s;
+  transition: all linear 0.2s !important;
   cursor: pointer;
 }
 #social_list .social_icon:hover {
@@ -50,16 +50,25 @@
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
 }
+#profile_header:hover {
+  transform: scale(1.01) !important;
+}
 
 #profile_body {
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
+  min-height: max-content;
+  height: 320px;
+}
+#profile_body:hover {
+  transform: scale(1.01) !important;
 }
 
 #profile_header,
 #profile_body {
   width: 80%;
   padding: 3rem;
+  transition: all linear 0.2s !important;
 }
 
 #social_list {
@@ -71,7 +80,7 @@
   #profile_header,
 #profile_body {
     width: 100% !important;
-    margin: 0 auto 3rem auto;
+    margin: 0 auto;
   }
 
   #profile_body {
@@ -114,7 +123,11 @@
   }
 
   #profile_body {
-    transform: perspective(1000px) scale(1.1);
+    transform: perspective(1000px) scale(1.01) translateX(-16px) !important;
+  }
+  #profile_body:hover {
+    transform: scale(1.13) translateX(-30px) rotateX(6deg) rotateY(-3deg) rotateZ(2deg) translateX(-30px) !important;
+    border-radius: 16px !important;
   }
 }
 .bg_gradient {
