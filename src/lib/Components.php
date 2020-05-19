@@ -51,7 +51,7 @@ class Components
 
         $pathToFile = sprintf("%s/../pages/$templateFileName.php", dirname(__FILE__)); //Path to folder templates
         !file_exists($pathToFile) &&
-        die(print_r(["[$pathToFile]", "view {$templateFileName} not found!", dirname(__FILE__)]));
+            die(print_r(["[$pathToFile]", "view {$templateFileName} not found!", dirname(__FILE__)]));
         if ($ob) {
             ob_start();
             define('context', $context);
@@ -94,12 +94,12 @@ class Components
             self::$HTML_CONTENT .= self::scriptsFrom($config['scripts']);
         }
         self::$HTML_CONTENT .= <<<HTML
-        $more
-        <title>$title</title>
-    </head>
-    <body class='$bodyClass'>
+                $more
+                <title>$title</title>
+            </head>
+            <body class='$bodyClass'>
 
-HTML;
+        HTML;
         return self::$HTML_CONTENT;
     }
 
@@ -111,7 +111,7 @@ HTML;
     {
         return Helpers::Reducer(
             $links,
-            fn($initialValue, $value, $key) => sprintf("%s<link rel='stylesheet' href='%s' >%s", $initialValue, $value, PHP_EOL),
+            fn ($initialValue, $value, $key) => sprintf("%s<link rel='stylesheet' href='%s' >%s", $initialValue, $value, PHP_EOL),
             ''
         );
     }
@@ -127,9 +127,9 @@ HTML;
 
         return Helpers::Reducer(
             $scripts,
-            fn($initialValue, $value, $key) => <<<HTML
+            fn ($initialValue, $value, $key) => <<<HTML
             $initialValue       <script type='text/javascript' src='$value'></script>
-            HTML. PHP_EOL,
+            HTML . PHP_EOL,
             PHP_EOL
         );
     }
@@ -148,7 +148,7 @@ HTML;
                 <script src='//stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js' integrity='sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6' crossorigin='anonymous'></script>
                 <script type='text/javascript' src='//cdn.datatables.net/v/bs4/dt-1.10.20/datatables.min.js'></script>
 
-        HTML. self::scriptsFrom($more) . $raw;
+        HTML . self::scriptsFrom($more) . $raw;
     }
 
     /**
@@ -179,18 +179,17 @@ HTML;
     public static function input(string $name, bool $required, ?string $label = '', ?string $labelHelper = '', ?string $type = 'text', ?string $placeholder = '', ?string $class = '', ?string $wrapClass = '', ?int $min = 4, ?int $max = 20)
     {
         $key = uniqid();
-        ?>
-        <div class="form-group <?= $wrapClass; ?>">
-            <label for="<?= $name; ?>"><?= $label; ?>
-                <input <?php if ($required) : ?>required<?php endif; ?> maxlength="<?= $max; ?>"
-                       minlength="<?= $min; ?>" type="<?= $type; ?>" class="form-control <?= $class; ?>"
-                       name="<?= $name; ?>" aria-describedby="<?= $name; ?>HelpId_<?= $key; ?>"
-                       placeholder="<?= $placeholder; ?>"/>
-            </label>
-            <small id="<?= $name; ?>HelpId_<?= $key; ?>" class="form-text text-secondary"><?= $labelHelper; ?></small>
-        </div>
-        <?php
-        return new static();
+        $required = $required ? "required" : '';
+        $helper_id = $name ."HelpId_$key";
+        $attrs =  "$required maxlength='$max' minlength='$min' type='$type' class='form-control $class' name='$name' aria-describedby='$helper_id' placeholder='$placeholder'";
+        return <<<HTML
+                <div class='form-group $wrapClass'>
+                    <label for='$name'>$label
+                        <input  $attrs />
+                    </label>
+                    <small id='$helper_id' class='form-text text-secondary'>$labelHelper</small>
+                </div>
+            HTML;
     }
 
     /**
@@ -210,36 +209,36 @@ HTML;
         }
         $html = '';
         $html .= sprintf(
-        /**@lang text */
+            /**@lang text */
             "%s</tr></thead>",
             Helpers::Reducer(
                 $data['headers'],
-                fn($initial, $currentValue) => sprintf(
-                /**@lang text */
+                fn ($initial, $currentValue) => sprintf(
+                    /**@lang text */
                     "%s<th scope='col'>%s</th>",
                     $initial,
                     $currentValue
                 ),
                 sprintf(
-                /**@lang text */
+                    /**@lang text */
                     "<table id='%s' class='table table-hover'><thead><tr>",
                     $id
                 )
             )
         );
         $html .= sprintf(
-        /**@lang text */
+            /**@lang text */
             "%s</tbody></table>",
             Helpers::Reducer(
                 $data['body'],
-                fn($initial, $currentValue) => sprintf(
-                /**@lang text */
+                fn ($initial, $currentValue) => sprintf(
+                    /**@lang text */
                     "%s%s</tr>",
                     $initial,
                     Helpers::Reducer(
                         $currentValue,
-                        fn($init, $v) => sprintf(
-                        /**@lang text */
+                        fn ($init, $v) => sprintf(
+                            /**@lang text */
                             "%s<th class='text-black-50' scope='row'>%s</th>",
                             $init,
                             $v

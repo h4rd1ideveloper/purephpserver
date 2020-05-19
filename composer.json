@@ -28,7 +28,7 @@
     }
   },
   "scripts": {
-    "migration-dev": "vendor/bin/phinx breakpoint -e development",
-    "seed-dev": "vendor/bin/phinx seed:run -e development"
+    "migration-dev": "vendor/bin/phinx breakpoint -e dev",
+    "seed-dev": "vendor/bin/phinx seed:run -e dev"
   }
 }

@@ -73,7 +73,7 @@ class PageController
     public static function loginAndSign(Request $request, Response $response, $args)
     {
         try {
-            $response->getBody()->write(Components::sender("Login"));
+            $response->getBody()->write(Components::sender("authentication/Form", ['error' => false, 'fields' => ['-1']]));
         } catch (Exception $e) {
             $response = $response->withStatus(500);
             $response->getBody()->write(sprintf("Internal server error%s %s", $e->getMessage(), $e->getTraceAsString()));
