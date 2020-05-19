@@ -26,4 +26,3 @@ class Person extends AbstractMigration
             ->create();
     }
 }
-$a = "work on render and components injections";
