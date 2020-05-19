@@ -21,7 +21,7 @@ class PostController
      * @return MessageInterface|Message|Response
      * @throws Exception
      */
-    public function post(Request $request, Response $response)
+    public function post_form(Request $request, Response $response)
     {
         $response->getBody()->write(View::Sender('create-post', ['title' => 'Create a new POST']));
         return $response;

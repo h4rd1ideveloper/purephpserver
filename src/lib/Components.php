@@ -17,6 +17,10 @@ class Components
      */
     private static string $HTML_CONTENT;
 
+    /**
+     * @param string $html
+     * @return string
+     */
     public static function pipe(string $html): string
     {
         return $html;
@@ -99,6 +103,10 @@ HTML;
         return self::$HTML_CONTENT;
     }
 
+    /**
+     * @param array $links
+     * @return string
+     */
     public static function linkFrom(array $links): string
     {
         return Helpers::Reducer(
@@ -108,6 +116,10 @@ HTML;
         );
     }
 
+    /**
+     * @param array $scripts
+     * @return string
+     */
     public static function scriptsFrom(array $scripts): string
     {
         $initialValue = '';
@@ -139,6 +151,9 @@ HTML;
         HTML. self::scriptsFrom($more) . $raw;
     }
 
+    /**
+     * @return string
+     */
     public static function closeView()
     {
         return <<<HTML

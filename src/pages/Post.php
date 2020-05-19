@@ -4,7 +4,11 @@ use App\lib\Components as _;
 use App\lib\Helpers;
 
 
-function Post_create($ctx = [])
+/**
+ * @param array|null $ctx
+ * @return string
+ */
+function Post_create(?array $ctx = []): string
 {
     $title = $ctx['title'] ?? 'TinyMCE Quick Start Guide';
     return _::headerHTML([

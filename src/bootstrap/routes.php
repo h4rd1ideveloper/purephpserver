@@ -1,13 +1,14 @@
 <?php
 
 use Slim\Routing\RouteCollectorProxy;
+
 //VIEWS
 $app->group('/', function (RouteCollectorProxy $views) {
     //ROOT
     $views->get('', 'App\controllers\PageController::home');
     //POST ENTITY 
     $views->group('post/', function (RouteCollectorProxy $post) {
-        $post->get('', 'App\controllers\PostController::post');
+        $post->get('', 'App\controllers\PostController::post_form');
     });
     //AUTH
     $views->group('authentication/', function (RouteCollectorProxy $authentication) {
@@ -24,10 +25,5 @@ $app->group('/api', function (RouteCollectorProxy $api) {
         $authentication->post('/sign', 'App\controllers\UserControllerApi::sign');
     });
 });
-//RAW
-//$app->get(
-//    '/fn',
-//    fn(Request $request, Response $response) => $response->withBody(
-//        (new StreamFactory)->createStream(getenv('database'))
-//    )
-//);
+//Testing
+$app->get('/fn', 'App\controllers\PageController::beta');

@@ -9,13 +9,4 @@ window.axios = ({url, method = 'POST', data = null, headers = json_headers}) => 
         console.trace(e, url, method, data, headers)
         cb({error: true})
     }
-}/*****
- const config = {
-    url:'http://localhost:8080/api/user',
-    method: 'GET'
- }
- const cb = result =>{console.log(result)}
- axios
- (config)
- (cb)
- */
+}

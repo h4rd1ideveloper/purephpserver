@@ -4,6 +4,10 @@
 namespace App\model;
 
 
+/**
+ * Class Post
+ * @package App\model
+ */
 class Post
 {
     /**
