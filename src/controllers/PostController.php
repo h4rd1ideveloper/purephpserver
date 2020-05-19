@@ -3,7 +3,7 @@
 
 namespace App\controllers;
 
-use App\pages\components\Post;
+use App\lib\Components as View;
 use Exception;
 use Psr\Http\Message\MessageInterface;
 use Slim\Psr7\Message;
@@ -23,7 +23,7 @@ class PostController
      */
     public function post(Request $request, Response $response)
     {
-        $response->getBody()->write(Post::create());
+        $response->getBody()->write(View::Sender('create-post', ['title' => 'Create a new POST']));
         return $response;
     }
 }
