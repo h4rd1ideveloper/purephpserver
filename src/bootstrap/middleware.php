@@ -3,11 +3,10 @@
 
 use App\controllers\handlers\ErrorHandler;
 use App\middleware\JsonBodyParserMiddleware;
-use App\middleware\TrailingMiddleware;
 use Slim\Exception\HttpMethodNotAllowedException;
 use Slim\Exception\HttpNotFoundException;
 
-
+/**@var $app Slim\App */
 $app->addRoutingMiddleware();
 $app->addErrorMiddleware(
     true,

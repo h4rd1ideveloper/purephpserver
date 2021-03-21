@@ -8,7 +8,7 @@ use Firebase\JWT\JWT as JWT;
 
 final class Token extends JWT
 {
-    public final static function decodePiece(string $headBase64)
+    public final static function decodePiece(string $headBase64): object
     {
         return self::jsonDecode(self::urlsafeB64Decode($headBase64));
     }
@@ -23,12 +23,12 @@ final class Token extends JWT
             if (function_exists('hash_equals')) {
                 return hash_equals($sig, $hash);
             }
-            $len = min(self::safeStringLength($sig), static::safeStringLength($hash));
+            $len = min(self::safeStringLength($sig), self::safeStringLength($hash));
             $status = 0;
             for ($i = 0; $i < $len; $i++) {
                 $status |= ord($sig[$i]) ^ ord($hash[$i]);
             }
-            $status |= (static::safeStringLength($sig) ^ static::safeStringLength($hash));
+            $status |= (self::safeStringLength($sig) ^ self::safeStringLength($hash));
             return ($status === 0);
         }
         return false;

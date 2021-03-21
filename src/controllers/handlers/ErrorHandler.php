@@ -34,19 +34,18 @@ class ErrorHandler
      */
     public static function notFound(): callable
     {
-        return
-            function (ServerRequestInterface $request, Throwable $exception, bool $displayErrorDetails) {
-                $response = (new Response)->withStatus(404);
-                $response->getBody()->write(
-                    Components::Sender("404")
-                );
-                return $response;
-            };
+        return fn(
+            ServerRequestInterface $request,
+            Throwable $exception,
+            bool $displayErrorDetails
+        ) => (new Response)
+            ->withStatus(404)
+            ->getBody()
+            ->write(Components::Sender("404"));
     }
 
     public static function missingEnvironments(string $reason): Response
     {
         return new Response(500, null, (new StreamFactory)->createStream($reason));
-
     }
 }

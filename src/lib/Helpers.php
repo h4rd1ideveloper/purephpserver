@@ -3,11 +3,11 @@
 namespace App\lib;
 
 use App\controllers\handlers\ErrorHandler;
+use App\lib\Logger as MyLogger;
 use Exception;
+use Firebase\JWT\JWT as JWT;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use InvalidArgumentException;
-use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
 use Psr\Http\Message\StreamInterface;
 use RuntimeException;
 use Slim\Psr7\Factory\StreamFactory;
@@ -57,7 +57,7 @@ class Helpers
         'driver' => 'mysql',
         'host' => 'localhost',
         'port' => '3306',
-        'database' => 'icardo_dev',
+        'database' => 'webapp',
         'username' => 'root',
         'password' => '',
         'charset' => 'utf8',
@@ -67,8 +67,8 @@ class Helpers
     /**
      * @param callable $map
      * @param int $length
-     * @param null $ref
-     * @return array
+     * @param array|null $ref
+     * @return void
      */
     public static function forMany(callable $map, int $length = 0, ?array &$ref = null): void
     {
@@ -95,11 +95,63 @@ class Helpers
             $capsule->schema();
             return $capsule;
         } catch (Exception $e) {
-            $log = new Logger('setupIlluminateConnectionAsGlobal');
-            $log->pushHandler(new StreamHandler('/monolog.log', Logger::WARNING));
-            $log->error($e->getMessage() . " " . $e->getTraceAsString() . PHP_EOL);
+            MyLogger::errorLog(Helpers::exceptionErrorMessage($e), 'setupIlluminateConnectionAsGlobal');
         }
         return false;
+    }
+
+    /**
+     * @param Exception $exception
+     * @param $payload
+     * @return string
+     */
+    public static function exceptionErrorMessage(Exception $exception, $payload = null): string
+    {
+        $json = (bool)(isset($payload) && self::mayUseJsonEncode($payload)) ? "payload: " . self::toJson($payload) : '';
+        return <<<ERROR
+            message: {$exception->getMessage()}
+            trace: {$exception->getTraceAsString()}
+            $json
+ERROR;
+    }
+
+    /**
+     * @param $value
+     * @return bool
+     */
+    public static function mayUseJsonEncode($value): bool
+    {
+        return (bool)(is_string($value) || is_array($value) || is_int($value) || is_bool($value));
+    }
+
+    /**
+     * Format any Object or Array to JSON string
+     * @param string|array|bool|int $toJson
+     * @return string
+     * @see json_encode()
+     * @see JSON_UNESCAPED_UNICODE
+     *
+     */
+    public static function toJson($toJson): string
+    {
+        return class_exists('JWT') ?
+            JWT::jsonEncode($toJson) : (
+            defined('JSON_UNESCAPED_UNICODE') ?
+                json_encode($toJson, JSON_UNESCAPED_UNICODE) : self::_toJson($toJson)
+            );
+    }
+
+    /**
+     * Because old version of the php dont contain  JSON_UNESCAPED_UNICODE const = (int 256)
+     * @deprecated old pattern  ///(?<!\\\\)\\\\u(\w{4})/
+     * @param $toJson
+     * @return string|string[]|null
+     */
+    public static function _toJson($toJson)
+    {
+        return preg_replace_callback('/\\\\u(\w{4})/', static function (array $matches): string {
+            return html_entity_decode('&#x' . $matches[1] . ';', ENT_COMPAT, 'UTF-8');
+        }, json_encode($toJson));
     }
 
     /**
@@ -119,7 +171,7 @@ class Helpers
      * @param mixed $default
      * @return mixed
      */
-    public static function orEmpty(?string $test, $default = 0)
+    public static function orEmpty(?string $test, $default = 0): ?string
     {
         return self::isOk($test) ? $test : $default;
     }
@@ -133,18 +185,6 @@ class Helpers
         return isset($string) && !empty($string) && (is_string($string) || is_int($string) || is_double($string));
     }
 
-    
-
-    /**
-     * @param $filename
-     * @param string $mode
-     * @return StreamInterface
-     */
-    public static function createStreamFromFile($filename, $mode = 'r+')
-    {
-        return (new StreamFactory)->createStreamFromFile($filename, $mode);
-    }
-
     /**
      * @param string|null $type
      * @param array $array
@@ -155,14 +195,16 @@ class Helpers
         $ok = true;
         foreach ($array as $row) {
             switch ($type) {
-                case 'string': {
-                        $ok = is_string($row) ? $ok : false;
-                        break;
-                    }
-                default: {
-                        $ok = is_array($row) ? $ok : false;
-                        break;
-                    }
+                case 'string':
+                {
+                    $ok = is_string($row) ? $ok : false;
+                    break;
+                }
+                default:
+                {
+                    $ok = is_array($row) ? $ok : false;
+                    break;
+                }
             }
         }
         return $ok;
@@ -184,10 +226,20 @@ class Helpers
                 }
             }
         } catch (Exception $e) {
-            $log = new Logger('setEnvByFile');
-            $log->pushHandler(new StreamHandler('/monolog.log', Logger::WARNING));
-            die(ErrorHandler::missingEnvironments($e->getMessage() . PHP_EOL . $e->getTraceAsString()));
+            $message = self::exceptionErrorMessage($e);
+            MyLogger::ErrorLog($message, 'setEnvByFile');
+            die(ErrorHandler::missingEnvironments($message));
         }
+    }
+
+    /**
+     * @param $filename
+     * @param string $mode
+     * @return StreamInterface
+     */
+    public static function createStreamFromFile($filename, $mode = 'r+'): StreamInterface
+    {
+        return (new StreamFactory)->createStreamFromFile($filename, $mode);
     }
 
     /**
@@ -254,25 +306,7 @@ class Helpers
      */
     public static function isMySQLFunction(string $string): bool
     {
-        return (bool) preg_match_all('/\(.*\)/', (string) $string);
-    }
-
-    /**
-     * Format any Object or Array to JSON string
-     * @param string|array|bool|int $toJson
-     * @return string
-     */
-    public static function toJson($toJson): string
-    {
-        /**
-         * Because old version of the php dont contain  JSON_UNESCAPED_UNICODE const = (int 256)
-         * @see json_encode()
-         * @see JSON_UNESCAPED_UNICODE
-         * @deprecated old pattern  ///(?<!\\\\)\\\\u(\w{4})/
-         */
-        return preg_replace_callback('/\\\\u(\w{4})/', static function (array $matches): string {
-            return html_entity_decode('&#x' . $matches[1] . ';', ENT_COMPAT, 'UTF-8');
-        }, json_encode($toJson));
+        return (bool)preg_match_all('/\(.*\)/', (string)$string);
     }
 
     /**
@@ -286,7 +320,7 @@ class Helpers
         $arr = [];
         foreach ($OBJ as $key => $valueNotUsedHer) {
             if ($noRepeat) {
-                self::insertIfNotExist((string) $key, $arr);
+                self::insertIfNotExist((string)$key, $arr);
                 continue;
             }
             $arr[] = $key;
@@ -341,7 +375,10 @@ class Helpers
      */
     public static function jsonToArray(string $data): array
     {
-        return json_decode($data, true) ?? [];
+        return (array)(class_exists('JWT') ?
+            JWT::jsonDecode($data) :
+            json_decode($data, true) ?? []
+        );
     }
 
     /**
@@ -369,7 +406,7 @@ class Helpers
     {
         $data = [];
         foreach ($array as $key => $value) {
-            if ((bool) $fn($value, $key) === true) {
+            if ((bool)$fn($value, $key) === true) {
                 $data[$key] = $value;
             }
         }
@@ -416,7 +453,7 @@ class Helpers
                 $flag[] = true;
             }
         }
-        return (bool) (count($flag) > 1 || preg_match("/d*s*=s*d*/", $value));
+        return (bool)(count($flag) > 1 || preg_match("/d*s*=s*d*/", $value));
     }
 
     /**
@@ -427,7 +464,7 @@ class Helpers
      */
     public static function containSubString(string $target, string $toSearch, int $offset = 0): bool
     {
-        return (bool) (strpos(strtoupper($target), strtoupper($toSearch), $offset) !== false);
+        return (bool)(strpos(strtoupper($target), strtoupper($toSearch), $offset) !== false);
     }
 
     /**
@@ -474,7 +511,7 @@ class Helpers
     /**
      * @param array $array
      * @param callable $closureKey
-     * @param callable $callbackValue
+     * @param callable|null $callbackValue
      * @return array
      */
     public static function valueAndKeyMap(array $array, callable $closureKey, ?callable $callbackValue = null): array
@@ -484,5 +521,20 @@ class Helpers
             $returned[$closureKey($value, $key) ?? $key] = $callbackValue === null ? $value : $callbackValue($value, $key);
         }
         return $returned;
+    }
+
+    /**
+     * @param callable $callback
+     * @param array|string|int|bool|callable $defaultValue
+     * @return mixed
+     */
+    public static function tryCatch(callable $callback, $defaultValue = false)
+    {
+        try {
+            return $callback();
+        } catch (Exception $exception) {
+            MyLogger::errorLog(self::exceptionErrorMessage($exception), 'tryCatch');
+            return is_callable($defaultValue) ? $defaultValue($exception) : $defaultValue;
+        }
     }
 }
