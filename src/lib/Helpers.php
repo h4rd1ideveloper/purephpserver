@@ -9,7 +9,6 @@ use Firebase\JWT\JWT as JWT;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use InvalidArgumentException;
 use Psr\Http\Message\StreamInterface;
-use RuntimeException;
 use Slim\Psr7\Factory\StreamFactory;
 
 /**
@@ -18,7 +17,7 @@ use Slim\Psr7\Factory\StreamFactory;
  * @version 1.1.0
  * @todo  Doc every methods and test
  */
-class Helpers
+class Helpers extends Regex
 {
     /**
      *
@@ -83,21 +82,27 @@ class Helpers
 
     /**
      * @param array $connectionConfig
+     * @param string $connectionName
      * @return Capsule|bool
      */
-    public static function setupIlluminateConnectionAsGlobal(array $connectionConfig = self::connectionConfig)
+    public static function setupIlluminateConnectionAsGlobal(array $connectionConfig = self::connectionConfig, string $connectionName = 'default')
+    {
+        return self::tryCatch(fn() => Factory::illuminateDatabase($connectionConfig));
+    }
+
+    /**
+     * @param callable $callback
+     * @param array|string|int|bool|callable $defaultValue
+     * @return mixed
+     */
+    public static function tryCatch(callable $callback, $defaultValue = false)
     {
         try {
-            $capsule = new Capsule;
-            $capsule->addConnection($connectionConfig);
-            $capsule->bootEloquent();
-            $capsule->setAsGlobal();
-            $capsule->schema();
-            return $capsule;
-        } catch (Exception $e) {
-            MyLogger::errorLog(Helpers::exceptionErrorMessage($e), 'setupIlluminateConnectionAsGlobal');
+            return $callback();
+        } catch (Exception $exception) {
+            MyLogger::errorLog(self::exceptionErrorMessage($exception), 'tryCatch');
+            return is_callable($defaultValue) ? $defaultValue($exception) : $defaultValue;
         }
-        return false;
     }
 
     /**
@@ -149,9 +154,15 @@ ERROR;
      */
     public static function _toJson($toJson)
     {
-        return preg_replace_callback('/\\\\u(\w{4})/', static function (array $matches): string {
-            return html_entity_decode('&#x' . $matches[1] . ';', ENT_COMPAT, 'UTF-8');
-        }, json_encode($toJson));
+        return preg_replace_callback(
+            parent::$_toJson,
+            fn(array $matches) => html_entity_decode(
+                "&#x{$matches[1]};",
+                ENT_COMPAT,
+                'UTF-8'
+            ),
+            json_encode($toJson)
+        );
     }
 
     /**
@@ -243,40 +254,6 @@ ERROR;
     }
 
     /**
-     * Safely opens a PHP stream resource using a filename.
-     *
-     * When fopen fails, PHP normally raises a warning. This function adds an
-     * error handler that checks for errors and throws an exception instead.
-     *
-     * @param string $filename File to open
-     * @param string $mode Mode used to open the file
-     *
-     * @return resource
-     * @throws RuntimeException if the file cannot be opened
-     */
-    public static function try_fopen(string $filename, string $mode)
-    {
-        $ex = null;
-        set_error_handler(function ($errno, $errstr) use ($filename, $mode, &$ex) {
-            $ex = new RuntimeException(sprintf(
-                'Unable to open %s using mode %s: %s',
-                $filename,
-                $mode,
-                $errstr
-            ));
-        });
-
-        $handle = fopen($filename, $mode);
-        restore_error_handler();
-
-        if ($ex) {
-            /** @var $ex RuntimeException */
-            throw $ex;
-        }
-        return $handle;
-    }
-
-    /**
      * @param string $to
      * @return string
      */
@@ -284,20 +261,10 @@ ERROR;
     {
         $host = $_SERVER['HTTP_HOST'];
         if (isset($_SERVER['REDIRECT_URL'])) {
-            $redirectUrl = explode('/', str_replace('index', '', isset($_SERVER['REDIRECT_URL']) ? $_SERVER['REDIRECT_URL'] : ''));
-            return sprintf('//%s%s/%s/%s', $host, $redirectUrl[0], $redirectUrl[1], $to);
+            [$index, $path] = explode('/', str_replace('index', '', isset($_SERVER['REDIRECT_URL']) ? $_SERVER['REDIRECT_URL'] : ''));
+            return sprintf('//%s%s/%s/%s', $host, $index, $path, $to);
         }
-        //echo "entrou2";
         return sprintf('//%s%s/%s', $host, getenv('path_root') ?? '', $to);
-    }
-
-    /**
-     * @param $str
-     * @return string|string[]|null
-     */
-    public static function soNumero(string $str)
-    {
-        return preg_replace("/[^0-9]/", "", $str);
     }
 
     /**
@@ -453,7 +420,7 @@ ERROR;
                 $flag[] = true;
             }
         }
-        return (bool)(count($flag) > 1 || preg_match("/d*s*=s*d*/", $value));
+        return (bool)(count($flag) > 1 || preg_match(parent::$equalCompare, $value));
     }
 
     /**
@@ -474,7 +441,7 @@ ERROR;
      * @param mixed $initialValue
      * @return mixed
      */
-    public static function Reducer(array $array, callable $callback, $initialValue = [])
+    public static function Reducer(array $array, callable $callback, $initialValue = []): array
     {
         foreach ($array as $key => $value) {
             $initialValue = $callback($initialValue, $value, $key);
@@ -505,7 +472,7 @@ ERROR;
      */
     public static function isOnlyNumbers(string $number): bool
     {
-        return preg_match("/^\d+$/", $number) ? true : false;
+        return preg_match(parent::$digits, $number) ? true : false;
     }
 
     /**
@@ -521,20 +488,5 @@ ERROR;
             $returned[$closureKey($value, $key) ?? $key] = $callbackValue === null ? $value : $callbackValue($value, $key);
         }
         return $returned;
-    }
-
-    /**
-     * @param callable $callback
-     * @param array|string|int|bool|callable $defaultValue
-     * @return mixed
-     */
-    public static function tryCatch(callable $callback, $defaultValue = false)
-    {
-        try {
-            return $callback();
-        } catch (Exception $exception) {
-            MyLogger::errorLog(self::exceptionErrorMessage($exception), 'tryCatch');
-            return is_callable($defaultValue) ? $defaultValue($exception) : $defaultValue;
-        }
     }
 }

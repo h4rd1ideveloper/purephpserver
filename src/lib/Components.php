@@ -122,21 +122,17 @@ class Components
      */
     public static function scriptsFrom(array $scripts): string
     {
-        $initialValue = '';
-        $value = '';
-
         return Helpers::Reducer(
             $scripts,
-            fn ($initialValue, $value, $key) => <<<HTML
-            $initialValue       <script type='text/javascript' src='$value'></script>
-            HTML . PHP_EOL,
-            PHP_EOL
+            fn ($initialValue, $value, $key) =>
+                /**@lang text*/"$initialValue <script type='text/javascript' src='$value'></script>" . PHP_EOL,PHP_EOL
         );
     }
 
     /**
      * @TODO param array $config
      * @param array $more
+     * @param string $raw
      * @return string
      */
     public static function scripts(array $more = [], string $raw = ''): string
@@ -154,7 +150,7 @@ class Components
     /**
      * @return string
      */
-    public static function closeView()
+    public static function closeView(): string
     {
         return <<<HTML
     
@@ -174,9 +170,9 @@ HTML;
      * @param string|null $wrapClass
      * @param int|null $min
      * @param int|null $max
-     * @return Components
+     * @return string
      */
-    public static function input(string $name, bool $required, ?string $label = '', ?string $labelHelper = '', ?string $type = 'text', ?string $placeholder = '', ?string $class = '', ?string $wrapClass = '', ?int $min = 4, ?int $max = 20)
+    public static function input(string $name, bool $required, ?string $label = '', ?string $labelHelper = '', ?string $type = 'text', ?string $placeholder = '', ?string $class = '', ?string $wrapClass = '', ?int $min = 4, ?int $max = 20): string
     {
         $key = uniqid();
         $required = $required ? "required" : '';
@@ -195,6 +191,7 @@ HTML;
     /**
      * @param array $data
      * @param $id
+     * @return string
      */
     public static function tableHTML(array $data, $id): string
     {
