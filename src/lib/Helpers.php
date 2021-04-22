@@ -5,9 +5,12 @@ namespace App\lib;
 use App\controllers\handlers\ErrorHandler;
 use App\lib\Logger as MyLogger;
 use Exception;
+use Faker\Factory;
 use Firebase\JWT\JWT as JWT;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use InvalidArgumentException;
+use JetBrains\PhpStorm\ArrayShape;
+use JetBrains\PhpStorm\Pure;
 use Psr\Http\Message\StreamInterface;
 use RuntimeException;
 use Slim\Psr7\Factory\StreamFactory;
@@ -50,19 +53,6 @@ class Helpers
         "TABLE", "TABLES", "TRUE", "UPDATE",
         "VALUES", "XOR", "DATABASE"
     ];
-    /**
-     *
-     */
-    const connectionConfig = [
-        'driver' => 'mysql',
-        'host' => 'localhost',
-        'port' => '3306',
-        'database' => 'webapp',
-        'username' => 'root',
-        'password' => '',
-        'charset' => 'utf8',
-        'collation' => 'utf8_unicode_ci',
-    ];
 
     /**
      * @param callable $map
@@ -85,8 +75,20 @@ class Helpers
      * @param array $connectionConfig
      * @return Capsule|bool
      */
-    public static function setupIlluminateConnectionAsGlobal(array $connectionConfig = self::connectionConfig)
+    public static function setupIlluminateConnectionAsGlobal(mixed $connectionConfig = false): Capsule|bool
     {
+        if (!$connectionConfig || !count($connectionConfig)) {
+            $connectionConfig = [
+                'driver' => self::connectionsConfigByKey('driver'),
+                'host' => self::connectionsConfigByKey('host'),
+                'port' => self::connectionsConfigByKey('port'),
+                'database' => self::connectionsConfigByKey('database'),
+                'username' => self::connectionsConfigByKey('username'),
+                'password' => self::connectionsConfigByKey('password'),
+                'charset' => 'utf8',
+                'collation' => 'utf8_unicode_ci',
+            ];
+        }
         try {
             $capsule = new Capsule;
             $capsule->addConnection($connectionConfig);
@@ -98,6 +100,62 @@ class Helpers
             MyLogger::errorLog(Helpers::exceptionErrorMessage($e), 'setupIlluminateConnectionAsGlobal');
         }
         return false;
+    }
+
+    public static function connectionsConfigByKey(string $key): bool|array|string
+    {
+        switch (strtolower($key)) {
+            case 'adapter':
+            case 'driver':
+            {
+                return getenv('driver') ?? (defined('driver') ? driver : 'mysql');
+            }
+            case 'host':
+            {
+                return getenv('host') ?? (defined('host') ? host : 'localhost');
+            }
+            case 'database':
+            case 'name':
+            {
+                return getenv('database') ?? (defined('database') ? database : 'icardo_dev');
+            }
+            case 'username':
+            case 'user':
+            {
+                return getenv('username') ?? (defined('username') ? username : 'root');
+            }
+            case 'password':
+            case 'pass':
+            {
+                return getenv('password') ?? (defined('password') ? password : '');
+            }
+            case   'port':
+            {
+                return getenv('port') ?? (defined('port') ? port : '3306');
+            }
+            case 'charset':
+            {
+                return getenv('charset') ?? (defined('charset') ? charset : 'utf8');
+            }
+            case 'collation':{
+                return  getenv('collation') ?? (defined('collation') ? collation : 'utf8_unicode_ci');
+            }
+            case 'phinx':
+            {
+                return [
+                    'adapter' => self::connectionsConfigByKey('adapter'),
+                    'host' => self::connectionsConfigByKey('host'),
+                    'name' => self::connectionsConfigByKey('name'),
+                    'user' => self::connectionsConfigByKey('user'),
+                    'pass' => self::connectionsConfigByKey('pass'),
+                    'port' => self::connectionsConfigByKey('port')
+                ];
+            }
+            default:
+            {
+                return [];
+            }
+        }
     }
 
     /**
@@ -126,13 +184,13 @@ ERROR;
 
     /**
      * Format any Object or Array to JSON string
-     * @param string|array|bool|int $toJson
+     * @param int|bool|array|string $toJson
      * @return string
      * @see json_encode()
      * @see JSON_UNESCAPED_UNICODE
      *
      */
-    public static function toJson($toJson): string
+    public static function toJson(int|bool|array|string $toJson): string
     {
         return class_exists('JWT') ?
             JWT::jsonEncode($toJson) : (
@@ -147,7 +205,7 @@ ERROR;
      * @param $toJson
      * @return string|string[]|null
      */
-    public static function _toJson($toJson)
+    public static function _toJson($toJson): array|string|null
     {
         return preg_replace_callback('/\\\\u(\w{4})/', static function (array $matches): string {
             return html_entity_decode('&#x' . $matches[1] . ';', ENT_COMPAT, 'UTF-8');
@@ -169,18 +227,18 @@ ERROR;
     /**
      * @param null|string $test
      * @param mixed $default
-     * @return mixed
+     * @return string|null
      */
-    public static function orEmpty(?string $test, $default = 0): ?string
+    #[Pure] public static function orEmpty(?string $test, $default = 0): ?string
     {
         return self::isOk($test) ? $test : $default;
     }
 
     /**
-     * @param string|int|double $string
+     * @param double|int|string $string
      * @return bool
      */
-    public static function isOk($string): bool
+    public static function isOk(float|int|string $string): bool
     {
         return isset($string) && !empty($string) && (is_string($string) || is_int($string) || is_double($string));
     }
@@ -270,7 +328,6 @@ ERROR;
         restore_error_handler();
 
         if ($ex) {
-            /** @var $ex RuntimeException */
             throw $ex;
         }
         return $handle;
@@ -284,25 +341,24 @@ ERROR;
     {
         $host = $_SERVER['HTTP_HOST'];
         if (isset($_SERVER['REDIRECT_URL'])) {
-            $redirectUrl = explode('/', str_replace('index', '', isset($_SERVER['REDIRECT_URL']) ? $_SERVER['REDIRECT_URL'] : ''));
+            $redirectUrl = explode('/', str_replace('index', '', $_SERVER['REDIRECT_URL'] ?? ''));
             return sprintf('//%s%s/%s/%s', $host, $redirectUrl[0], $redirectUrl[1], $to);
         }
-        //echo "entrou2";
         return sprintf('//%s%s/%s', $host, getenv('path_root') ?? '', $to);
     }
 
     /**
-     * @param $str
+     * @param string $str
      * @return string|string[]|null
      */
-    public static function soNumero(string $str)
+    public static function onlyNumbers(string $str): array|string|null
     {
         return preg_replace("/[^0-9]/", "", $str);
     }
 
     /**
      * @param $string string
-     * @return false|int
+     * @return bool
      */
     public static function isMySQLFunction(string $string): bool
     {
@@ -331,9 +387,9 @@ ERROR;
     /**
      * Insert a value if not exist in array only unique values is accept
      * @param $value mixed
-     * @param $arr
+     * @param array $arr
      */
-    public static function insertIfNotExist($value, array &$arr): void
+    public static function insertIfNotExist(mixed $value, array &$arr): void
     {
         if (!in_array($value, $arr)) {
             $arr[] = $value;
@@ -357,7 +413,7 @@ ERROR;
     /**
      * Filter array by ID
      * @param array $ids
-     * @param $arr
+     * @param array $arr
      * @return array
      */
     public static function getRowsByKeys(array $ids, array $arr): array
@@ -370,7 +426,7 @@ ERROR;
     }
 
     /**
-     * @param $data
+     * @param string $data
      * @return array
      */
     public static function jsonToArray(string $data): array
@@ -415,9 +471,8 @@ ERROR;
 
     /**
      * entriesFrom
-     * @param $anyIterable
+     * @param array $anyIterable
      * @return array
-     * @throws InvalidArgumentException
      */
     public static function Entries(array $anyIterable): array
     {
@@ -430,7 +485,7 @@ ERROR;
 
     /**
      *  isSQLInjection check if contain sql injection on string param $value and return true or false
-     * @param $value
+     * @param string $value
      * @param string $type
      * @param bool $options
      * @return bool
@@ -457,8 +512,8 @@ ERROR;
     }
 
     /**
-     * @param $target
-     * @param $toSearch
+     * @param string $target
+     * @param string $toSearch
      * @param int $offset
      * @return bool
      */
@@ -469,12 +524,12 @@ ERROR;
 
     /**
      * array Reducer like a javascript
-     * @param $array
-     * @param $callback
+     * @param array $array
+     * @param callable $callback
      * @param mixed $initialValue
      * @return mixed
      */
-    public static function Reducer(array $array, callable $callback, $initialValue = [])
+    public static function Reducer(array $array, callable $callback, $initialValue = []): mixed
     {
         foreach ($array as $key => $value) {
             $initialValue = $callback($initialValue, $value, $key);
@@ -483,10 +538,10 @@ ERROR;
     }
 
     /**
-     * @param $strDate
-     * @return false|string
+     * @param string $strDate
+     * @return string
      */
-    public static function ymdToDmy(string $strDate)
+    public static function ymdToDmy(string $strDate): string
     {
         self::orEmpty($strDate, '0000-00-00');
         if (
@@ -500,7 +555,7 @@ ERROR;
     }
 
     /**
-     * @param $number
+     * @param string $number
      * @return bool
      */
     public static function isOnlyNumbers(string $number): bool
@@ -528,7 +583,7 @@ ERROR;
      * @param array|string|int|bool|callable $defaultValue
      * @return mixed
      */
-    public static function tryCatch(callable $callback, $defaultValue = false)
+    public static function tryCatch(callable $callback, $defaultValue = false): mixed
     {
         try {
             return $callback();
@@ -536,5 +591,20 @@ ERROR;
             MyLogger::errorLog(self::exceptionErrorMessage($exception), 'tryCatch');
             return is_callable($defaultValue) ? $defaultValue($exception) : $defaultValue;
         }
+    }
+
+    #[ArrayShape(['username' => "string", 'password' => "string", 'email' => "string", 'first_name' => "string", 'last_name' => "string", 'phone' => "string", 'address' => "string"])]
+    public static function fakerUserToSeed(): array
+    {
+        $faker = Factory::create('pt_BR');
+        return [
+            'username' => $faker->userName,
+            'password' => $faker->password(60, 60),
+            'email' => $faker->email,
+            'first_name' => $faker->firstName,
+            'last_name' => $faker->lastName,
+            'phone' => $faker->phoneNumber,
+            'address' => $faker->address
+        ];
     }
 }

@@ -1,33 +1,19 @@
 <?php
 
+namespace App\database\seeds;
 date_default_timezone_set("America/Sao_Paulo");
 
 use App\lib\Helpers;
 use App\model\User;
-use Faker\Factory;
 use Phinx\Seed\AbstractSeed;
 
-/**
- * Class UserSeeder
- */
 class UserSeeder extends AbstractSeed
 {
-
     public function run()
     {
         Helpers::setupIlluminateConnectionAsGlobal();
-        $user = new User;
-        $faker = Factory::create('pt_BR');
         Helpers::forMany(
-            fn () => (new User([
-                'username' => $faker->userName,
-                'password' => $faker->password(60, 60),
-                'email' => $faker->email,
-                'first_name' => $faker->firstName,
-                'last_name' => $faker->lastName,
-                'phone' => $faker->phoneNumber,
-                'address' => $faker->address
-            ]))->save(),
+            fn() => (new User(Helpers::fakerUserToSeed()))->save(),
             500
         );
     }

@@ -13,13 +13,6 @@ return [
     'environments' => [
         'default_migration_table' => 'phinxlog',
         'default_database' => 'dev',
-        'dev' => [
-            'adapter' => getenv('driver') ?? (defined('driver') ? driver : 'mysql'),
-            'host' => getenv('host') ?? (defined('host') ? host : 'localhost'),
-            'name' => getenv('database') ?? (defined('database') ? database : 'icardo_dev'),
-            'user' => getenv('username') ?? (defined('username') ? username : 'root'),
-            'pass' => getenv('password') ?? (defined('password') ? password : ''),
-            'port' => getenv('port') ?? (defined('port') ? port : '3306')
-        ]
+        'dev' => Helpers::connectionsConfigByKey('phinx')
     ]
 ];
