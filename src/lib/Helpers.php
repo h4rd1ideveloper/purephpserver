@@ -22,7 +22,7 @@ class Helpers extends Regex
     /**
      *
      */
-    const filters = [
+    public const filters = [
         'bool' => [FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE],
         'email' => [FILTER_VALIDATE_EMAIL, FILTER_FLAG_EMAIL_UNICODE],
         'float' => [FILTER_VALIDATE_FLOAT, FILTER_FLAG_ALLOW_THOUSAND],
@@ -40,7 +40,7 @@ class Helpers extends Regex
      * @Description  $blackList  used to check if match more that 1 times
      * @example "ALTER FIELDS" or "DROP TABLE" and other combinations
      */
-    const blackList = [
+    public const blackList = [
         "ALTER", "ANALYZE", "CREATE",
         "DELETE", "DESCRIBE", "DROP", "EXISTS",
         "FIELDS", "FLOAT", "GRANT", "INSERT",
@@ -52,7 +52,7 @@ class Helpers extends Regex
     /**
      *
      */
-    const connectionConfig = [
+    public const connectionConfig = [
         'driver' => 'mysql',
         'host' => 'localhost',
         'port' => '3306',

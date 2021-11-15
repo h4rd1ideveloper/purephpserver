@@ -21,8 +21,7 @@ class ErrorHandler
      */
     public static function notAllowedMethod(): callable
     {
-        return
-            function (ServerRequestInterface $request, Throwable $exception, bool $displayErrorDetails) {
+        return static function (ServerRequestInterface $request, Throwable $exception, bool $displayErrorDetails) {
                 $response = (new Response)->withStatus(405);
                 $response->getBody()->write('405 NOT ALLOWED');
                 return $response;
@@ -34,14 +33,14 @@ class ErrorHandler
      */
     public static function notFound(): callable
     {
-        return fn(
+        return static fn(
             ServerRequestInterface $request,
             Throwable $exception,
             bool $displayErrorDetails
         ) => (new Response)
             ->withStatus(404)
             ->getBody()
-            ->write(Components::Sender("404"));
+            ->write(Components::render("404"));
     }
 
     public static function missingEnvironments(string $reason): Response

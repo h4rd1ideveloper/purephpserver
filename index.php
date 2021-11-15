@@ -2,20 +2,19 @@
 date_default_timezone_set("America/Sao_Paulo");
 
 use App\lib\Helpers;
+use App\main\Server;
 use DI\Container;
 use Slim\Factory\AppFactory;
 
-require(dirname(__FILE__) . '/vendor/autoload.php');
+require(__DIR__ . '/vendor/autoload.php');
 
 Helpers::setEnvByFile('.env');
-AppFactory::setContainer(new Container);
+$container = new Container;
+
+AppFactory::setContainer($container);
+
 $app = AppFactory::create();
-$app->setBasePath(getenv('path_root') ?? (defined('path_root') ? path_root : ''));
-$container = $app->getContainer();
 
-require(dirname(__FILE__) . '/src/bootstrap/config.php');
-require(dirname(__FILE__) . '/src/bootstrap/dependencies.php');
-require(dirname(__FILE__) . '/src/bootstrap/middleware.php');
-require(dirname(__FILE__) . '/src/bootstrap/routes.php');
+$server = new Server($app, $container);
 
-$app->run();
+$server->run();

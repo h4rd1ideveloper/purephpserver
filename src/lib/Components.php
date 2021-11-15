@@ -32,7 +32,7 @@ class Components
      * @return string
      * @throws Exception
      */
-    public static function Sender(string $templateFileName, array $context = []): string
+    public static function render(string $templateFileName, array $context = []): string
     {
         return self::viewFileAsString($templateFileName, true, $context);
     }
@@ -49,9 +49,9 @@ class Components
     public static function viewFileAsString(string $templateFileName, bool $ob = false, array $context = []): string
     {
 
-        $pathToFile = sprintf("%s/../pages/$templateFileName.php", dirname(__FILE__)); //Path to folder templates
+        $pathToFile = sprintf("%s/../pages/$templateFileName.php", __DIR__); //Path to folder templates
         !file_exists($pathToFile) &&
-            die(print_r(["[$pathToFile]", "view {$templateFileName} not found!", dirname(__FILE__)]));
+            die(print_r(["[$pathToFile]", "view {$templateFileName} not found!", __DIR__]));
         if ($ob) {
             ob_start();
             define('context', $context);

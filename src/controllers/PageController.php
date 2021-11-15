@@ -27,7 +27,7 @@ class PageController
     {
         try {
             $response->getBody()->write(
-                Components::sender($args['view'])
+                Components::render($args['view'])
             );
         } catch (Exception $e) {
             $response->getBody()->write(sprintf("Internal server error \n %s", Helpers::exceptionErrorMessage($e)));
@@ -45,7 +45,7 @@ class PageController
     {
         try {
             $response->getBody()->write(
-                Components::sender("dashboard")
+                Components::render("dashboard")
             );
         } catch (Exception $e) {
             $response
@@ -57,18 +57,20 @@ class PageController
     }
 
     /**
-     * @param Request $request
      * @param Response $response
-     * @param $args
      * @return Response
      */
-    public static function loginAndSign(Request $request, Response $response, $args): Response
+    public static function loginAndSign(Response $response): Response
     {
         try {
-            $response->getBody()->write(Components::sender("authentication/Form", ['error' => false, 'fields' => ['-1']]));
+            $response
+                ->getBody()
+                ->write(Components::render("authentication/Form", ['error' => false, 'fields' => ['-1']]));
         } catch (Exception $e) {
-            $response = $response->withStatus(500);
-            $response->getBody()->write(sprintf("Internal server error \n %s", Helpers::exceptionErrorMessage($e)));
+            $response
+                ->withStatus(500)
+                ->getBody()
+                ->write(sprintf("Internal server error \n %s", Helpers::exceptionErrorMessage($e)));
         }
         return $response;
     }

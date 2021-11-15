@@ -23,7 +23,7 @@ class PostController
      */
     public function post_form(Request $request, Response $response)
     {
-        $response->getBody()->write(View::Sender('create-post', ['title' => 'Create a new POST']));
+        $response->getBody()->write(View::render('create-post', ['title' => 'Create a new POST']));
         return $response;
     }
 }

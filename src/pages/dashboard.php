@@ -13,7 +13,7 @@ $baseUrl = Helpers::baseURL();
         $baseUrl . 'src/pages/css/background.svg.css'
     ],
     'raw' => '<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.1/css/all.css" integrity="sha384-O8whS3fhG2OnA5Kas0Y9l3cfpmYjapjI0E4theH4iuMD+pLhbf6JI0jIMfYcK3yZ" crossorigin="anonymous">'
-]);
+])
 ?>
     <nav class="navbar navbar-expand-lg navbar-light bg-light shadow ">
         <div class="container">
@@ -43,7 +43,7 @@ $baseUrl = Helpers::baseURL();
             </div>
         </div>
     </nav>
-<?php require(dirname(__FILE__) . '/img/background.svg'); ?>
+    <?php require(__DIR__ . '/img/background.svg'); ?>
     <main id="profile" class="container-lg">
         <div id="profile_header" class="d-flex flex-column justify-content-center align-items-center bg_gradient">
             <img id="avatar" src="<?= $baseUrl . 'src/pages/img/avatar.jpg'; ?>" alt="" class="mb-4 shadown">
