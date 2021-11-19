@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\controllers;
+namespace App\presentation\controllers;
 
 use App\lib\Components;
 use App\lib\Helpers;

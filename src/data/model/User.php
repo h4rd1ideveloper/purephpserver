@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\model;
+namespace App\data\model;
 
 
 use Illuminate\Database\Eloquent\Model;
@@ -31,6 +31,4 @@ class User extends Model
         'phone',
         'address'
     ];
-
-
 }

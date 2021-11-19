@@ -13,11 +13,11 @@ class Post
     /**
      * @var string
      */
-    protected $table = 'users';
+    protected string $table = 'users';
     /**
      * @var string[]
      */
-    protected $fillable = [
+    protected array $fillable = [
         'username',
         'password',
         'email',

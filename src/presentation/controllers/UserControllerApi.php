@@ -28,11 +28,12 @@ class UserControllerApi
     public function login(Request $request, Response $response)
     {
         $body = $request->getParsedBody();
-        if ($key = $body['user_key'] && $value = $body['user_value'] && $password = $body['password']) {
+        if (($key = $body['user_key']) && ($value = $body['user_value']) && $password = $body['password']) {
             $password = password_hash($password, PASSWORD_DEFAULT);
             $user = (new PersonRepository(new User))
                 ->setExcepted(['user_id'])
                 ->setRepo(User::where($key, $value)->get()->toArray());
+
             $response = $response->withHeader('Content-Type', 'Application/json');
             $response->getBody()->write(Helpers::toJson($user));
         }

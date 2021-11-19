@@ -17,7 +17,7 @@ use Slim\Psr7\Factory\StreamFactory;
  * @version 1.1.0
  * @todo  Doc every methods and test
  */
-class Helpers extends Regex
+class Helpers extends StringManipulation
 {
     /**
      *
@@ -205,18 +205,8 @@ ERROR;
     {
         $ok = true;
         foreach ($array as $row) {
-            switch ($type) {
-                case 'string':
-                {
-                    $ok = is_string($row) ? $ok : false;
-                    break;
-                }
-                default:
-                {
-                    $ok = is_array($row) ? $ok : false;
-                    break;
-                }
-            }
+            $isValid = ($type === 'string') ? is_string($row) : is_array($row);
+            $ok = $isValid ? $ok : false;
         }
         return $ok;
     }
@@ -231,7 +221,7 @@ ERROR;
             foreach (explode(PHP_EOL, $env) as $row) {
                 $keyAndValue = explode('=', trim($row));
                 [$key, $value] = [$keyAndValue[0] ?? '', $keyAndValue[1] ?? ''];
-                if ($key !== '' && $value !== '') {
+                if ($key !== '' && $value !== '' && (!getenv($key) || getenv($key) !== $value)) {
                     [$key, $value] = [strtolower(trim($key)), strtolower(trim($value))];
                     putenv("$key=$value");
                 }
@@ -248,7 +238,7 @@ ERROR;
      * @param string $mode
      * @return StreamInterface
      */
-    public static function createStreamFromFile($filename, $mode = 'r+'): StreamInterface
+    public static function createStreamFromFile($filename, string $mode = 'r+'): StreamInterface
     {
         return (new StreamFactory)->createStreamFromFile($filename, $mode);
     }
@@ -261,7 +251,7 @@ ERROR;
     {
         $host = $_SERVER['HTTP_HOST'];
         if (isset($_SERVER['REDIRECT_URL'])) {
-            [$index, $path] = explode('/', str_replace('index', '', isset($_SERVER['REDIRECT_URL']) ? $_SERVER['REDIRECT_URL'] : ''));
+            [$index, $path] = explode('/', str_replace('index', '', $_SERVER['REDIRECT_URL'] ?? ''));
             return sprintf('//%s%s/%s/%s', $host, $index, $path, $to);
         }
         return sprintf('//%s%s/%s', $host, getenv('path_root') ?? '', $to);
@@ -298,11 +288,12 @@ ERROR;
     /**
      * Insert a value if not exist in array only unique values is accept
      * @param $value mixed
-     * @param $arr
+     * @param array $arr
+     * @param bool $strict
      */
-    public static function insertIfNotExist($value, array &$arr): void
+    public static function insertIfNotExist($value, array &$arr,bool $strict = false): void
     {
-        if (!in_array($value, $arr)) {
+        if (!in_array($value, $arr, $strict)) {
             $arr[] = $value;
         }
     }

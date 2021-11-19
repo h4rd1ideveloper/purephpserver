@@ -17,6 +17,13 @@ class Components
      */
     private static string $HTML_CONTENT;
 
+    private static string $pathToViewers;
+
+    public function __construct(?string $VIEW_PATH)
+    {
+        self::setPathToViewers($VIEW_PATH ?? environments('path_viewers'));
+    }
+
     /**
      * @param string $html
      * @return string
@@ -42,23 +49,36 @@ class Components
      * @param bool $ob
      * @param array $context
      * @return string
-     * @throws Exception
-     * @see Stream
-     * @see ob_start
      */
     public static function viewFileAsString(string $templateFileName, bool $ob = false, array $context = []): string
     {
-
-        $pathToFile = sprintf("%s/../pages/$templateFileName.php", __DIR__); //Path to folder templates
+        $patchToViewers = self::getPathToViewers();
+        $pathToFile = "$patchToViewers$templateFileName.php";
         !file_exists($pathToFile) &&
-            die(print_r(["[$pathToFile]", "view {$templateFileName} not found!", __DIR__]));
+        die(print_r(["[$pathToFile]", "view {$templateFileName} not found!", __DIR__]));
         if ($ob) {
             ob_start();
             define('context', $context);
             include_once($pathToFile);
             return ob_get_clean() ?? '';
         }
-        return Helpers::createStreamFromFile($pathToFile, 'r+')->getContents();
+        return Helpers::createStreamFromFile($pathToFile)->getContents();
+    }
+
+    /**
+     * @return string
+     */
+    public static function getPathToViewers(): string
+    {
+        return self::$pathToViewers;
+    }
+
+    /**
+     * @param string $pathToViewers
+     */
+    public static function setPathToViewers(string $pathToViewers): void
+    {
+        self::$pathToViewers = $pathToViewers;
     }
 
     /**
@@ -111,7 +131,7 @@ class Components
     {
         return Helpers::Reducer(
             $links,
-            fn ($initialValue, $value, $key) => sprintf("%s<link rel='stylesheet' href='%s' >%s", $initialValue, $value, PHP_EOL),
+            fn($initialValue, $value, $key) => sprintf("%s<link rel='stylesheet' href='%s' >%s", $initialValue, $value, PHP_EOL),
             ''
         );
     }
@@ -124,8 +144,7 @@ class Components
     {
         return Helpers::Reducer(
             $scripts,
-            fn ($initialValue, $value, $key) =>
-                /**@lang text*/"$initialValue <script type='text/javascript' src='$value'></script>" . PHP_EOL,PHP_EOL
+            fn($initialValue, $value, $key) => /**@lang text */ "$initialValue <script type='text/javascript' src='$value'></script>" . PHP_EOL, PHP_EOL
         );
     }
 
@@ -144,7 +163,7 @@ class Components
                 <script src='//stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js' integrity='sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6' crossorigin='anonymous'></script>
                 <script type='text/javascript' src='//cdn.datatables.net/v/bs4/dt-1.10.20/datatables.min.js'></script>
 
-        HTML . self::scriptsFrom($more) . $raw;
+        HTML. self::scriptsFrom($more) . $raw;
     }
 
     /**
@@ -161,7 +180,7 @@ HTML;
 
     /**
      * @param string $name
-     * @param bool $required
+     * @param $required
      * @param string|null $label
      * @param string|null $labelHelper
      * @param string|null $type
@@ -172,12 +191,12 @@ HTML;
      * @param int|null $max
      * @return string
      */
-    public static function input(string $name, bool $required, ?string $label = '', ?string $labelHelper = '', ?string $type = 'text', ?string $placeholder = '', ?string $class = '', ?string $wrapClass = '', ?int $min = 4, ?int $max = 20): string
+    public static function input(string $name, $required, ?string $label = '', ?string $labelHelper = '', ?string $type = 'text', ?string $placeholder = '', ?string $class = '', ?string $wrapClass = '', ?int $min = 4, ?int $max = 20): string
     {
-        $key = uniqid();
+        $key = uniqid('', true);
         $required = $required ? "required" : '';
-        $helper_id = $name ."HelpId_$key";
-        $attrs =  "$required maxlength='$max' minlength='$min' type='$type' class='form-control $class' name='$name' aria-describedby='$helper_id' placeholder='$placeholder'";
+        $helper_id = $name . "HelpId_$key";
+        $attrs = "$required maxlength='$max' minlength='$min' type='$type' class='form-control $class' name='$name' aria-describedby='$helper_id' placeholder='$placeholder'";
         return <<<HTML
                 <div class='form-group $wrapClass'>
                     <label for='$name'>$label
@@ -204,47 +223,27 @@ HTML;
         if (!isset($data['body']) || !is_array($data['body']) || !is_array($data['body'][0])) {
             throw new InvalidArgumentException("Atributo body é obrigatorio e deve ser um array de array");
         }
-        $html = '';
-        $html .= sprintf(
-            /**@lang text */
+        $html = sprintf(
             "%s</tr></thead>",
             Helpers::Reducer(
                 $data['headers'],
-                fn ($initial, $currentValue) => sprintf(
-                    /**@lang text */
-                    "%s<th scope='col'>%s</th>",
-                    $initial,
-                    $currentValue
-                ),
-                sprintf(
-                    /**@lang text */
-                    "<table id='%s' class='table table-hover'><thead><tr>",
-                    $id
-                )
+                fn($initial, $currentValue) => sprintf("%s<th scope='col'>%s</th>", $initial, $currentValue),
+                sprintf("<table id='%s' class='table table-hover'><thead><tr>", $id)
             )
         );
         $html .= sprintf(
-            /**@lang text */
             "%s</tbody></table>",
             Helpers::Reducer(
                 $data['body'],
-                fn ($initial, $currentValue) => sprintf(
-                    /**@lang text */
+                fn($initial, $currentValue) => sprintf(
                     "%s%s</tr>",
                     $initial,
                     Helpers::Reducer(
                         $currentValue,
-                        fn ($init, $v) => sprintf(
-                            /**@lang text */
-                            "%s<th class='text-black-50' scope='row'>%s</th>",
-                            $init,
-                            $v
-                        ),
-                        /**@lang text */
+                        fn($init, $v) => sprintf("%s<th class='text-black-50' scope='row'>%s</th>", $init, $v),
                         '<tr>'
                     )
                 ),
-                /**@lang text */
                 '<tbody>'
             )
         );

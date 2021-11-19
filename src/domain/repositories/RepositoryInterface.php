@@ -1,7 +1,8 @@
 <?php
 
-namespace App\database\repositories;
+namespace App\domain\repositories;
 
+use App\database\repositories\PersonRepository;
 use Illuminate\Database\Eloquent\Model;
 
 interface RepositoryInterface

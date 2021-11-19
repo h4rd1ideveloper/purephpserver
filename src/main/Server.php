@@ -28,12 +28,7 @@ class Server extends Router
             ->illuminateDb()
             ->setupMiddleware()
             ->getApp()
-            ->setBasePath(
-                _env(
-                    'path_root',
-                    defined('path_root') ? path_root : ''
-                )
-            );
+            ->setBasePath(environments('path_root'));
         parent::__construct($this->getApp());
     }
 
@@ -89,14 +84,14 @@ class Server extends Router
     private function dbSettings(): Server
     {
         $this->container->set('db_settings', fn() => [
-            'driver' => _env('driver', defined('driver') ? driver : 'mysql'),
-            'host' => _env('host', defined('host') ? host : 'localhost'),
-            'port' => _env('port', defined('port') ? port : '3306'),
-            'database' => _env('database', defined('database') ? database : 'webapp'),
-            'username' => _env('username', defined('username') ? username : 'root'),
-            'password' => _env('password', defined('password') ? password : ''),
-            'charset' => _env('charset', defined('charset') ? charset : 'utf8'),
-            'collation' => _env('collation', defined('collation') ? collation : 'utf8_unicode_ci'),
+            'driver' => environments('driver', defined('driver') ? driver : 'mysql'),
+            'host' => environments('host', defined('host') ? host : 'localhost'),
+            'port' => environments('port', defined('port') ? port : '3306'),
+            'database' => environments('database', defined('database') ? database : 'webapp'),
+            'username' => environments('username', defined('username') ? username : 'root'),
+            'password' => environments('password', defined('password') ? password : ''),
+            'charset' => environments('charset', defined('charset') ? charset : 'utf8'),
+            'collation' => environments('collation', defined('collation') ? collation : 'utf8_unicode_ci'),
         ]);
         return $this;
     }

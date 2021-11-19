@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\lib;
+namespace App\infra\lib;
 
 
 use Illuminate\Database\Capsule\Manager as Capsule;
@@ -17,7 +17,7 @@ class Factory
     /**
      *
      */
-    const defaultFileToLog = '/monolog.log';
+    public const defaultFileToLog = '/monolog.log';
 
     /**
      * @param string $name
@@ -35,11 +35,11 @@ class Factory
     }
 
     /**
-     * @param $connectionConfig
+     * @param array $connectionConfig
      * @param string $connectionName
      * @return Capsule
      */
-    public static function illuminateDatabase(array $connectionConfig,string $connectionName = 'default'): Capsule
+    public static function illuminateDatabase(array $connectionConfig, string $connectionName = 'default'): Capsule
     {
         $capsule = new Capsule;
         $capsule->addConnection($connectionConfig, $connectionName);

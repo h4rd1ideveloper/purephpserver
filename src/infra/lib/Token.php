@@ -1,21 +1,19 @@
 <?php
 
+namespace App\infra\lib;
 
-namespace App\lib;
-
-
-use Firebase\JWT\JWT as JWT;
+use Firebase\JWT\JWT;
 
 final class Token extends JWT
 {
-    public final static function decodePiece(string $headBase64): object
+    public static function decodePiece(string $headBase64): object
     {
         return self::jsonDecode(self::urlsafeB64Decode($headBase64));
     }
 
-    public final static function isValidByKey(string $token, $key, string $alg = 'SHA256'): bool
+    public static function isValidByKey(string $token_string, $key, string $alg = 'SHA256'): bool
     {
-        $token = explode('.', $token);
+        $token = explode('.', $token_string);
         if (count($token) === 3) {
             [$headBase64, $bodyBase64, $cryptoBase64] = $token;
             $sig = self::urlsafeB64Decode($cryptoBase64);
@@ -34,14 +32,7 @@ final class Token extends JWT
         return false;
     }
 
-    /**
-     * Get the number of bytes in cryptographic strings.
-     * length
-     * @param string
-     *
-     * @return int
-     */
-    private final static function safeStringLength(string $str): int
+    private static function safeStringLength(string $str): int
     {
         if (function_exists('mb_strlen')) {
             return mb_strlen($str, '8bit');
