@@ -7,6 +7,7 @@ use App\lib\Helpers as Helpers;
 use App\lib\Logger;
 use App\main\router\Router;
 use App\middleware\JsonBodyParserMiddleware;
+use App\presentation\middleware\JsonBodyParserMiddleware;
 use DI\Container;
 use DI\DependencyException;
 use DI\NotFoundException;

@@ -21,6 +21,6 @@ trait ControllerTrait
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->viewer = new Components();
+        $this->viewer = new Components(environments('path_viewers','src/presentation/viewers'));
     }
 }

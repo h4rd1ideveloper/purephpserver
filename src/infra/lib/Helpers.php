@@ -1,14 +1,16 @@
 <?php
 
-namespace App\lib;
+namespace App\infra\lib;
 
 use App\controllers\handlers\ErrorHandler;
-use App\lib\Logger as MyLogger;
+use App\infra\servicies\security\Logger;
 use Exception;
 use Firebase\JWT\JWT as JWT;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use InvalidArgumentException;
+use JsonException;
 use Psr\Http\Message\StreamInterface;
+use RuntimeException;
 use Slim\Psr7\Factory\StreamFactory;
 
 /**
@@ -83,7 +85,8 @@ class Helpers extends StringManipulation
     /**
      * @param array $connectionConfig
      * @param string $connectionName
-     * @return Capsule|bool
+     * @return array|bool
+     * @throws JsonException
      */
     public static function setupIlluminateConnectionAsGlobal(array $connectionConfig = self::connectionConfig, string $connectionName = 'default')
     {
@@ -94,14 +97,15 @@ class Helpers extends StringManipulation
      * @param callable $callback
      * @param array|string|int|bool|callable $defaultValue
      * @return mixed
+     * @throws JsonException
      */
     public static function tryCatch(callable $callback, $defaultValue = false)
     {
         try {
             return $callback();
         } catch (Exception $exception) {
-            MyLogger::errorLog(self::exceptionErrorMessage($exception), 'tryCatch');
-            return is_callable($defaultValue) ? $defaultValue($exception) : $defaultValue;
+            Logger::errorLog(self::exceptionErrorMessage($exception), 'tryCatch');
+            return is_callable($defaultValue) ? $defaultValue() : $defaultValue;
         }
     }
 
@@ -109,10 +113,11 @@ class Helpers extends StringManipulation
      * @param Exception $exception
      * @param $payload
      * @return string
+     * @throws JsonException
      */
     public static function exceptionErrorMessage(Exception $exception, $payload = null): string
     {
-        $json = (bool)(isset($payload) && self::mayUseJsonEncode($payload)) ? "payload: " . self::toJson($payload) : '';
+        $json = isset($payload) && self::mayUseJsonEncode($payload) ? "payload: " . self::toJson($payload) : '';
         return <<<ERROR
             message: {$exception->getMessage()}
             trace: {$exception->getTraceAsString()}
@@ -133,17 +138,17 @@ ERROR;
      * Format any Object or Array to JSON string
      * @param string|array|bool|int $toJson
      * @return string
-     * @see json_encode()
+     * @throws JsonException
      * @see JSON_UNESCAPED_UNICODE
      *
+     * @see json_encode()
      */
     public static function toJson($toJson): string
     {
-        return class_exists('JWT') ?
-            JWT::jsonEncode($toJson) : (
-            defined('JSON_UNESCAPED_UNICODE') ?
-                json_encode($toJson, JSON_UNESCAPED_UNICODE) : self::_toJson($toJson)
-            );
+        if (class_exists('JWT')) {
+            return JWT::jsonEncode($toJson);
+        }
+        return defined('JSON_UNESCAPED_UNICODE') ? json_encode($toJson, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE) : self::_toJson($toJson);
     }
 
     /**
@@ -151,56 +156,39 @@ ERROR;
      * @deprecated old pattern  ///(?<!\\\\)\\\\u(\w{4})/
      * @param $toJson
      * @return string|string[]|null
+     * @throws JsonException
      */
     public static function _toJson($toJson)
     {
         return preg_replace_callback(
             parent::$_toJson,
-            fn(array $matches) => html_entity_decode(
+            static fn(array $matches) => html_entity_decode(
                 "&#x{$matches[1]};",
                 ENT_COMPAT,
                 'UTF-8'
             ),
-            json_encode($toJson)
+            json_encode($toJson, JSON_THROW_ON_ERROR)
         );
     }
 
-    /**
-     * @param array $payload
-     * @return string
-     * @throws Exception
-     */
     public static function XfsToken(array $payload = []): string
     {
-        if (getenv('key') === '' || !self::orEmpty(getenv('key')))
+        if (getenv('key') === '' || !self::orEmpty(getenv('key'))) {
             return Token::encode($payload, getenv('key') ?? '');
-        throw new Exception('Invalid XfsToken', 403);
+        }
+        throw new RuntimeException('Invalid XfsToken', 403);
     }
 
-    /**
-     * @param null|string $test
-     * @param mixed $default
-     * @return mixed
-     */
     public static function orEmpty(?string $test, $default = 0): ?string
     {
         return self::isOk($test) ? $test : $default;
     }
 
-    /**
-     * @param string|int|double $string
-     * @return bool
-     */
     public static function isOk($string): bool
     {
         return isset($string) && !empty($string) && (is_string($string) || is_int($string) || is_double($string));
     }
 
-    /**
-     * @param string|null $type
-     * @param array $array
-     * @return bool
-     */
     public static function isArrayOf(?string $type, array $array): bool
     {
         $ok = true;
@@ -211,9 +199,6 @@ ERROR;
         return $ok;
     }
 
-    /**
-     * @param string $filename
-     */
     public static function setEnvByFile(string $filename): void
     {
         try {
@@ -228,25 +213,16 @@ ERROR;
             }
         } catch (Exception $e) {
             $message = self::exceptionErrorMessage($e);
-            MyLogger::ErrorLog($message, 'setEnvByFile');
+            Logger::ErrorLog($message, 'setEnvByFile');
             die(ErrorHandler::missingEnvironments($message));
         }
     }
 
-    /**
-     * @param $filename
-     * @param string $mode
-     * @return StreamInterface
-     */
     public static function createStreamFromFile($filename, string $mode = 'r+'): StreamInterface
     {
         return (new StreamFactory)->createStreamFromFile($filename, $mode);
     }
 
-    /**
-     * @param string $to
-     * @return string
-     */
     public static function baseURL(string $to = ''): string
     {
         $host = $_SERVER['HTTP_HOST'];
@@ -257,10 +233,6 @@ ERROR;
         return sprintf('//%s%s/%s', $host, getenv('path_root') ?? '', $to);
     }
 
-    /**
-     * @param $string string
-     * @return false|int
-     */
     public static function isMySQLFunction(string $string): bool
     {
         return (bool)preg_match_all('/\(.*\)/', (string)$string);
@@ -291,7 +263,7 @@ ERROR;
      * @param array $arr
      * @param bool $strict
      */
-    public static function insertIfNotExist($value, array &$arr,bool $strict = false): void
+    public static function insertIfNotExist($value, array &$arr, bool $strict = false): void
     {
         if (!in_array($value, $arr, $strict)) {
             $arr[] = $value;
@@ -312,30 +284,28 @@ ERROR;
         return $arr;
     }
 
-    /**
-     * Filter array by ID
-     * @param array $ids
-     * @param $arr
-     * @return array
-     */
+
     public static function getRowsByKeys(array $ids, array $arr): array
     {
         $source = [];
         foreach ($ids as $id) {
-            if (isset($arr[$id])) $source[$id] = $arr[$id];
+            if (isset($arr[$id])) {
+                $source[$id] = $arr[$id];
+            }
         }
         return $source;
     }
 
     /**
-     * @param $data
+     * @param string $data
      * @return array
+     * @throws JsonException
      */
     public static function jsonToArray(string $data): array
     {
         return (array)(class_exists('JWT') ?
             JWT::jsonDecode($data) :
-            json_decode($data, true) ?? []
+            json_decode($data, true, 512, JSON_THROW_ON_ERROR) ?? []
         );
     }
 
@@ -364,7 +334,7 @@ ERROR;
     {
         $data = [];
         foreach ($array as $key => $value) {
-            if ((bool)$fn($value, $key) === true) {
+            if ($fn($value, $key) === true) {
                 $data[$key] = $value;
             }
         }
@@ -373,9 +343,8 @@ ERROR;
 
     /**
      * entriesFrom
-     * @param $anyIterable
+     * @param array $anyIterable
      * @return array
-     * @throws InvalidArgumentException
      */
     public static function Entries(array $anyIterable): array
     {
@@ -388,15 +357,15 @@ ERROR;
 
     /**
      *  isSQLInjection check if contain sql injection on string param $value and return true or false
-     * @param $value
+     * @param string $value
      * @param string $type
-     * @param bool $options
+     * @param  $options
      * @return bool
      */
-    public static function isSQLInjection(string $value, string $type = 'string', $options = false): bool
+    public static function isSQLInjection(string $value, string $type = 'string', $options = null): bool
     {
         $validate = self::filters[$type][0];
-        $flag = $options ? $options : self::filters[$type][1][0];
+        $flag = $options ?: self::filters[$type][1][0];
         $checked = filter_var($value, $validate, $flag);
         if (strlen($value) !== strlen($checked)) {
             return true;
@@ -411,24 +380,18 @@ ERROR;
                 $flag[] = true;
             }
         }
-        return (bool)(count($flag) > 1 || preg_match(parent::$equalCompare, $value));
+        return count($flag) > 1 || preg_match(parent::$equalCompare, $value);
     }
 
-    /**
-     * @param $target
-     * @param $toSearch
-     * @param int $offset
-     * @return bool
-     */
     public static function containSubString(string $target, string $toSearch, int $offset = 0): bool
     {
-        return (bool)(strpos(strtoupper($target), strtoupper($toSearch), $offset) !== false);
+        return strpos(strtoupper($target), strtoupper($toSearch), $offset) !== false;
     }
 
     /**
      * array Reducer like a javascript
-     * @param $array
-     * @param $callback
+     * @param array $array
+     * @param callable $callback
      * @param mixed $initialValue
      * @return mixed
      */
@@ -440,10 +403,6 @@ ERROR;
         return $initialValue;
     }
 
-    /**
-     * @param $strDate
-     * @return false|string
-     */
     public static function ymdToDmy(string $strDate)
     {
         self::orEmpty($strDate, '0000-00-00');
@@ -457,21 +416,11 @@ ERROR;
         return date('d/m/Y', strtotime($strDate));
     }
 
-    /**
-     * @param $number
-     * @return bool
-     */
     public static function isOnlyNumbers(string $number): bool
     {
-        return preg_match(parent::$digits, $number) ? true : false;
+        return (bool)preg_match(parent::$digits, $number);
     }
 
-    /**
-     * @param array $array
-     * @param callable $closureKey
-     * @param callable|null $callbackValue
-     * @return array
-     */
     public static function valueAndKeyMap(array $array, callable $closureKey, ?callable $callbackValue = null): array
     {
         $returned = [];

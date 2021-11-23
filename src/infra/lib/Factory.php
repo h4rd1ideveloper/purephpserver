@@ -34,18 +34,13 @@ class Factory
         return $log;
     }
 
-    /**
-     * @param array $connectionConfig
-     * @param string $connectionName
-     * @return Capsule
-     */
-    public static function illuminateDatabase(array $connectionConfig, string $connectionName = 'default'): Capsule
+
+    public static function illuminateDatabase(array $connectionConfig, string $connectionName = 'default'): array
     {
         $capsule = new Capsule;
         $capsule->addConnection($connectionConfig, $connectionName);
         $capsule->bootEloquent();
         $capsule->setAsGlobal();
-        $capsule->schema();
-        return $capsule;
+        return [$capsule, $capsule::schema()];
     }
 }

@@ -2,6 +2,7 @@
 
 date_default_timezone_set("America/Sao_Paulo");
 
+use App\data\model\User;
 use App\lib\Helpers;
 use App\model\User;
 use Faker\Factory;
@@ -16,7 +17,6 @@ class UserSeeder extends AbstractSeed
     public function run()
     {
         Helpers::setupIlluminateConnectionAsGlobal();
-        $user = new User;
         $faker = Factory::create('pt_BR');
         Helpers::forMany(
             fn () => (new User([

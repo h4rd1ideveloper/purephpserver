@@ -26,11 +26,11 @@ class Router
         //API
         $app->group('/api', function (RouteCollectorProxy $api) {
             $api->group('/user', function (RouteCollectorProxy $user) {
-                $user->get('[/{skip:[0-9]+}[/{limit:[0-9]+}]]', 'App\controllers\UserControllerApi::all');
+                $user->get('[/{skip:[0-9]+}[/{limit:[0-9]+}]]', 'App\controllers\UserController::all');
             });
             $api->group('/authentication', function (RouteCollectorProxy $authentication) {
-                $authentication->post('/login', 'App\controllers\UserControllerApi::login');
-                $authentication->post('/sign', 'App\controllers\UserControllerApi::sign');
+                $authentication->post('/login', 'App\controllers\UserController::login');
+                $authentication->post('/sign', 'App\controllers\UserController::sign');
             });
         });
         //Testing

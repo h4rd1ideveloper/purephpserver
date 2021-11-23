@@ -1,10 +1,10 @@
 <?php
 
 
-namespace App\middleware;
+namespace App\presentation\middleware;
 
 
-use App\lib\Token;
+use App\infra\lib\Token;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\MiddlewareInterface;
@@ -21,16 +21,10 @@ class AuthenticationApi implements MiddlewareInterface
      */
     public function process(Request $request, RequestHandler $handler): Response
     {
-        if (!Token
-            ::isValidByKey(
-                $request->getHeaderLine('Authentication-token'),
-                get('key')
-            )
+        if (!Token::isValidByKey(
+            $request->getHeaderLine('Authentication-token'), get('key'))
         ) {
-            die(
-            (new ResponseObject)
-                ->withStatus(403)
-            );
+            die((new ResponseObject)->withStatus(403));
         }
         return $handler->handle($request);
     }
