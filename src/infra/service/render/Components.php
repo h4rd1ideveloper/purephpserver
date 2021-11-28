@@ -1,7 +1,8 @@
 <?php
 
-namespace App\lib;
+namespace App\infra\service\render;
 
+use App\infra\lib\Helpers;
 use Exception;
 use InvalidArgumentException;
 
@@ -9,7 +10,7 @@ use InvalidArgumentException;
  * Class Components
  * @package App\view\components
  */
-class Components
+class Components extends Helpers
 {
 
     /**
@@ -19,7 +20,7 @@ class Components
 
     private static string $pathToViewers;
 
-    public function __construct(?string $VIEW_PATH)
+    protected function __construct(?string $VIEW_PATH)
     {
         self::setPathToViewers($VIEW_PATH ?? environments('path_viewers'));
     }
@@ -28,64 +29,16 @@ class Components
      * @param string $html
      * @return string
      */
-    public static function pipe(string $html): string
+    protected static function pipe(string $html): string
     {
         return $html;
-    }
-
-    /**
-     * @param string $templateFileName
-     * @param array $context
-     * @return string
-     * @throws Exception
-     */
-    public static function render(string $templateFileName, array $context = []): string
-    {
-        return self::viewFileAsString($templateFileName, true, $context);
-    }
-
-    /**
-     * @param string $templateFileName
-     * @param bool $ob
-     * @param array $context
-     * @return string
-     */
-    public static function viewFileAsString(string $templateFileName, bool $ob = false, array $context = []): string
-    {
-        $patchToViewers = self::getPathToViewers();
-        $pathToFile = "$patchToViewers$templateFileName.php";
-        !file_exists($pathToFile) &&
-        die(print_r(["[$pathToFile]", "view {$templateFileName} not found!", __DIR__]));
-        if ($ob) {
-            ob_start();
-            define('context', $context);
-            include_once($pathToFile);
-            return ob_get_clean() ?? '';
-        }
-        return Helpers::createStreamFromFile($pathToFile)->getContents();
-    }
-
-    /**
-     * @return string
-     */
-    public static function getPathToViewers(): string
-    {
-        return self::$pathToViewers;
-    }
-
-    /**
-     * @param string $pathToViewers
-     */
-    public static function setPathToViewers(string $pathToViewers): void
-    {
-        self::$pathToViewers = $pathToViewers;
     }
 
     /**
      * @param array $config
      * @return string
      */
-    public static function headerHTML(array $config = []): string
+    protected static function headerHTML(array $config = []): string
     {
         self::$HTML_CONTENT = '';
         $baseUrl = substr(Helpers::baseURL(), -1) !== '/' ? Helpers::baseURL() : substr(Helpers::baseURL(), 0, -1);
@@ -127,7 +80,7 @@ class Components
      * @param array $links
      * @return string
      */
-    public static function linkFrom(array $links): string
+    protected static function linkFrom(array $links): string
     {
         return Helpers::Reducer(
             $links,
@@ -140,7 +93,7 @@ class Components
      * @param array $scripts
      * @return string
      */
-    public static function scriptsFrom(array $scripts): string
+    protected static function scriptsFrom(array $scripts): string
     {
         return Helpers::Reducer(
             $scripts,
@@ -154,7 +107,7 @@ class Components
      * @param string $raw
      * @return string
      */
-    public static function scripts(array $more = [], string $raw = ''): string
+    protected static function scripts(array $more = [], string $raw = ''): string
     {
         return <<<HTML
         
@@ -169,7 +122,7 @@ class Components
     /**
      * @return string
      */
-    public static function closeView(): string
+    protected static function closeView(): string
     {
         return <<<HTML
     
@@ -178,25 +131,12 @@ class Components
 HTML;
     }
 
-    /**
-     * @param string $name
-     * @param $required
-     * @param string|null $label
-     * @param string|null $labelHelper
-     * @param string|null $type
-     * @param string|null $placeholder
-     * @param string|null $class
-     * @param string|null $wrapClass
-     * @param int|null $min
-     * @param int|null $max
-     * @return string
-     */
-    public static function input(string $name, $required, ?string $label = '', ?string $labelHelper = '', ?string $type = 'text', ?string $placeholder = '', ?string $class = '', ?string $wrapClass = '', ?int $min = 4, ?int $max = 20): string
+    protected static function input(string $name, bool $required = false, ?string $label = '', ?string $labelHelper = '', ?string $type = 'text', ?string $placeholder = '', ?string $class = '', ?string $wrapClass = '', ?int $min = 4, ?int $max = 20): string
     {
         $key = uniqid('', true);
-        $required = $required ? "required" : '';
+        $_required = $required ? "required" : '';
         $helper_id = $name . "HelpId_$key";
-        $attrs = "$required maxlength='$max' minlength='$min' type='$type' class='form-control $class' name='$name' aria-describedby='$helper_id' placeholder='$placeholder'";
+        $attrs = "$_required maxlength='$max' minlength='$min' type='$type' class='form-control $class' name='$name' aria-describedby='$helper_id' placeholder='$placeholder'";
         return <<<HTML
                 <div class='form-group $wrapClass'>
                     <label for='$name'>$label
@@ -212,7 +152,7 @@ HTML;
      * @param $id
      * @return string
      */
-    public static function tableHTML(array $data, $id): string
+    protected static function tableHTML(array $data, $id): string
     {
         if (count($data) === 0) {
             throw new InvalidArgumentException("O array não pode ser Vazio");
@@ -248,5 +188,53 @@ HTML;
             )
         );
         return $html;
+    }
+
+    /**
+     * @param string $templateFileName
+     * @param array $context
+     * @return string
+     * @throws Exception
+     */
+    protected static function render(string $templateFileName, array $context = []): string
+    {
+        return self::viewFileAsString($templateFileName, true, $context);
+    }
+
+    /**
+     * @param string $templateFileName
+     * @param bool $ob
+     * @param array $context
+     * @return string
+     */
+    protected static function viewFileAsString(string $templateFileName, bool $ob = false, array $context = []): string
+    {
+        $patchToViewers = self::getPathToViewers();
+        $pathToFile = "$patchToViewers$templateFileName.php";
+        !file_exists($pathToFile) &&
+        die(print_r(["[$pathToFile]", "view {$templateFileName} not found!", __DIR__]));
+        if ($ob) {
+            ob_start();
+            define('context', $context);
+            include_once($pathToFile);
+            return ob_get_clean() ?? '';
+        }
+        return Helpers::createStreamFromFile($pathToFile)->getContents();
+    }
+
+    /**
+     * @return string
+     */
+    protected static function getPathToViewers(): string
+    {
+        return self::$pathToViewers;
+    }
+
+    /**
+     * @param string $pathToViewers
+     */
+    protected static function setPathToViewers(string $pathToViewers): void
+    {
+        self::$pathToViewers = $pathToViewers;
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
+namespace App\data\migrations;
 
-use App\data\migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
 class Person extends Migration

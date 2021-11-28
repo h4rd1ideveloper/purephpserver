@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\controllers\handlers;
+namespace App\presentation\handler;
 
 
 use App\lib\Components;
@@ -22,10 +22,10 @@ class ErrorHandler
     public static function notAllowedMethod(): callable
     {
         return static function (ServerRequestInterface $request, Throwable $exception, bool $displayErrorDetails) {
-                $response = (new Response)->withStatus(405);
-                $response->getBody()->write('405 NOT ALLOWED');
-                return $response;
-            };
+            $response = new Response(405);
+            $response->getBody()->write('405 NOT ALLOWED');
+            return $response;
+        };
     }
 
     /**
@@ -33,11 +33,7 @@ class ErrorHandler
      */
     public static function notFound(): callable
     {
-        return static fn(
-            ServerRequestInterface $request,
-            Throwable $exception,
-            bool $displayErrorDetails
-        ) => (new Response)
+        return static fn(ServerRequestInterface $request, Throwable $exception, bool $displayErrorDetails) => (new Response)
             ->withStatus(404)
             ->getBody()
             ->write(Components::render("404"));

@@ -22,6 +22,6 @@ interface UserRepositoryInterface
     public static function createUser(array $UserDetails): User;
 
     public static function updateUser(int $UserId, array $newDetails);
-    public static function findUser(string $login);
+    public static function findUserBy(string $value,string $key):array;
 
 }

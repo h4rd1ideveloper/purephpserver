@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\controllers;
+namespace App\presentation\controller;
 
 use App\lib\Components as View;
 use Exception;

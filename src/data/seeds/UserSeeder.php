@@ -1,12 +1,11 @@
 <?php
 
+use App\data\model\User;
+use App\infra\lib\Helpers;
+use Phinx\Seed\AbstractSeed;
+
 date_default_timezone_set("America/Sao_Paulo");
 
-use App\data\model\User;
-use App\lib\Helpers;
-use App\model\User;
-use Faker\Factory;
-use Phinx\Seed\AbstractSeed;
 
 /**
  * Class UserSeeder
@@ -14,12 +13,12 @@ use Phinx\Seed\AbstractSeed;
 class UserSeeder extends AbstractSeed
 {
 
-    public function run()
+    public function run(): void
     {
-        Helpers::setupIlluminateConnectionAsGlobal();
+  /*      Helpers::setupIlluminateConnectionAsGlobal();
         $faker = Factory::create('pt_BR');
         Helpers::forMany(
-            fn () => (new User([
+            fn() => (new User([
                 'username' => $faker->userName,
                 'password' => $faker->password(60, 60),
                 'email' => $faker->email,
@@ -29,6 +28,6 @@ class UserSeeder extends AbstractSeed
                 'address' => $faker->address
             ]))->save(),
             500
-        );
+        );*/
     }
 }

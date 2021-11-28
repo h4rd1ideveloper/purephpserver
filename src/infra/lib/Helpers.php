@@ -6,7 +6,6 @@ use App\controllers\handlers\ErrorHandler;
 use App\infra\servicies\security\Logger;
 use Exception;
 use Firebase\JWT\JWT as JWT;
-use Illuminate\Database\Capsule\Manager as Capsule;
 use InvalidArgumentException;
 use JsonException;
 use Psr\Http\Message\StreamInterface;
@@ -21,9 +20,7 @@ use Slim\Psr7\Factory\StreamFactory;
  */
 class Helpers extends StringManipulation
 {
-    /**
-     *
-     */
+
     public const filters = [
         'bool' => [FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE],
         'email' => [FILTER_VALIDATE_EMAIL, FILTER_FLAG_EMAIL_UNICODE],
@@ -51,9 +48,6 @@ class Helpers extends StringManipulation
         "TABLE", "TABLES", "TRUE", "UPDATE",
         "VALUES", "XOR", "DATABASE"
     ];
-    /**
-     *
-     */
     public const connectionConfig = [
         'driver' => 'mysql',
         'host' => 'localhost',
@@ -65,12 +59,6 @@ class Helpers extends StringManipulation
         'collation' => 'utf8_unicode_ci',
     ];
 
-    /**
-     * @param callable $map
-     * @param int $length
-     * @param array|null $ref
-     * @return void
-     */
     public static function forMany(callable $map, int $length = 0, ?array &$ref = null): void
     {
         for ($i = 0; $i < $length; $i++) {
@@ -82,12 +70,6 @@ class Helpers extends StringManipulation
         }
     }
 
-    /**
-     * @param array $connectionConfig
-     * @param string $connectionName
-     * @return array|bool
-     * @throws JsonException
-     */
     public static function setupIlluminateConnectionAsGlobal(array $connectionConfig = self::connectionConfig, string $connectionName = 'default')
     {
         return self::tryCatch(fn() => Factory::illuminateDatabase($connectionConfig));
@@ -96,25 +78,21 @@ class Helpers extends StringManipulation
     /**
      * @param callable $callback
      * @param array|string|int|bool|callable $defaultValue
+     * @param bool $debugger
      * @return mixed
-     * @throws JsonException
      */
-    public static function tryCatch(callable $callback, $defaultValue = false)
+    public static function tryCatch(callable $callback, $defaultValue = false, bool $debugger = false)
     {
         try {
             return $callback();
         } catch (Exception $exception) {
-            Logger::errorLog(self::exceptionErrorMessage($exception), 'tryCatch');
-            return is_callable($defaultValue) ? $defaultValue() : $defaultValue;
+            if ($debugger) {
+                Logger::errorLog(self::exceptionErrorMessage($exception), 'tryCatch');
+            }
+            return is_callable($defaultValue) ? $defaultValue($exception) : $defaultValue;
         }
     }
 
-    /**
-     * @param Exception $exception
-     * @param $payload
-     * @return string
-     * @throws JsonException
-     */
     public static function exceptionErrorMessage(Exception $exception, $payload = null): string
     {
         $json = isset($payload) && self::mayUseJsonEncode($payload) ? "payload: " . self::toJson($payload) : '';
@@ -125,30 +103,22 @@ class Helpers extends StringManipulation
 ERROR;
     }
 
-    /**
-     * @param $value
-     * @return bool
-     */
     public static function mayUseJsonEncode($value): bool
     {
-        return (bool)(is_string($value) || is_array($value) || is_int($value) || is_bool($value));
+        return is_string($value) || is_array($value) || is_int($value) || is_bool($value);
     }
 
     /**
      * Format any Object or Array to JSON string
      * @param string|array|bool|int $toJson
      * @return string
-     * @throws JsonException
-     * @see JSON_UNESCAPED_UNICODE
-     *
-     * @see json_encode()
      */
     public static function toJson($toJson): string
     {
         if (class_exists('JWT')) {
             return JWT::jsonEncode($toJson);
         }
-        return defined('JSON_UNESCAPED_UNICODE') ? json_encode($toJson, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE) : self::_toJson($toJson);
+        return self::tryCatch(fn() => defined('JSON_UNESCAPED_UNICODE') ? json_encode($toJson, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE) : self::_toJson($toJson), '');
     }
 
     /**
@@ -156,19 +126,14 @@ ERROR;
      * @deprecated old pattern  ///(?<!\\\\)\\\\u(\w{4})/
      * @param $toJson
      * @return string|string[]|null
-     * @throws JsonException
      */
-    public static function _toJson($toJson)
+    public static function _toJson($toJson): string
     {
-        return preg_replace_callback(
+        return self::tryCatch(fn() => preg_replace_callback(
             parent::$_toJson,
-            static fn(array $matches) => html_entity_decode(
-                "&#x{$matches[1]};",
-                ENT_COMPAT,
-                'UTF-8'
-            ),
+            static fn(array $matches) => html_entity_decode("&#x{$matches[1]};", ENT_COMPAT, 'UTF-8'),
             json_encode($toJson, JSON_THROW_ON_ERROR)
-        );
+        ), '');
     }
 
     public static function XfsToken(array $payload = []): string

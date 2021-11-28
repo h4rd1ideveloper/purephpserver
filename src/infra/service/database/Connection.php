@@ -51,7 +51,7 @@ class Connection
      */
     public function __wakeup()
     {
-        throw new RuntimeException("Cannot unserialize singleton");
+        throw new RuntimeException("Cannot un-serialize singleton");
     }
 
     /**

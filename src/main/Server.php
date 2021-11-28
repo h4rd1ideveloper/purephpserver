@@ -2,11 +2,11 @@
 
 namespace App\main;
 
+
 use App\controllers\handlers\ErrorHandler;
-use App\lib\Helpers as Helpers;
-use App\lib\Logger;
+use App\infra\lib\Helpers;
+use App\infra\servicies\security\Logger;
 use App\main\router\Router;
-use App\middleware\JsonBodyParserMiddleware;
 use App\presentation\middleware\JsonBodyParserMiddleware;
 use DI\Container;
 use DI\DependencyException;

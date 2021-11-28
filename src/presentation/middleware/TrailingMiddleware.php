@@ -4,7 +4,7 @@
 namespace App\middleware;
 
 
-use App\lib\Helpers;
+use App\infra\lib\Helpers;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\MiddlewareInterface;

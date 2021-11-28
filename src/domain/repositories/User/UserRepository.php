@@ -4,9 +4,9 @@ namespace App\domain\repositories\User;
 
 
 use App\data\model\User;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\infra\lib\Helpers;
 
-class UserRepository implements UserRepositoryInterface
+class UserRepository extends Helpers implements UserRepositoryInterface
 {
     /**
      * @inheritDoc
@@ -36,20 +36,22 @@ class UserRepository implements UserRepositoryInterface
 
     public static function updateUser(int $UserId, array $newDetails)
     {
-        return User::whereId($UserId)->update($newDetails);
+        return User::whereId($UserId)
+            ->update($newDetails);
     }
 
     /**
-     * @param string $login
+     * @param string $value
+     * @param string $key
      * @return array
      */
-    public static function findUser(string $login): array
+    public static function findUserBy(string $value, string $key): array
     {
-        try {
-            $user = User::where('username', $login)->firstOrFail();
-        } catch (ModelNotFoundException $notFoundException) {
-            $user = User::where('email', $login)->firstOrFail();
-        }
-        return $user->attributesToArray();
+        return self::tryCatch(static function () use ($value, $key) {
+            return User::where($key, $value)
+                ->firstOrFail()
+                ->attributesToArray();
+        }, []);
     }
+
 }

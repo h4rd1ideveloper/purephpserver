@@ -1,34 +1,13 @@
 <?php
 
-namespace App\__TEST__;
+namespace App\infra\lib;
 
-use App\lib\Helpers;
 use PHPUnit\Framework\TestCase;
 
 class HelpersTest extends TestCase
 {
 
-    public function testObjectKeys()
-    {
-
-    }
-
-    public function testTry_fopen()
-    {
-
-    }
-
-    public function testMap()
-    {
-
-    }
-
-    public function testGetRowsByKeys()
-    {
-
-    }
-
-    public function testFakerUserToSeed()
+    public function testIsOk()
     {
 
     }
@@ -38,7 +17,7 @@ class HelpersTest extends TestCase
 
     }
 
-    public function testInsertIfNotExist()
+    public function testMap()
     {
 
     }
@@ -48,17 +27,42 @@ class HelpersTest extends TestCase
 
     }
 
-    public function testToJson()
+    public function testCreateStreamFromFile()
+    {
+
+    }
+
+    public function testBaseURL()
+    {
+
+    }
+
+    public function testForMany()
+    {
+
+    }
+
+    public function testInsertIfNotExist()
+    {
+
+    }
+
+    public function testTryCatch()
+    {
+
+    }
+
+    public function testIsArrayOf()
+    {
+
+    }
+
+    public function testIsSQLInjection()
     {
 
     }
 
     public function testValueAndKeyMap()
-    {
-
-    }
-
-    public function testIsOk()
     {
 
     }
@@ -73,67 +77,12 @@ class HelpersTest extends TestCase
 
     }
 
-    public function testExceptionErrorMessage()
+    public function testGetRowsByKeys()
     {
 
     }
 
-    public function testOrEmpty()
-    {
-
-    }
-
-    public function testIsArrayOf()
-    {
-
-    }
-
-    public function testBaseURL()
-    {
-
-    }
-
-    public function testEntries()
-    {
-
-    }
-
-    public function testFilter()
-    {
-
-    }
-
-    public function testForMany()
-    {
-
-    }
-
-    public function testJsonToArray()
-    {
-
-    }
-
-    public function testIsMySQLFunction()
-    {
-
-    }
-
-    public function testOnlyNumbers()
-    {
-
-    }
-
-    public function testIsSQLInjection()
-    {
-
-    }
-
-    public function testSetEnvByFile()
-    {
-
-    }
-
-    public function test_toJson()
+    public function testToJson()
     {
 
     }
@@ -143,17 +92,37 @@ class HelpersTest extends TestCase
 
     }
 
+    public function testFilter()
+    {
+
+    }
+
+    public function testSetEnvByFile()
+    {
+
+    }
+
+    public function testIsMySQLFunction()
+    {
+
+    }
+
+    public function testEntries()
+    {
+
+    }
+
     public function testContainSubString()
     {
 
     }
 
-    public function testCreateStreamFromFile()
+    public function testOrEmpty()
     {
 
     }
 
-    public function testTryCatch()
+    public function testExceptionErrorMessage()
     {
 
     }
@@ -163,7 +132,27 @@ class HelpersTest extends TestCase
 
     }
 
+    public function test_toJson()
+    {
+
+    }
+
+    public function testObjectKeys()
+    {
+
+    }
+
     public function testReducer()
+    {
+
+    }
+
+    public function testJsonToArray()
+    {
+
+    }
+
+    public function testReplaceOnlyNumbersTo()
     {
 
     }

@@ -2,23 +2,19 @@
 
 namespace App\domain\useCase;
 
-use App\infra\servicies\security\Logger;
+use App\infra\lib\Helpers;
 use App\main\Factory;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-abstract class Authentication
+abstract class Authentication extends Helpers
 {
-    public static function login(string $login, string $password): array
+    public static function login(string $login, string $password): bool
     {
-        try {
-            $user = Factory::userRepository()::findUser($login);
-            if (password_verify($password, $user['password'])) {
-                return $user;
+        return self::tryCatch(static function () use ($password, $login) {
+            $user = Factory::userRepository()::findUserBy($login, 'username');
+            if (!count($user)) {
+                $user = Factory::userRepository()::findUserBy($login, 'email');
             }
-            Logger::debugLog("login: $login,try authenticate with wrong password", 'login|notAuthenticate');
-        } catch (ModelNotFoundException $notFoundException) {
-            Logger::debugLog($notFoundException->getMessage(), get_class($notFoundException));
-        }
-        return [];
+            return password_verify($password, $user['password']);
+        }, false, true);
     }
 }

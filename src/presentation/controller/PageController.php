@@ -1,10 +1,10 @@
 <?php
 
 
-namespace App\presentation\controllers;
+namespace App\presentation\controller;
 
+use App\infra\lib\Helpers;
 use App\lib\Components;
-use App\lib\Helpers;
 use Exception;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
