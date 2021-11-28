@@ -3,10 +3,10 @@
 namespace App\main;
 
 
-use App\controllers\handlers\ErrorHandler;
 use App\infra\lib\Helpers;
 use App\infra\servicies\security\Logger;
 use App\main\router\Router;
+use App\presentation\handler\ErrorHandler;
 use App\presentation\middleware\JsonBodyParserMiddleware;
 use DI\Container;
 use DI\DependencyException;
@@ -85,14 +85,14 @@ class Server extends Router
     private function dbSettings(): Server
     {
         $this->container->set('db_settings', fn() => [
-            'driver' => environments('driver', defined('driver') ? driver : 'mysql'),
-            'host' => environments('host', defined('host') ? host : 'localhost'),
-            'port' => environments('port', defined('port') ? port : '3306'),
-            'database' => environments('database', defined('database') ? database : 'webapp'),
-            'username' => environments('username', defined('username') ? username : 'root'),
-            'password' => environments('password', defined('password') ? password : ''),
-            'charset' => environments('charset', defined('charset') ? charset : 'utf8'),
-            'collation' => environments('collation', defined('collation') ? collation : 'utf8_unicode_ci'),
+            'driver' => environments('driver', 'mysql'),
+            'host' => environments('host', 'localhost'),
+            'port' => environments('port', '3306'),
+            'database' => environments('database', 'webapp'),
+            'username' => environments('username', 'root'),
+            'password' => environments('password'),
+            'charset' => environments('charset', 'utf8'),
+            'collation' => environments('collation', 'utf8_unicode_ci'),
         ]);
         return $this;
     }
