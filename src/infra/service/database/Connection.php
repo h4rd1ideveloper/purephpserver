@@ -1,6 +1,6 @@
 <?php
 
-namespace App\infra\database;
+namespace App\infra\service\database;
 
 
 use App\infra\lib\Factory;

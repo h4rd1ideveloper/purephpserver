@@ -1,6 +1,6 @@
 <?php
 
-namespace App\infra\lib;
+namespace App\infra\service\security;
 
 use Firebase\JWT\JWT;
 

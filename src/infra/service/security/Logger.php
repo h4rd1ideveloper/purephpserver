@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\infra\servicies\security;
+namespace App\infra\service\security;
 
 use App\infra\lib\Factory;
 use Monolog\Logger as MonoLogger;

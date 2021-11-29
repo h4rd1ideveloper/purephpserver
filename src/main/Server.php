@@ -4,8 +4,9 @@ namespace App\main;
 
 
 use App\infra\lib\Helpers;
-use App\infra\servicies\security\Logger;
+use App\infra\service\security\Logger;
 use App\main\router\Router;
+use App\middleware\TrailingMiddleware;
 use App\presentation\handler\ErrorHandler;
 use App\presentation\middleware\JsonBodyParserMiddleware;
 use DI\Container;
@@ -53,12 +54,16 @@ class Server extends Router
 
     private function setupMiddleware(): Server
     {
-        $this->app->addRoutingMiddleware();
-        $this->app->addErrorMiddleware(true, true, true)
+        $this
+            ->app
+            ->add(new TrailingMiddleware)
+            ->add(new JsonBodyParserMiddleware)
+            ->addRoutingMiddleware();
+        $this
+            ->app
+            ->addErrorMiddleware(true, true, true)
             ->setErrorHandler(HttpNotFoundException::class, ErrorHandler::notFound())
             ->setErrorHandler(HttpMethodNotAllowedException::class, ErrorHandler::notAllowedMethod());
-        //$app->add(new TrailingMiddleware);
-        $this->app->add(new JsonBodyParserMiddleware);
         return $this;
     }
 
